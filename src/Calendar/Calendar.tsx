@@ -10,72 +10,101 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-const Calendar = () => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+interface GetClassesForDayProps {
+  day: Date;
+  currentMonth: Date;
+}
 
-  const renderHeader = () => {
-    const dateFormat = "MMMM yyyy";
-    return (
-      <div className="flex justify-between items-center py-2 px-4">
-        <div className="cursor-pointer" onClick={onPrevMonthClick}>
-          &lt;
-        </div>
-        <div>
-          <span>{format(currentMonth, dateFormat)}</span>
-        </div>
-        <div className="cursor-pointer" onClick={onNextMonthClick}>
-          &gt;
-        </div>
+function getClassesForDay({
+  day,
+  currentMonth,
+}: GetClassesForDayProps): string {
+  const monthStart = startOfMonth(currentMonth);
+  const dayIsSameMonth = isSameMonth(day, monthStart);
+  const dayIsToday = isSameDay(day, new Date());
+
+  if (!dayIsSameMonth) return "text-gray-400";
+  if (dayIsToday) return "bg-blue-500 text-white rounded-full";
+  return "text-gray-700";
+}
+
+interface HeaderProps {
+  currentMonth: Date;
+  onPrevMonthClick: () => void;
+  onNextMonthClick: () => void;
+}
+
+function Header({
+  currentMonth,
+  onPrevMonthClick,
+  onNextMonthClick,
+}: HeaderProps) {
+  const dateFormat = "MMMM yyyy";
+  return (
+    <div className="flex justify-between items-center py-2 px-4">
+      <div className="cursor-pointer" onClick={onPrevMonthClick}>
+        &lt;
       </div>
-    );
-  };
+      <div>
+        <span>{format(currentMonth, dateFormat)}</span>
+      </div>
+      <div className="cursor-pointer" onClick={onNextMonthClick}>
+        &gt;
+      </div>
+    </div>
+  );
+}
 
-  const renderDays = () => {
+interface DaysProps {
+  currentMonth: Date;
+}
+
+function Days({ currentMonth }: DaysProps) {
+  const days = useMemo(() => {
     const dateFormat = "EEEEEE";
-    const days = [];
-    let startDate = startOfWeek(currentMonth);
+    const startDate = startOfWeek(currentMonth);
+    return [...Array(7)].map((_, i) => (
+      <div
+        className="flex-1 py-2 text-center uppercase font-semibold text-sm"
+        key={i}
+      >
+        {format(addDays(startDate, i), dateFormat)}
+      </div>
+    ));
+  }, [currentMonth]);
 
-    for (let i = 0; i < 7; i++) {
-      days.push(
-        <div
-          className="flex-1 py-2 text-center uppercase font-semibold text-sm"
-          key={i}
-        >
-          {format(addDays(startDate, i), dateFormat)}
-        </div>
-      );
-    }
+  return <div className="flex">{days}</div>;
+}
 
-    return <div className="flex">{days}</div>;
-  };
+interface CellsProps {
+  currentMonth: Date;
+}
 
-  const renderCells = () => {
+function Cells({ currentMonth }: CellsProps) {
+  const rows = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
     const startDate = startOfWeek(monthStart);
     const endDate = endOfWeek(monthEnd);
 
     const dateFormat = "d";
-    const rows = [];
-
     let days = [];
     let day = startDate;
-    let formattedDate = "";
 
+    const rows = [];
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
-        formattedDate = format(day, dateFormat);
-
+        const formattedDate = format(day, dateFormat);
         days.push(
           <div
-            className={`flex-1 py-1 flex justify-center items-center`}
+            className="flex-1 py-1 flex justify-center items-center"
             key={day.toDateString()}
           >
             <div
-              className={`w-9 h-9 flex items-center justify-center ${getClassesFor(
-                day
+              className={`w-9 h-9 flex items-center justify-center ${getClassesForDay(
+                { day, currentMonth }
               )}`}
             >
               <span>{formattedDate}</span>
@@ -91,39 +120,34 @@ const Calendar = () => {
       );
       days = [];
     }
+    return rows;
+  }, [currentMonth]);
 
-    return <div className="flex-1">{rows}</div>;
-  };
+  return <div className="flex-1">{rows}</div>;
+}
 
-  function getClassesFor(day: Date) {
-    const monthStart = startOfMonth(currentMonth);
-    const dayIsSameMonth = isSameMonth(day, monthStart);
-    const dayIsToday = isSameDay(day, new Date());
+function Calendar() {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
-    if (!dayIsSameMonth) {
-      return "text-gray-400";
-    } else if (dayIsToday) {
-      return "bg-blue-500 text-white rounded-full";
-    } else {
-      return "text-gray-700";
-    }
+  function onPrevMonthClick() {
+    setCurrentMonth(subMonths(currentMonth, 1));
   }
 
-  const onPrevMonthClick = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
-  };
-
-  const onNextMonthClick = () => {
+  function onNextMonthClick() {
     setCurrentMonth(addMonths(currentMonth, 1));
-  };
+  }
 
   return (
     <div className="font-sans border border-gray-300 max-w-xs mx-auto rounded-lg overflow-hidden shadow-lg">
-      {renderHeader()}
-      {renderDays()}
-      {renderCells()}
+      <Header
+        currentMonth={currentMonth}
+        onPrevMonthClick={onPrevMonthClick}
+        onNextMonthClick={onNextMonthClick}
+      />
+      <Days currentMonth={currentMonth} />
+      <Cells currentMonth={currentMonth} />
     </div>
   );
-};
+}
 
 export default Calendar;
