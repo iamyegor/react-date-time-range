@@ -1,3 +1,4 @@
+import React from "react";
 import {
   addDays,
   endOfMonth,
@@ -8,7 +9,6 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { classNames } from "primereact/utils";
 
 interface CellsGridProps {
   currentMonth: Date;
@@ -25,7 +25,7 @@ function CellsGrid({ currentMonth }: CellsGridProps) {
     while (day <= endDate) {
       const days = generateWeekDays(day);
       rows.push(
-        <div className="row" key={rows.length}>
+        <div className="flex flex-row justify-between" key={day.toString()}>
           {days}
         </div>
       );
@@ -45,25 +45,25 @@ function CellsGrid({ currentMonth }: CellsGridProps) {
   }
 
   function renderDayCell(day: Date) {
-    return isSameMonth(day, monthStart) ? (
+    const dayNumber = format(day, "d");
+    const isCurrentMonth = isSameMonth(day, monthStart);
+    const isToday = isSameDay(day, new Date());
+
+    return (
       <div
-        className={`col cell ${getClassForToday(day)}`}
+        className={`w-full h-12 flex justify-center items-center ${
+          isCurrentMonth ? "bg-white" : "bg-gray-200"
+        } ${
+          isToday ? "text-white bg-green-500" : "text-gray-700"
+        } rounded-full`}
         key={day.toDateString()}
       >
-        <span className="number">{format(day, "d")}</span>
+        <span>{isCurrentMonth ? dayNumber : ""}</span>
       </div>
-    ) : (
-      <div className="col cell"></div>
     );
   }
 
-  function getClassForToday(day: Date) {
-    if (isSameDay(day, new Date())) {
-      return "selected";
-    }
-  }
-
-  return <div className="body">{generateMonthRows()}</div>;
+  return <div className="grid grid-cols-7 gap-1">{generateMonthRows()}</div>;
 }
 
 export default CellsGrid;
