@@ -10,7 +10,9 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import "./Calendar.css";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 interface GetClassesForDayProps {
   day: Date;
@@ -103,9 +105,8 @@ function Cells({ currentMonth }: CellsProps) {
             key={day.toDateString()}
           >
             <div
-              className={`w-9 h-9 flex items-center justify-center ${getClassesForDay(
-                { day, currentMonth }
-              )}`}
+              className={`w-9 h-9 flex items-center justify-center 
+              ${getClassesForDay({ day, currentMonth })}`}
             >
               <span>{formattedDate}</span>
             </div>
@@ -123,11 +124,35 @@ function Cells({ currentMonth }: CellsProps) {
     return rows;
   }, [currentMonth]);
 
-  return <div className="flex-1">{rows}</div>;
+  return <div className="flex-shrink-0 w-full">{rows}</div>;
 }
 
 function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [cellsComponents, setCellsComponents] = useState<
+    { id: number; element: JSX.Element }[]
+  >([]);
+  console.log(cellsComponents);
+
+  useEffect(() => {
+    const id = new Date().getTime();
+    const newComponent = {
+      id,
+      element: (
+        <Cells currentMonth={currentMonth} key={currentMonth.toDateString()} />
+      ),
+    };
+
+    setCellsComponents((prev) => [...prev, newComponent]);
+
+    if (cellsComponents.length > 0) {
+      setTimeout(() => {
+        setCellsComponents((prevComponents) =>
+          prevComponents.length > 0 ? prevComponents.slice(1) : []
+        );
+      }, 200);
+    }
+  }, [currentMonth]);
 
   function onPrevMonthClick() {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -138,14 +163,31 @@ function Calendar() {
   }
 
   return (
-    <div className="font-sans border border-gray-300 max-w-xs mx-auto rounded-lg overflow-hidden shadow-lg">
+    <div className="calendar font-sans border border-gray-300 max-w-xs mx-auto rounded-lg overflow-hidden shadow-lg">
       <Header
         currentMonth={currentMonth}
         onPrevMonthClick={onPrevMonthClick}
         onNextMonthClick={onNextMonthClick}
       />
-      <Days currentMonth={currentMonth} />
-      <Cells currentMonth={currentMonth} />
+      <div className="relative overflow-hidden w-full h-[255px]">
+        <div>
+          <Days currentMonth={currentMonth} />
+          <TransitionGroup>
+            <div className="flex ">
+              {cellsComponents.map((cell) => (
+                <CSSTransition
+                  key={cell.id}
+                  timeout={500}
+                  classNames={"my-component"}
+                >
+                  {cell.element}
+                </CSSTransition>
+              ))}
+            </div>
+          </TransitionGroup>
+          {/* <Cells currentMonth={currentMonth} /> */}
+        </div>
+      </div>
     </div>
   );
 }
