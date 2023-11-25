@@ -27,7 +27,7 @@ interface GetClassesForDayProps {
 
 function Cells({
   currentMonth,
-  selectedDate: selectedDate,
+  selectedDate,
   onDateSelect,
 }: CellsProps): ReactElement {
   const rows = useMemo(
@@ -87,7 +87,17 @@ function Cells({
     currentMonth: Date,
     dateFormat: string
   ): ReactElement {
-    const formattedDate = format(day, dateFormat);
+    const monthStart = startOfMonth(currentMonth);
+    const isDaySameMonth = isSameMonth(day, monthStart);
+
+    if (!isDaySameMonth) {
+      return (
+        <div className="flex-1 py-1" key={day.toDateString()}>
+          <div className="w-8 h-8" />
+        </div>
+      );
+    }
+
     let classes = getClassesForDay({ day, currentMonth });
 
     if (classes.includes("selected-cell")) {
@@ -97,6 +107,7 @@ function Cells({
       );
     }
 
+    const formattedDate = format(day, dateFormat);
     return (
       <div
         className="flex-1 py-1 flex justify-center items-center 
