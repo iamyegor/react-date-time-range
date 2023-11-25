@@ -14,13 +14,21 @@ export default function Header({
   const dateFormat = "MMMM yyyy";
   return (
     <div className="flex justify-between items-center py-2 px-4">
-      <div className="cursor-pointer" onClick={onPrevMonthClick}>
+      <div
+        className="cursor-pointer"
+        onClick={onPrevMonthClick}
+        data-testid="left-arrow"
+      >
         &lt;
       </div>
       <div>
         <span>{format(currentMonth, dateFormat)}</span>
       </div>
-      <div className="cursor-pointer" onClick={onNextMonthClick}>
+      <div
+        className="cursor-pointer"
+        onClick={onNextMonthClick}
+        data-testid="right-arrow"
+      >
         &gt;
       </div>
     </div>

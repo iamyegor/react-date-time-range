@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./Calendar.css";
 import Cells from "./Cells";
-import Header from "./Header";
 import Days from "./Days";
+import Header from "./Header";
 
 const duration = 250;
 

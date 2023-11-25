@@ -11,6 +11,7 @@ export default function Days({ currentMonth }: DaysProps) {
     const startDate = startOfWeek(currentMonth);
     return [...Array(7)].map((_, i) => (
       <div
+        data-testid="day-heading"
         className="flex-1 py-2 text-center uppercase text-gray-500 text-xs"
         key={i}
       >

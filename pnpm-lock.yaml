@@ -20,9 +20,6 @@ dependencies:
   react-transition-group:
     specifier: ^4.4.5
     version: 4.4.5(react-dom@18.2.0)(react@18.2.0)
-  transition-hook:
-    specifier: ^1.5.2
-    version: 1.5.2(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@testing-library/jest-dom':
@@ -3104,16 +3101,6 @@ packages:
     dependencies:
       punycode: 2.3.1
     dev: true
-
-  /transition-hook@1.5.2(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-zVW5wP+hzOCk56jU5V5GAIsuaf+gZv43pzxyimXQ74JnD1yoprxTfzoPjr0yjC/Mrc9JyCh3Wb6UhXD+8dlO4w==}
-    peerDependencies:
-      react: ^16.8.0  || ^17.0.0
-      react-dom: ^16.8.0  || ^17.0.0
-    dependencies:
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: false
 
   /ts-api-utils@1.0.3(typescript@5.3.2):
     resolution: {integrity: sha512-wNMeqtMz5NtwpT/UZGY5alT+VoKdSsOOP/kqHFcUW1P/VRhH2wJ48+DN2WwUliNbQ976ETwDL0Ifd2VVvgonvg==}
