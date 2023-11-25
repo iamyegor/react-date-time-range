@@ -1,0 +1,3 @@
+.selected-cell {
+  @apply bg-blue-500 text-white rounded-full;
+}

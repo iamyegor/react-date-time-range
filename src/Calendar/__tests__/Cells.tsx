@@ -14,11 +14,16 @@ describe("Cells component", () => {
 
   beforeEach(() => {
     currentMonth = new Date(2023, 6, 15);
+    render(
+      <Cells
+        currentMonth={currentMonth}
+        selectedDate={new Date()}
+        onDateSelect={() => {}}
+      />
+    );
   });
 
   it("renders correct number of day elements for a given month", () => {
-    render(<Cells currentMonth={currentMonth} />);
-
     const startDay = startOfWeek(startOfMonth(currentMonth));
     const endDay = endOfWeek(endOfMonth(currentMonth));
     const totalDays = differenceInCalendarDays(endDay, startDay) + 1;

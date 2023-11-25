@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import {
   addDays,
   endOfMonth,
@@ -8,12 +9,15 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useMemo } from "react";
+import "./styles/Cells.css";
 
 const DAYS_IN_A_WEEK = 7;
 
 interface CellsProps {
   currentMonth: Date;
+  selectedDate: Date | null;
+  onDateSelect: (date: Date) => void;
 }
 
 interface GetClassesForDayProps {
@@ -21,8 +25,11 @@ interface GetClassesForDayProps {
   currentMonth: Date;
 }
 
-function Cells({ currentMonth }: CellsProps): ReactElement {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+function Cells({
+  currentMonth,
+  selectedDate: selectedDate,
+  onDateSelect,
+}: CellsProps): ReactElement {
   const rows = useMemo(
     () => generateWeeks(currentMonth),
     [currentMonth, selectedDate]
@@ -33,13 +40,13 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     currentMonth,
   }: GetClassesForDayProps): string {
     const monthStart = startOfMonth(currentMonth);
-    const dayIsSameMonth = isSameMonth(day, monthStart);
-    const dayIsToday = isSameDay(day, new Date());
-    const isDaySelected = isSameDay(day, selectedDate);
+    const isDaySameMonth = isSameMonth(day, monthStart);
+    const isToday = isSameDay(day, new Date());
+    const isSelected = selectedDate && isSameDay(day, selectedDate);
 
-    if (!dayIsSameMonth) return "text-gray-400";
-    if (isDaySelected) return "bg-blue-500 text-white rounded-full";
-    if (dayIsToday) return "border border-gray-400 rounded-full";
+    if (!isDaySameMonth) return "text-gray-400";
+    if (isSelected) return "selected-cell";
+    if (isToday) return "border border-gray-400 rounded-full";
     return "";
   }
 
@@ -81,16 +88,26 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     dateFormat: string
   ): ReactElement {
     const formattedDate = format(day, dateFormat);
+    let classes = getClassesForDay({ day, currentMonth });
+
+    if (classes.includes("selected-cell")) {
+      classes = classNames(
+        classes,
+        "group-hover:bg-blue-400 group-hover:border-none"
+      );
+    }
+
     return (
       <div
-        className="flex-1 py-1 flex justify-center items-center hover:cursor-pointer"
+        className="flex-1 py-1 flex justify-center items-center 
+        hover:cursor-pointer group"
         key={day.toDateString()}
-        onClick={() => setSelectedDate(day)}
+        onClick={() => onDateSelect(day)}
       >
         <div
-          className={`w-8 h-8 flex items-center justify-center text-xs ${getClassesForDay(
-            { day, currentMonth }
-          )}`}
+          className={`w-8 h-8 flex items-center justify-center text-xs 
+          group-hover:border group-hover:bg-blue-200/50 rounded-full
+          group-hover:border-gray-400 ${classes} group-ho`}
         >
           <span>{formattedDate}</span>
         </div>

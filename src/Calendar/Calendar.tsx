@@ -1,32 +1,43 @@
 import { addMonths, subMonths } from "date-fns";
 import { useEffect, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import "./styles/Calendar.css";
 import Cells from "./Cells";
 import Days from "./Days";
 import Header from "./Header";
+import "./styles/Calendar.css";
 
 const duration = 250;
 
 function Calendar() {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isCurrentMonthNext, setIsCurrentMonthNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
-    { id: number; element: JSX.Element; isNext: boolean }[]
+    { id: string; element: JSX.Element; isNext: boolean }[]
   >([]);
 
   useEffect(() => {
-    const id = new Date().getTime();
+    const key = currentMonth.toDateString();
+
     const newComponent = {
-      id,
+      id: key,
       element: (
-        <Cells currentMonth={currentMonth} key={currentMonth.toDateString()} />
+        <Cells
+          currentMonth={currentMonth}
+          key={key}
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+        />
       ),
       isNext: isCurrentMonthNext,
     };
 
     setCellsComponents([newComponent]);
-  }, [currentMonth]);
+  }, [currentMonth, selectedDate]);
+
+  function handleDateSelect(day: Date) {
+    setSelectedDate(day);
+  }
 
   function onPrevMonthClick() {
     setCurrentMonth(subMonths(currentMonth, 1));
