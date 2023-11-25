@@ -11,8 +11,9 @@ import {
   subMonths,
 } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
-import "./Calendar.css";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "./Calendar.css";
+import { is } from "date-fns/locale";
 
 interface GetClassesForDayProps {
   day: Date;
@@ -69,7 +70,7 @@ function Days({ currentMonth }: DaysProps) {
     const startDate = startOfWeek(currentMonth);
     return [...Array(7)].map((_, i) => (
       <div
-        className="flex-1 py-2 text-center uppercase font-semibold text-sm"
+        className="flex-1 py-2 text-center uppercase text-gray-500 text-xs"
         key={i}
       >
         {format(addDays(startDate, i), dateFormat)}
@@ -105,7 +106,7 @@ function Cells({ currentMonth }: CellsProps) {
             key={day.toDateString()}
           >
             <div
-              className={`w-9 h-9 flex items-center justify-center 
+              className={`w-8 h-8 flex items-center justify-center  text-xs
               ${getClassesForDay({ day, currentMonth })}`}
             >
               <span>{formattedDate}</span>
@@ -127,12 +128,14 @@ function Cells({ currentMonth }: CellsProps) {
   return <div className="flex-shrink-0 w-full">{rows}</div>;
 }
 
+const duration = 250;
+
 function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isCurrentMonthNext, setIsCurrentMonthNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
-    { id: number; element: JSX.Element }[]
+    { id: number; element: JSX.Element; isNext: boolean }[]
   >([]);
-  console.log(cellsComponents);
 
   useEffect(() => {
     const id = new Date().getTime();
@@ -141,53 +144,44 @@ function Calendar() {
       element: (
         <Cells currentMonth={currentMonth} key={currentMonth.toDateString()} />
       ),
+      isNext: isCurrentMonthNext,
     };
 
-    setCellsComponents((prev) => [...prev, newComponent]);
-
-    if (cellsComponents.length > 0) {
-      setTimeout(() => {
-        setCellsComponents((prevComponents) =>
-          prevComponents.length > 0 ? prevComponents.slice(1) : []
-        );
-      }, 200);
-    }
+    setCellsComponents([newComponent]);
   }, [currentMonth]);
 
   function onPrevMonthClick() {
     setCurrentMonth(subMonths(currentMonth, 1));
+    setIsCurrentMonthNext(false);
   }
 
   function onNextMonthClick() {
     setCurrentMonth(addMonths(currentMonth, 1));
+    setIsCurrentMonthNext(true);
   }
 
   return (
-    <div className="calendar font-sans border border-gray-300 max-w-xs mx-auto rounded-lg overflow-hidden shadow-lg">
+    <div
+      className="calendar font-sans border border-gray-300 max-w-xs 
+    mx-auto rounded-lg overflow-hidden shadow-lg h-[300px] p-4 box-content"
+    >
       <Header
         currentMonth={currentMonth}
         onPrevMonthClick={onPrevMonthClick}
         onNextMonthClick={onNextMonthClick}
       />
-      <div className="relative overflow-hidden w-full h-[255px]">
-        <div>
-          <Days currentMonth={currentMonth} />
-          <TransitionGroup>
-            <div className="flex ">
-              {cellsComponents.map((cell) => (
-                <CSSTransition
-                  key={cell.id}
-                  timeout={500}
-                  classNames={"my-component"}
-                >
-                  {cell.element}
-                </CSSTransition>
-              ))}
-            </div>
-          </TransitionGroup>
-          {/* <Cells currentMonth={currentMonth} /> */}
-        </div>
-      </div>
+      <Days currentMonth={currentMonth} />
+      <TransitionGroup className={"relative"}>
+        {cellsComponents.map((cell) => (
+          <CSSTransition
+            timeout={duration}
+            classNames={`${isCurrentMonthNext ? "slide-next" : "slide-prev"}`}
+            key={cell.id}
+          >
+            <div className="absolute top-0 w-full z-10">{cell.element}</div>
+          </CSSTransition>
+        ))}
+      </TransitionGroup>
     </div>
   );
 }

@@ -1,17 +1,37 @@
-.my-component-enter {
-  transform: translateX(100%);
+.slide-next-enter {
+  transform: translateX(110%);
 }
 
-.my-component-enter-active {
+.slide-next-enter-active {
   transform: translateX(0);
-  transition: transform 500ms ease-in-out;
+  transition: transform 0.25s ease-in-out;
 }
 
-.my-component-exit {
+.slide-next-exit {
   transform: translateX(0);
+  transition: transform 0.25s linear;
 }
 
-.my-component-exit-active {
-  transform: translateX(-100%);
-  transition: transform 500ms ease-in-out;
+.slide-next-exit-active {
+  transform: translateX(-110%);
+  transition: transform 0.25s ease-in-out;
+}
+
+.slide-prev-enter {
+  transform: translateX(-110%);
+}
+
+.slide-prev-enter-active {
+  transform: translateX(0);
+  transition: transform 0.25s ease-in-out;
+}
+
+.slide-prev-exit {
+  transform: translateX(0);
+  transition: transform 0.25s linear;
+}
+
+.slide-prev-exit-active {
+  transform: translateX(110%);
+  transition: transform 0.25s ease-in-out;
 }
