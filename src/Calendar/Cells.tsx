@@ -8,7 +8,13 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { useMemo } from "react";
+import { ReactElement, useMemo } from "react";
+
+const DAYS_IN_A_WEEK = 7;
+
+interface CellsProps {
+  currentMonth: Date;
+}
 
 interface GetClassesForDayProps {
   day: Date;
@@ -28,49 +34,63 @@ function getClassesForDay({
   return "text-gray-700";
 }
 
-interface CellsProps {
-  currentMonth: Date;
+function generateWeeks(currentMonth: Date): ReactElement[] {
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(monthStart);
+  const startDate = startOfWeek(monthStart);
+  const endDate = endOfWeek(monthEnd);
+
+  let weeks: ReactElement[] = [];
+  let currentDate = startDate;
+  while (currentDate <= endDate) {
+    weeks.push(generateWeek(currentDate, currentMonth));
+    currentDate = addDays(currentDate, DAYS_IN_A_WEEK);
+  }
+  return weeks;
 }
 
-export default function Cells({ currentMonth }: CellsProps) {
-  const rows = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
+function generateWeek(startOfWeek: Date, currentMonth: Date): ReactElement {
+  const dateFormat = "d";
+  let days: ReactElement[] = [];
+  let currentDay = startOfWeek;
 
-    const dateFormat = "d";
-    let days = [];
-    let day = startDate;
+  for (let i = 0; i < DAYS_IN_A_WEEK; i++) {
+    days.push(renderDay(currentDay, currentMonth, dateFormat));
+    currentDay = addDays(currentDay, 1);
+  }
 
-    const rows = [];
-    while (day <= endDate) {
-      for (let i = 0; i < 7; i++) {
-        const formattedDate = format(day, dateFormat);
-        days.push(
-          <div
-            className="flex-1 py-1 flex justify-center items-center"
-            key={day.toDateString()}
-          >
-            <div
-              className={`w-8 h-8 flex items-center justify-center  text-xs
-              ${getClassesForDay({ day, currentMonth })}`}
-            >
-              <span>{formattedDate}</span>
-            </div>
-          </div>
-        );
-        day = addDays(day, 1);
-      }
-      rows.push(
-        <div className="flex" key={day.toDateString()}>
-          {days}
-        </div>
-      );
-      days = [];
-    }
-    return rows;
-  }, [currentMonth]);
+  return (
+    <div className="flex" key={currentDay.toDateString()}>
+      {days}
+    </div>
+  );
+}
 
+function renderDay(
+  day: Date,
+  currentMonth: Date,
+  dateFormat: string
+): ReactElement {
+  const formattedDate = format(day, dateFormat);
+  return (
+    <div
+      className="flex-1 py-1 flex justify-center items-center"
+      key={day.toDateString()}
+    >
+      <div
+        className={`w-8 h-8 flex items-center justify-center text-xs ${getClassesForDay(
+          { day, currentMonth }
+        )}`}
+      >
+        <span>{formattedDate}</span>
+      </div>
+    </div>
+  );
+}
+
+function Cells({ currentMonth }: CellsProps): ReactElement {
+  const rows = useMemo(() => generateWeeks(currentMonth), [currentMonth]);
   return <div className="flex-shrink-0 w-full">{rows}</div>;
 }
+
+export default Cells;

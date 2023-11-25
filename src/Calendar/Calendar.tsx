@@ -1,7 +1,7 @@
 import { addMonths, subMonths } from "date-fns";
 import { useEffect, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import "./Calendar.css";
+import "./styles/Calendar.css";
 import Cells from "./Cells";
 import Days from "./Days";
 import Header from "./Header";
