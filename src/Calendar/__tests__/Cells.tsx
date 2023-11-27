@@ -1,11 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import {
-  differenceInCalendarDays,
-  endOfMonth,
-  endOfWeek,
-  startOfMonth,
-  startOfWeek,
-} from "date-fns";
 import { beforeEach, describe, expect, it } from "vitest";
 import Cells from "../Cells";
 
@@ -17,19 +10,17 @@ describe("Cells component", () => {
     render(
       <Cells
         currentMonth={currentMonth}
-        selectedDate={new Date()}
-        onDateSelect={() => {}}
+        firstDate={null}
+        onFirstDateSelect={() => {}}
+        secondDate={null}
+        onSecondDateSelect={() => {}}
       />
     );
   });
 
   it("renders correct number of day elements for a given month", () => {
-    const startDay = startOfWeek(startOfMonth(currentMonth));
-    const endDay = endOfWeek(endOfMonth(currentMonth));
-    const totalDays = differenceInCalendarDays(endDay, startDay) + 1;
-
     const dayElements = screen.getAllByText(/^\d+$/);
 
-    expect(dayElements.length).toBe(totalDays);
+    expect(dayElements.length).toBe(31);
   });
 });

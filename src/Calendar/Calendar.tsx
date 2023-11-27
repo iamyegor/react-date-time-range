@@ -9,9 +9,10 @@ import "./styles/Calendar.css";
 const duration = 250;
 
 function Calendar() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [firstDate, setFirstDate] = useState<Date | null>(null);
+  const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [isCurrentMonthNext, setIsCurrentMonthNext] = useState(true);
+  const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element; isNext: boolean }[]
   >([]);
@@ -25,28 +26,34 @@ function Calendar() {
         <Cells
           currentMonth={currentMonth}
           key={key}
-          selectedDate={selectedDate}
-          onDateSelect={handleDateSelect}
+          firstDate={firstDate}
+          onFirstDateSelect={handleFirstDateSelect}
+          secondDate={secondDate}
+          onSecondDateSelect={handleSecondDateSelect}
         />
       ),
-      isNext: isCurrentMonthNext,
+      isNext: isNext,
     };
 
     setCellsComponents([newComponent]);
-  }, [currentMonth, selectedDate]);
+  }, [currentMonth, firstDate, secondDate]);
 
-  function handleDateSelect(day: Date) {
-    setSelectedDate(day);
+  function handleFirstDateSelect(day: Date) {
+    setFirstDate(day);
+  }
+
+  function handleSecondDateSelect(day: Date) {
+    setSecondDate(day);
   }
 
   function onPrevMonthClick() {
     setCurrentMonth(subMonths(currentMonth, 1));
-    setIsCurrentMonthNext(false);
+    setIsNext(false);
   }
 
   function onNextMonthClick() {
     setCurrentMonth(addMonths(currentMonth, 1));
-    setIsCurrentMonthNext(true);
+    setIsNext(true);
   }
 
   return (
@@ -64,7 +71,7 @@ function Calendar() {
         {cellsComponents.map((cell) => (
           <CSSTransition
             timeout={duration}
-            classNames={`${isCurrentMonthNext ? "slide-next" : "slide-prev"}`}
+            classNames={`${isNext ? "slide-next" : "slide-prev"}`}
             key={cell.id}
           >
             <div className="absolute top-0 w-full z-10">{cell.element}</div>
