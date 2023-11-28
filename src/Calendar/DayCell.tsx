@@ -1,18 +1,14 @@
 import classNames from "classnames";
 import {
-  addDays,
-  endOfMonth,
   format,
-  isEqual,
-  isSameMonth,
-  isSaturday,
-  isSunday,
+  isSameMonth
 } from "date-fns";
 import { ReactElement } from "react";
+import DashedBorder from "./DashedBorder";
 import EmptyCell from "./EmptyCell";
 import FilledCell from "./FilledCell";
-import "./styles/DayCell.css";
 import Highlighted from "./Highlighted";
+import "./styles/DayCell.css";
 
 interface DayCellProps {
   day: Date;
@@ -48,45 +44,6 @@ function DayCell({
     return classes;
   }
 
-  function getDashedBorder(): string {
-    let dashedBorder = "border-dashed border-t-2 border-b-2 border-gray-300";
-
-    if (firstDate && hoveredDate) {
-      const comparisonDate = secondDate || firstDate;
-      if (day > comparisonDate && day <= hoveredDate) {
-        return getBorderStyling(dashedBorder);
-      }
-    }
-
-    return "";
-  }
-
-  function getBorderStyling(dottedBorder: string): string {
-    if (isSunday(day) || day.getDate() === 1) {
-      dottedBorder = classNames(
-        dottedBorder,
-        "border-l-2 rounded-l-full left-[6px]"
-      );
-    }
-    if (
-      isSaturday(day) ||
-      day.getDate() === endOfMonth(day).getDate() ||
-      (hoveredDate && isEqual(hoveredDate, day))
-    ) {
-      dottedBorder = classNames(
-        dottedBorder,
-        "border-r-2 rounded-r-full right-[6px]"
-      );
-    }
-    if (
-      (secondDate && isEqual(day, addDays(secondDate, 1))) ||
-      (firstDate && isEqual(day, addDays(firstDate, 1)))
-    ) {
-      dottedBorder = classNames(dottedBorder, "-left-2");
-    }
-    return dottedBorder;
-  }
-
   const formattedDate = format(day, "d");
   const classes = getDayCellClasses();
 
@@ -100,7 +57,14 @@ function DayCell({
 
   return (
     <FilledCell
-      dashedBorder={getDashedBorder()}
+      dashedBorder={
+        <DashedBorder
+          firstDate={firstDate}
+          secondDate={secondDate}
+          hoveredDate={hoveredDate}
+          day={day}
+        />
+      }
       highlighted={
         <Highlighted firstDate={firstDate} secondDate={secondDate} day={day} />
       }

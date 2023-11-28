@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 
 interface FilledCellProps {
-  dashedBorder: string;
+  dashedBorder: JSX.Element;
   highlighted: JSX.Element;
   classes: string;
   formattedDate: string;
@@ -28,10 +28,7 @@ function FilledCell({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div
-        className={`absolute top-[3px] left-[1px] bottom-[3px] right-[1px] 
-        flex items-center justify-center ${dashedBorder}`}
-      ></div>
+      {dashedBorder}
       <div
         className={`w-8 h-8 flex items-center justify-center text-xs 
         group-hover:border group-hover:bg-blue-200/50 rounded-full 
