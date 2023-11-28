@@ -27,9 +27,9 @@ function Calendar() {
           currentMonth={currentMonth}
           key={key}
           firstDate={firstDate}
-          onFirstDateSelect={handleFirstDateSelect}
           secondDate={secondDate}
-          onSecondDateSelect={handleSecondDateSelect}
+          handleFirstDateSelect={handleFirstDateSelect}
+          handleSecondDateSelect={handleSecondDateSelect}
         />
       ),
       isNext: isNext,

@@ -3,10 +3,9 @@ import {
   addDays,
   endOfMonth,
   isEqual,
-  isSunday,
-  isSaturday,
   isSameMonth,
-  secondsToHours,
+  isSaturday,
+  isSunday
 } from "date-fns";
 
 export default function DashedBorder({

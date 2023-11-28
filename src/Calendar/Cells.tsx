@@ -2,42 +2,81 @@ import {
   addDays,
   endOfMonth,
   endOfWeek,
+  isEqual,
   isSameDay,
   isSameMonth,
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import WeekRow from "./WeekRow";
+import classNames from "classnames";
 
 interface CellsProps {
   currentMonth: Date;
   firstDate: Date | null;
-  onFirstDateSelect: (date: Date) => void;
   secondDate: Date | null;
-  onSecondDateSelect: (date: Date) => void;
+  handleFirstDateSelect: (day: Date) => void;
+  handleSecondDateSelect: (day: Date) => void;
 }
 
 const DAYS_IN_A_WEEK = 7;
 
+export enum DraggedDate {
+  First = "first",
+  Second = "second",
+  None = "none",
+}
+
 function Cells({
   currentMonth,
   firstDate,
-  onFirstDateSelect,
   secondDate,
-  onSecondDateSelect,
+  handleFirstDateSelect,
+  handleSecondDateSelect,
 }: CellsProps): ReactElement {
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
+
+  useEffect(() => {
+    if (hoveredDate) {
+      if (draggedDate === DraggedDate.First) {
+        if (secondDate && hoveredDate > secondDate) {
+          handleFirstDateSelect(secondDate);
+          handleSecondDateSelect(hoveredDate);
+          setDraggedDate(DraggedDate.Second);
+        } else {
+          handleFirstDateSelect(hoveredDate);
+        }
+      } else if (draggedDate === DraggedDate.Second) {
+        if (firstDate && hoveredDate < firstDate) {
+          handleSecondDateSelect(firstDate);
+          handleFirstDateSelect(hoveredDate);
+          setDraggedDate(DraggedDate.First);
+        } else {
+          handleSecondDateSelect(hoveredDate);
+        }
+      }
+    }
+  }, [hoveredDate, draggedDate]);
+
+  function handleDateDrag(draggedDate: DraggedDate) {
+    setDraggedDate(draggedDate);
+  }
+
+  function handleDateRelease() {
+    setDraggedDate(DraggedDate.None);
+  }
 
   const handleCellClick = (day: Date) => {
     if (firstDate) {
       if (day < firstDate) {
-        onFirstDateSelect(day);
+        handleFirstDateSelect(day);
       } else {
-        onSecondDateSelect(day);
+        handleSecondDateSelect(day);
       }
     } else {
-      onFirstDateSelect(day);
+      handleFirstDateSelect(day);
     }
   };
 
@@ -49,17 +88,24 @@ function Cells({
     currentMonth: Date;
   }): string => {
     const monthStart = startOfMonth(currentMonth);
-    const isDaySameMonth = isSameMonth(day, monthStart);
-    const isToday = isSameDay(day, new Date());
-    let isSelected = firstDate && isSameDay(day, firstDate);
-    if (!isSelected) {
-      isSelected = secondDate && isSameDay(day, secondDate);
+    let className = "";
+
+    if (draggedDate != DraggedDate.None) {
+      className = "cursor-grabbing";
     }
 
-    if (!isDaySameMonth) return "text-gray-400";
-    if (isSelected) return "selected-cell";
-    if (isToday) return "border border-gray-300 rounded-full";
-    return "";
+    if (!isSameMonth(day, monthStart)) {
+      return classNames("text-gray-400", className);
+    } else if (
+      (firstDate && isSameDay(day, firstDate)) ||
+      (secondDate && isSameDay(day, secondDate))
+    ) {
+      return classNames("selected-cell cursor-grab", className);
+    } else if (isSameDay(day, new Date())) {
+      return classNames("border border-gray-300 rounded-full", className);
+    }
+
+    return className;
   };
 
   const rows = useMemo(() => {
@@ -82,6 +128,9 @@ function Cells({
           onCellClick={handleCellClick}
           onHover={setHoveredDate}
           getClassesForDay={getClassesForDay}
+          handleDateDrag={handleDateDrag}
+          handleDateRelease={handleDateRelease}
+          draggedDate={draggedDate}
         />
       );
       currentDate = addDays(currentDate, DAYS_IN_A_WEEK);
@@ -89,7 +138,15 @@ function Cells({
     return weeks;
   }, [currentMonth, firstDate, secondDate, hoveredDate]);
 
-  return <div className="flex-shrink-0 w-full">{rows}</div>;
+  return (
+    <div
+      className={`flex-shrink-0 w-full ${
+        draggedDate !== DraggedDate.None ? "cursor-grabbing" : ""
+      }`}
+    >
+      {rows}
+    </div>
+  );
 }
 
 export default Cells;

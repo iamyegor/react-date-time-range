@@ -1,6 +1,7 @@
 import { addDays } from "date-fns";
 import { ReactElement } from "react";
 import DayCell from "./DayCell";
+import { DraggedDate } from "./Cells";
 
 interface WeekRowProps {
   startOfWeek: Date;
@@ -11,6 +12,9 @@ interface WeekRowProps {
   onCellClick: (day: Date) => void;
   onHover: (day: Date | null) => void;
   getClassesForDay: (props: { day: Date; currentMonth: Date }) => string;
+  handleDateDrag: (draggedDate: DraggedDate) => void;
+  handleDateRelease: () => void;
+  draggedDate: DraggedDate;
 }
 
 const DAYS_IN_A_WEEK = 7;
@@ -24,6 +28,9 @@ function WeekRow({
   onCellClick,
   onHover,
   getClassesForDay,
+  handleDateDrag,
+  handleDateRelease,
+  draggedDate,
 }: WeekRowProps): ReactElement {
   let days: ReactElement[] = [];
   let currentDay = startOfWeek;
@@ -40,6 +47,9 @@ function WeekRow({
         onCellClick={onCellClick}
         onHover={onHover}
         getClassesForDay={getClassesForDay}
+        handleDateDrag={handleDateDrag}
+        handleDateRelease={handleDateRelease}
+        draggedDate={draggedDate}
       />
     );
     currentDay = addDays(currentDay, 1);
