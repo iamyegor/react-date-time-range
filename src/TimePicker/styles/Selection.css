@@ -1,0 +1,11 @@
+.selection-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.selection-scroll::-webkit-scrollbar-track {
+  @apply bg-gray-200 rounded;
+}
+
+.selection-scroll::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-sm;
+}

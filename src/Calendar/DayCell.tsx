@@ -1,8 +1,5 @@
 import classNames from "classnames";
-import {
-  format,
-  isSameMonth
-} from "date-fns";
+import { format, isSameMonth } from "date-fns";
 import { ReactElement } from "react";
 import DashedBorder from "./DashedBorder";
 import EmptyCell from "./EmptyCell";

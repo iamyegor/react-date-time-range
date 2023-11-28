@@ -1,16 +1,9 @@
 import "@testing-library/jest-dom";
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { addMonths, format, subMonths } from "date-fns";
+import { addMonths, differenceInCalendarDays, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths } from "date-fns";
 import { ReactNode } from "react";
 import Calendar from "../Calendar"; // Adjust the import path as necessary
-import {
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  differenceInCalendarDays,
-} from "date-fns";
 
 vi.mock("react-transition-group", () => {
   return {
