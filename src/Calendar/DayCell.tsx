@@ -12,6 +12,7 @@ import { ReactElement } from "react";
 import EmptyCell from "./EmptyCell";
 import FilledCell from "./FilledCell";
 import "./styles/DayCell.css";
+import Highlighted from "./Highlighted";
 
 interface DayCellProps {
   day: Date;
@@ -86,36 +87,6 @@ function DayCell({
     return dottedBorder;
   }
 
-  function getHighlighted() {
-    const highlighted = "bg-blue-200/50 border-blue-400";
-    if (firstDate && secondDate) {
-      if (day >= firstDate && day <= secondDate) {
-        return getHighlightedStyling(highlighted);
-      }
-    }
-
-    return "";
-  }
-
-  function getHighlightedStyling(highlighted: string) {
-    if (
-      (firstDate && isEqual(day, firstDate)) ||
-      isSunday(day) ||
-      day.getDate() === 1
-    ) {
-      highlighted = classNames(highlighted, "rounded-l-full left-2");
-    }
-    if (
-      (secondDate && isEqual(day, secondDate)) ||
-      isSaturday(day) ||
-      day.getDate() === endOfMonth(day).getDate()
-    ) {
-      highlighted = classNames(highlighted, "rounded-r-full right-2");
-    }
-
-    return highlighted;
-  }
-
   const formattedDate = format(day, "d");
   const classes = getDayCellClasses();
 
@@ -130,7 +101,9 @@ function DayCell({
   return (
     <FilledCell
       dashedBorder={getDashedBorder()}
-      highlighted={getHighlighted()}
+      highlighted={
+        <Highlighted firstDate={firstDate} secondDate={secondDate} day={day} />
+      }
       classes={classes}
       formattedDate={formattedDate}
       onClick={handleClick}

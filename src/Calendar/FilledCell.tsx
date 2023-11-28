@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 
 interface FilledCellProps {
   dashedBorder: string;
-  highlighted: string;
+  highlighted: JSX.Element;
   classes: string;
   formattedDate: string;
   onClick: () => void;
@@ -39,10 +39,7 @@ function FilledCell({
       >
         <span>{formattedDate}</span>
       </div>
-      <div
-        className={`absolute top-[3px] left-0 bottom-[3px] right-0
-        flex items-center justify-center ${highlighted}`}
-      ></div>
+      {highlighted}
     </div>
   );
 }
