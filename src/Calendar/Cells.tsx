@@ -31,7 +31,11 @@ function Cells({
 
   const handleCellClick = (day: Date) => {
     if (firstDate) {
-      onSecondDateSelect(day);
+      if (day < firstDate) {
+        onFirstDateSelect(day);
+      } else {
+        onSecondDateSelect(day);
+      }
     } else {
       onFirstDateSelect(day);
     }
