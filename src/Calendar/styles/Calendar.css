@@ -7,11 +7,6 @@
   transition: transform 0.25s ease-in-out;
 }
 
-.slide-next-exit {
-  transform: translateX(0);
-  transition: transform 0.25s linear;
-}
-
 .slide-next-exit-active {
   transform: translateX(-110%);
   transition: transform 0.25s ease-in-out;
@@ -24,11 +19,6 @@
 .slide-prev-enter-active {
   transform: translateX(0);
   transition: transform 0.25s ease-in-out;
-}
-
-.slide-prev-exit {
-  transform: translateX(0);
-  transition: transform 0.25s linear;
 }
 
 .slide-prev-exit-active {
