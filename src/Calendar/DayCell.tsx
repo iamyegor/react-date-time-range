@@ -49,23 +49,18 @@ function DayCell({
 
   function getDottedBorder(): string {
     let dottedBorder = "border-dotted border-t-2 border-b-2 border-gray-400";
-    let hasDottedBorder = false;
 
     if (firstDate && hoveredDate) {
       const comparisonDate = secondDate || firstDate;
       if (day > comparisonDate && day <= hoveredDate) {
-        hasDottedBorder = true;
+        return getBorderStyling(dottedBorder);
       }
     }
 
-    if (!hasDottedBorder) {
-      return "";
-    }
-
-    return applyBorderStyling(dottedBorder);
+    return "";
   }
 
-  function applyBorderStyling(dottedBorder: string): string {
+  function getBorderStyling(dottedBorder: string): string {
     if (isSunday(day) || day.getDate() === 1) {
       dottedBorder = classNames(
         dottedBorder,
@@ -91,9 +86,40 @@ function DayCell({
     return dottedBorder;
   }
 
+  function getHighlighted() {
+    const highlighted = "bg-blue-200/50 border-blue-400";
+    if (firstDate && secondDate) {
+      if (day >= firstDate && day <= secondDate) {
+        return getHighlightedStyling(highlighted);
+      }
+    }
+
+    return "";
+  }
+
+  function getHighlightedStyling(highlighted: string) {
+    if (
+      (firstDate && isEqual(day, firstDate)) ||
+      isSunday(day) ||
+      day.getDate() === 1
+    ) {
+      highlighted = classNames(highlighted, "rounded-l-full left-2");
+    }
+    if (
+      (secondDate && isEqual(day, secondDate)) ||
+      isSaturday(day) ||
+      day.getDate() === endOfMonth(day).getDate()
+    ) {
+      highlighted = classNames(highlighted, "rounded-r-full right-2");
+    }
+
+    return highlighted;
+  }
+
   const formattedDate = format(day, "d");
   const classes = getDayCellClasses();
   const dottedBorder = getDottedBorder();
+  const highlighted = getHighlighted();
 
   const handleClick = () => onCellClick(day);
   const handleMouseEnter = () => onHover(day);
@@ -106,6 +132,7 @@ function DayCell({
   return (
     <FilledCell
       dottedBorder={dottedBorder}
+      highlighted={highlighted}
       classes={classes}
       formattedDate={formattedDate}
       onClick={handleClick}
