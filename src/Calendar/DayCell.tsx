@@ -47,13 +47,13 @@ function DayCell({
     return classes;
   }
 
-  function getDottedBorder(): string {
-    let dottedBorder = "border-dotted border-t-2 border-b-2 border-gray-400";
+  function getDashedBorder(): string {
+    let dashedBorder = "border-dashed border-t-2 border-b-2 border-gray-300";
 
     if (firstDate && hoveredDate) {
       const comparisonDate = secondDate || firstDate;
       if (day > comparisonDate && day <= hoveredDate) {
-        return getBorderStyling(dottedBorder);
+        return getBorderStyling(dashedBorder);
       }
     }
 
@@ -118,8 +118,6 @@ function DayCell({
 
   const formattedDate = format(day, "d");
   const classes = getDayCellClasses();
-  const dottedBorder = getDottedBorder();
-  const highlighted = getHighlighted();
 
   const handleClick = () => onCellClick(day);
   const handleMouseEnter = () => onHover(day);
@@ -131,8 +129,8 @@ function DayCell({
 
   return (
     <FilledCell
-      dottedBorder={dottedBorder}
-      highlighted={highlighted}
+      dashedBorder={getDashedBorder()}
+      highlighted={getHighlighted()}
       classes={classes}
       formattedDate={formattedDate}
       onClick={handleClick}

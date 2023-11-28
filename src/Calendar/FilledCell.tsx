@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 
 interface FilledCellProps {
-  dottedBorder: string;
+  dashedBorder: string;
   highlighted: string;
   classes: string;
   formattedDate: string;
@@ -11,7 +11,7 @@ interface FilledCellProps {
 }
 
 function FilledCell({
-  dottedBorder,
+  dashedBorder,
   highlighted,
   classes,
   formattedDate,
@@ -30,7 +30,7 @@ function FilledCell({
     >
       <div
         className={`absolute top-[3px] left-[1px] bottom-[3px] right-[1px] 
-        flex items-center justify-center ${dottedBorder}`}
+        flex items-center justify-center ${dashedBorder}`}
       ></div>
       <div
         className={`w-8 h-8 flex items-center justify-center text-xs 
