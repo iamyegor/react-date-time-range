@@ -58,7 +58,7 @@ function Cells({
 
     if (!isDaySameMonth) return "text-gray-400";
     if (isSelected) return "selected-cell";
-    if (isToday) return "border border-gray-400 rounded-full";
+    if (isToday) return "border border-gray-300 rounded-full";
     return "";
   };
 

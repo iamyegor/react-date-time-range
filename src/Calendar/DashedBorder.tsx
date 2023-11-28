@@ -1,5 +1,13 @@
 import classNames from "classnames";
-import { addDays, endOfMonth, isEqual, isSunday, isSaturday } from "date-fns";
+import {
+  addDays,
+  endOfMonth,
+  isEqual,
+  isSunday,
+  isSaturday,
+  isSameMonth,
+  secondsToHours,
+} from "date-fns";
 
 export default function DashedBorder({
   firstDate,
@@ -43,12 +51,21 @@ export default function DashedBorder({
       );
     }
     if (
-      (secondDate && isEqual(day, addDays(secondDate, 1))) ||
-      (firstDate && isEqual(day, addDays(firstDate, 1)))
+      (secondDate && isNextDay(secondDate)) ||
+      (firstDate && isNextDay(firstDate))
     ) {
-      dottedBorder = classNames(dottedBorder, "-left-7 rounded-l");
+      dottedBorder = classNames(dottedBorder, "-left-[1.25rem] rounded-l");
     }
     return dottedBorder;
+  }
+
+  function isNextDay(date: Date) {
+    if (isEqual(day, addDays(date, 1))) {
+      if (isSameMonth(day, date) && !isSunday(day)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   return (
