@@ -46,7 +46,7 @@ export default function DashedBorder({
       (secondDate && isEqual(day, addDays(secondDate, 1))) ||
       (firstDate && isEqual(day, addDays(firstDate, 1)))
     ) {
-      dottedBorder = classNames(dottedBorder, "-left-2");
+      dottedBorder = classNames(dottedBorder, "-left-7 rounded-l");
     }
     return dottedBorder;
   }
