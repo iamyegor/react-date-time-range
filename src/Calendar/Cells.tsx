@@ -3,7 +3,7 @@ import {
   endOfMonth,
   endOfWeek,
   startOfMonth,
-  startOfWeek
+  startOfWeek,
 } from "date-fns";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import WeekRow from "./WeekRow";
@@ -12,8 +12,8 @@ interface CellsProps {
   currentMonth: Date;
   firstDate: Date | null;
   secondDate: Date | null;
-  handleFirstDateSelect: (day: Date) => void;
-  handleSecondDateSelect: (day: Date) => void;
+  setFirstDate: (day: Date) => void;
+  setSecondDate: (day: Date) => void;
 }
 
 const DAYS_IN_A_WEEK = 7;
@@ -28,8 +28,8 @@ function Cells({
   currentMonth,
   firstDate,
   secondDate,
-  handleFirstDateSelect,
-  handleSecondDateSelect,
+  setFirstDate,
+  setSecondDate,
 }: CellsProps): ReactElement {
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
@@ -38,19 +38,19 @@ function Cells({
     if (hoveredDate) {
       if (draggedDate === DraggedDate.First) {
         if (secondDate && hoveredDate > secondDate) {
-          handleFirstDateSelect(secondDate);
-          handleSecondDateSelect(hoveredDate);
+          setFirstDate(secondDate);
+          setSecondDate(hoveredDate);
           setDraggedDate(DraggedDate.Second);
         } else {
-          handleFirstDateSelect(hoveredDate);
+          setFirstDate(hoveredDate);
         }
       } else if (draggedDate === DraggedDate.Second) {
         if (firstDate && hoveredDate < firstDate) {
-          handleSecondDateSelect(firstDate);
-          handleFirstDateSelect(hoveredDate);
+          setSecondDate(firstDate);
+          setFirstDate(hoveredDate);
           setDraggedDate(DraggedDate.First);
         } else {
-          handleSecondDateSelect(hoveredDate);
+          setSecondDate(hoveredDate);
         }
       }
     }
@@ -67,12 +67,12 @@ function Cells({
   const handleCellClick = (day: Date) => {
     if (firstDate) {
       if (day < firstDate) {
-        handleFirstDateSelect(day);
+        setFirstDate(day);
       } else {
-        handleSecondDateSelect(day);
+        setSecondDate(day);
       }
     } else {
-      handleFirstDateSelect(day);
+      setFirstDate(day);
     }
   };
 

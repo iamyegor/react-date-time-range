@@ -28,8 +28,8 @@ function Calendar() {
           key={key}
           firstDate={firstDate}
           secondDate={secondDate}
-          handleFirstDateSelect={handleFirstDateSelect}
-          handleSecondDateSelect={handleSecondDateSelect}
+          setFirstDate={handleFirstDateSelect}
+          setSecondDate={handleSecondDateSelect}
         />
       ),
       isNext: isNext,
