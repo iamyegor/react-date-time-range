@@ -10,8 +10,14 @@ import { useCalendar } from "./CalendarProvider";
 const duration = 250;
 
 function Calendar() {
-  const { firstDate, secondDate, setFirstDate, setSecondDate } = useCalendar();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const {
+    firstDate,
+    secondDate,
+    setFirstDate,
+    setSecondDate,
+    currentMonth,
+    setCurrentMonth,
+  } = useCalendar();
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element; isNext: boolean }[]

@@ -1,9 +1,19 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { addMonths, differenceInCalendarDays, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths } from "date-fns";
+import {
+  addMonths,
+  differenceInCalendarDays,
+  endOfMonth,
+  endOfWeek,
+  format,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
 import { ReactNode } from "react";
-import Calendar from "../Calendar"; // Adjust the import path as necessary
+import renderInProviders from "../../test/heplers/renderInProvider";
+import Calendar from "../Calendar";
 
 vi.mock("react-transition-group", () => {
   return {
@@ -14,7 +24,7 @@ vi.mock("react-transition-group", () => {
 
 describe("Calendar Component", () => {
   beforeEach(async () => {
-    render(<Calendar />);
+    renderInProviders(<Calendar />);
   });
 
   function calculateEmptyCellsForMonth(month: Date): number {
@@ -60,11 +70,11 @@ describe("Calendar Component", () => {
     expect(screen.queryByText(prevMonth)).toBeInTheDocument();
   });
 
-  it("changes to the next month  in the headerwhen next button is clicked", async () => {
+  it("changes to the next month in the header when next button is clicked", async () => {
     const currentMonth = new Date();
     await userEvent.click(screen.getByTestId("right-arrow"));
 
     const nextMonth = format(addMonths(currentMonth, 1), "MMMM yyyy");
-    expect(screen.queryByText(nextMonth)).toBeInTheDocument();
+    expect(screen.getByText(nextMonth)).toBeInTheDocument();
   });
 });

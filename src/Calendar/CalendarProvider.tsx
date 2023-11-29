@@ -9,6 +9,8 @@ type CalendarContextProps = {
   secondDate: Date | null;
   setFirstDate: (day: Date) => void;
   setSecondDate: (day: Date) => void;
+  currentMonth: Date;
+  setCurrentMonth: (month: Date) => void;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
@@ -19,6 +21,8 @@ const CalendarContext = createContext<CalendarContextProps>({
   secondDate: null,
   setFirstDate: () => {},
   setSecondDate: () => {},
+  currentMonth: new Date(),
+  setCurrentMonth: () => {},
 });
 
 export function useCalendar() {
@@ -33,6 +37,7 @@ export default function CalendarProvider({
   const [firstDate, setFirstDate] = useState<Date | null>(null);
   const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   function handleCellClick(day: Date) {
     if (firstDate) {
@@ -56,6 +61,8 @@ export default function CalendarProvider({
         secondDate,
         setFirstDate,
         setSecondDate,
+        currentMonth,
+        setCurrentMonth,
       }}
     >
       {children}
