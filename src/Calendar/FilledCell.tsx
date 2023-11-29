@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { format, isDate, isEqual, isSameDay } from "date-fns";
+import { format, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
