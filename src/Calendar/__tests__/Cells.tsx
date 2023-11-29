@@ -11,9 +11,9 @@ describe("Cells component", () => {
       <Cells
         currentMonth={currentMonth}
         firstDate={null}
-        onFirstDateSelect={() => {}}
         secondDate={null}
-        onSecondDateSelect={() => {}}
+        setFirstDate={() => {}}
+        setSecondDate={() => {}}
       />
     );
   });

@@ -11,6 +11,7 @@ import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
 import DashedBorder from "./DashedBorder";
 import Highlighted from "./Highlighted";
+import "./styles/DayCell.css";
 
 interface FilledCellProps {
   day: Date;

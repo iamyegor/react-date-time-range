@@ -2,11 +2,7 @@ import classNames from "classnames";
 import { endOfMonth, isEqual, isSaturday, isSunday } from "date-fns";
 import { useCalendar } from "./CalendarProvider";
 
-export default function Highlighted({
-  day,
-}: {
-  day: Date;
-}) {
+export default function Highlighted({ day }: { day: Date }) {
   const { firstDate, secondDate } = useCalendar();
 
   function getHighlighted() {
