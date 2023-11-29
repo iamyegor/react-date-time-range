@@ -12,7 +12,7 @@ import { useCalendar } from "./CalendarProvider";
 const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
 const BORDER_LEFT = "border-l-2 rounded-l-full left-[6px]";
 const BORDER_RIGHT = "border-r-2 rounded-r-full right-[6px]";
-const BORDER_ADJUSTED_LEFT = "-left-[1.25rem] rounded-l";
+const BORDER_LENGTHENED_LEFT = "-left-7 rounded-l";
 
 export default function DashedBorder({ day }: { day: Date }) {
   const { firstDate, secondDate, hoveredDate } = useCalendar();
@@ -43,7 +43,7 @@ export default function DashedBorder({ day }: { day: Date }) {
   function getAdjustedLeftBorder(borderStyle: string): string {
     return (secondDate && isNextDay(secondDate)) ||
       (firstDate && isNextDay(firstDate))
-      ? classNames(borderStyle, BORDER_ADJUSTED_LEFT)
+      ? classNames(borderStyle, BORDER_LENGTHENED_LEFT)
       : borderStyle;
   }
 
@@ -54,7 +54,9 @@ export default function DashedBorder({ day }: { day: Date }) {
   }
 
   function getDashedBorder(): string {
-    if (!shouldApplyDashedBorder()) return "";
+    if (!shouldApplyDashedBorder()) {
+      return "";
+    }
 
     let borderStyle = BORDER_DASHED;
     borderStyle = getLeftBorderStyling(borderStyle);
