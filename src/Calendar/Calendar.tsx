@@ -1,11 +1,11 @@
 import { addMonths, subMonths } from "date-fns";
 import { useEffect, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { useCalendar } from "./CalendarProvider";
 import Cells from "./Cells";
 import Days from "./Days";
 import Header from "./Header";
 import "./styles/Calendar.css";
-import { useCalendar } from "./CalendarProvider";
 
 const duration = 250;
 
@@ -15,6 +15,13 @@ function Calendar() {
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element; isNext: boolean }[]
   >([]);
+  const [shouldApplyTransition, setShouldApplyTransition] = useState(false);
+
+  useEffect(() => {
+    if (!shouldApplyTransition && cellsComponents.length === 1) {
+      setShouldApplyTransition(true);
+    }
+  }, [cellsComponents]);
 
   useEffect(() => {
     const key = currentMonth.toDateString();
@@ -53,7 +60,11 @@ function Calendar() {
         {cellsComponents.map((cell) => (
           <CSSTransition
             timeout={duration}
-            classNames={`${isNext ? "slide-next" : "slide-prev"}`}
+            classNames={
+              !shouldApplyTransition
+                ? ""
+                : `${isNext ? "slide-next" : "slide-prev"}`
+            }
             key={cell.id}
           >
             <div className="absolute top-0 w-full z-10">{cell.element}</div>
