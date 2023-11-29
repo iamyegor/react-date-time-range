@@ -1,9 +1,5 @@
 import classNames from "classnames";
-import {
-  format,
-  isEqual,
-  isSameDay
-} from "date-fns";
+import { format, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
@@ -25,36 +21,26 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     setHoveredDate,
   } = useCalendar();
 
+  const isDateSelected = (date: Date) =>
+    ((firstDate && isSameDay(date, firstDate)) ||
+      (secondDate && isSameDay(date, secondDate))) &&
+    date instanceof Date;
+
+  const isToday = isSameDay(day, new Date());
+
   function getClassesForDay(): string {
-    let className = "";
-
-    if (draggedDate != DraggedDate.None) {
-      className = "cursor-grabbing";
-    }
-
-    if (
-      (firstDate && isSameDay(day, firstDate)) ||
-      (secondDate && isSameDay(day, secondDate))
-    ) {
-      return classNames("selected-cell cursor-grab", className);
-    } else if (isSameDay(day, new Date())) {
-      return classNames("border border-gray-300 rounded-full", className);
-    }
-
-    return className;
+    return classNames({
+      "cursor-grabbing": draggedDate != DraggedDate.None,
+      "selected-cell cursor-grab": isDateSelected(day) && day instanceof Date,
+      "border border-gray-300 rounded-full": isToday,
+    });
   }
 
   function getDayCellClasses(): string {
-    let classes = getClassesForDay();
-
-    if (classes.includes("selected-cell")) {
-      classes = classNames(
-        classes,
-        "group-hover:bg-blue-400 group-hover:border-none"
-      );
-    }
-
-    return classes;
+    return classNames(getClassesForDay(), {
+      "group-hover:bg-blue-400 group-hover:border-none":
+        isDateSelected(day) && day instanceof Date,
+    });
   }
 
   function handleMouseDown() {
@@ -72,7 +58,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       onClick={() => handleCellClick(day)}
       onMouseEnter={() => setHoveredDate(day)}
       onMouseLeave={() => setHoveredDate(null)}
-      onMouseDown={() => handleMouseDown()}
+      onMouseDown={handleMouseDown}
       onMouseUp={() => setDraggedDate(DraggedDate.None)}
     >
       <DashedBorder day={day} />
