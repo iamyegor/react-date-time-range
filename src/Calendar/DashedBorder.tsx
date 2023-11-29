@@ -9,54 +9,59 @@ import {
 } from "date-fns";
 import { useCalendar } from "./CalendarProvider";
 
+const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
+const BORDER_LEFT = "border-l-2 rounded-l-full left-[6px]";
+const BORDER_RIGHT = "border-r-2 rounded-r-full right-[6px]";
+const BORDER_ADJUSTED_LEFT = "-left-[1.25rem] rounded-l";
+
 export default function DashedBorder({ day }: { day: Date }) {
   const { firstDate, secondDate, hoveredDate } = useCalendar();
-  function getDashedBorder(): string {
-    let dashedBorder = "border-dashed border-t-2 border-b-2 border-gray-300";
 
-    if (firstDate && hoveredDate) {
-      const comparisonDate = secondDate || firstDate;
-      if (day > comparisonDate && day <= hoveredDate) {
-        return getBorderStyling(dashedBorder);
-      }
+  function shouldApplyDashedBorder(): boolean {
+    if (!firstDate || !hoveredDate || !(secondDate || firstDate)) {
+      return false;
     }
 
-    return "";
+    const comparisonDate = secondDate || firstDate;
+    return day > comparisonDate && day <= hoveredDate;
   }
 
-  function getBorderStyling(dottedBorder: string): string {
-    if (isSunday(day) || day.getDate() === 1) {
-      dottedBorder = classNames(
-        dottedBorder,
-        "border-l-2 rounded-l-full left-[6px]"
-      );
-    }
-    if (
-      isSaturday(day) ||
+  function getLeftBorderStyling(borderStyle: string): string {
+    return isSunday(day) || day.getDate() === 1
+      ? classNames(borderStyle, BORDER_LEFT)
+      : borderStyle;
+  }
+
+  function getRightBorderStyling(borderStyle: string): string {
+    return isSaturday(day) ||
       day.getDate() === endOfMonth(day).getDate() ||
       (hoveredDate && isEqual(hoveredDate, day))
-    ) {
-      dottedBorder = classNames(
-        dottedBorder,
-        "border-r-2 rounded-r-full right-[6px]"
-      );
-    }
-    if (
-      (secondDate && isNextDay(secondDate)) ||
-      (firstDate && isNextDay(firstDate))
-    ) {
-      dottedBorder = classNames(dottedBorder, "-left-[1.25rem] rounded-l");
-    }
-    return dottedBorder;
+      ? classNames(borderStyle, BORDER_RIGHT)
+      : borderStyle;
   }
 
-  function isNextDay(date: Date) {
-    if (isEqual(day, addDays(date, 1))) {
-      if (isSameMonth(day, date) && !isSunday(day)) {
-        return true;
-      }
-    }
-    return false;
+  function getAdjustedLeftBorder(borderStyle: string): string {
+    return (secondDate && isNextDay(secondDate)) ||
+      (firstDate && isNextDay(firstDate))
+      ? classNames(borderStyle, BORDER_ADJUSTED_LEFT)
+      : borderStyle;
+  }
+
+  function isNextDay(date: Date): boolean {
+    return (
+      isEqual(day, addDays(date, 1)) && isSameMonth(day, date) && !isSunday(day)
+    );
+  }
+
+  function getDashedBorder(): string {
+    if (!shouldApplyDashedBorder()) return "";
+
+    let borderStyle = BORDER_DASHED;
+    borderStyle = getLeftBorderStyling(borderStyle);
+    borderStyle = getRightBorderStyling(borderStyle);
+    borderStyle = getAdjustedLeftBorder(borderStyle);
+
+    return borderStyle;
   }
 
   return (
