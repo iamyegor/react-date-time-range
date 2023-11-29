@@ -10,8 +10,8 @@ import {
 import { useCalendar } from "./CalendarProvider";
 
 const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
-const BORDER_LEFT = "border-l-2 rounded-l-full left-[6px]";
-const BORDER_RIGHT = "border-r-2 rounded-r-full right-[6px]";
+const BORDER_LEFT = "border-l-2 rounded-l-full left-[5px]";
+const BORDER_RIGHT = "border-r-2 rounded-r-full right-[5px]";
 const BORDER_LENGTHENED_LEFT = "-left-7 rounded-l";
 
 export default function DashedBorder({ day }: { day: Date }) {
