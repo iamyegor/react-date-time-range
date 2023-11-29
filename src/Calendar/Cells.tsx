@@ -5,10 +5,10 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { ReactElement, useEffect, useMemo, useState } from "react";
+import { ReactElement, useEffect, useMemo } from "react";
+import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
 import WeekRow from "./WeekRow";
-import { DraggedDate } from "../types";
 
 interface CellsProps {
   currentMonth: Date;
@@ -27,8 +27,7 @@ function Cells({
   setFirstDate,
   setSecondDate,
 }: CellsProps): ReactElement {
-  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
-  const { draggedDate, setDraggedDate } = useCalendar();
+  const { hoveredDate, setHoveredDate, draggedDate, setDraggedDate } = useCalendar();
 
   useEffect(() => {
     if (hoveredDate) {
@@ -68,7 +67,6 @@ function Cells({
           currentMonth={currentMonth}
           firstDate={firstDate}
           secondDate={secondDate}
-          hoveredDate={hoveredDate}
           onHover={setHoveredDate}
         />
       );

@@ -7,7 +7,6 @@ interface WeekRowProps {
   currentMonth: Date;
   firstDate: Date | null;
   secondDate: Date | null;
-  hoveredDate: Date | null;
   onHover: (day: Date | null) => void;
 }
 
@@ -18,7 +17,6 @@ function WeekRow({
   currentMonth,
   firstDate,
   secondDate,
-  hoveredDate,
   onHover,
 }: WeekRowProps): ReactElement {
   let days: ReactElement[] = [];
@@ -32,7 +30,6 @@ function WeekRow({
         currentMonth={currentMonth}
         firstDate={firstDate}
         secondDate={secondDate}
-        hoveredDate={hoveredDate}
         onHover={onHover}
       />
     );

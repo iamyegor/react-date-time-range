@@ -11,6 +11,8 @@ type CalendarContextProps = {
   setSecondDate: (day: Date) => void;
   currentMonth: Date;
   setCurrentMonth: (month: Date) => void;
+  hoveredDate: Date | null;
+  setHoveredDate: (day: Date | null) => void;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
@@ -23,6 +25,8 @@ const CalendarContext = createContext<CalendarContextProps>({
   setSecondDate: () => {},
   currentMonth: new Date(),
   setCurrentMonth: () => {},
+  hoveredDate: null,
+  setHoveredDate: () => {},
 });
 
 export function useCalendar() {
@@ -38,6 +42,7 @@ export default function CalendarProvider({
   const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
 
   function handleCellClick(day: Date) {
     if (firstDate) {
@@ -63,6 +68,8 @@ export default function CalendarProvider({
         setSecondDate,
         currentMonth,
         setCurrentMonth,
+        hoveredDate,
+        setHoveredDate,
       }}
     >
       {children}

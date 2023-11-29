@@ -3,10 +3,10 @@ import { format, isSameDay, isSameMonth, startOfMonth } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
+import DashedBorder from "./DashedBorder";
+import Highlighted from "./Highlighted";
 
 interface FilledCellProps {
-  dashedBorder: JSX.Element;
-  highlighted: JSX.Element;
   day: Date;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
@@ -15,16 +15,20 @@ interface FilledCellProps {
 }
 
 function FilledCell({
-  dashedBorder,
-  highlighted,
   day,
   onMouseEnter,
   onMouseLeave,
   handleDateDrag,
   handleDateRelease,
 }: FilledCellProps): ReactElement {
-  const { firstDate, secondDate, draggedDate, currentMonth, handleCellClick } =
-    useCalendar();
+  const {
+    firstDate,
+    secondDate,
+    draggedDate,
+    currentMonth,
+    handleCellClick,
+    hoveredDate,
+  } = useCalendar();
 
   function getClassesForDay({
     day,
@@ -77,7 +81,12 @@ function FilledCell({
       onMouseDown={() => handleDateDrag()}
       onMouseUp={() => handleDateRelease()}
     >
-      {dashedBorder}
+      <DashedBorder
+        firstDate={firstDate}
+        secondDate={secondDate}
+        day={day}
+        hoveredDate={hoveredDate}
+      />
       <div
         className={`w-8 h-8 flex items-center justify-center text-xs 
         hover:cursor-pointer group-hover:border group-hover:bg-blue-200/50 
@@ -85,7 +94,7 @@ function FilledCell({
       >
         <span>{format(day, "d")}</span>
       </div>
-      {highlighted}
+      <Highlighted firstDate={firstDate} secondDate={secondDate} day={day} />
     </div>
   );
 }
