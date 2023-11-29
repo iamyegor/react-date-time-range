@@ -27,8 +27,7 @@ function Cells({
   setFirstDate,
   setSecondDate,
 }: CellsProps): ReactElement {
-  const { hoveredDate, setHoveredDate, draggedDate, setDraggedDate } =
-    useCalendar();
+  const { hoveredDate, draggedDate, setDraggedDate } = useCalendar();
 
   useEffect(() => {
     if (hoveredDate) {
@@ -66,7 +65,6 @@ function Cells({
           key={currentDate.toDateString()}
           startOfWeek={currentDate}
           currentMonth={currentMonth}
-          onHover={setHoveredDate}
         />
       );
       currentDate = addDays(currentDate, DAYS_IN_A_WEEK);

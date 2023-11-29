@@ -1,15 +1,14 @@
 import classNames from "classnames";
 import { endOfMonth, isEqual, isSaturday, isSunday } from "date-fns";
+import { useCalendar } from "./CalendarProvider";
 
 export default function Highlighted({
-  firstDate,
-  secondDate,
   day,
 }: {
-  firstDate: Date | null;
-  secondDate: Date | null;
   day: Date;
 }) {
+  const { firstDate, secondDate } = useCalendar();
+
   function getHighlighted() {
     const highlighted = "bg-blue-200/50 border-blue-400";
     if (firstDate && secondDate) {

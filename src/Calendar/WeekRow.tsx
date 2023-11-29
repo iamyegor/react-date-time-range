@@ -1,31 +1,26 @@
-import { addDays } from "date-fns";
+import { addDays, isSameMonth } from "date-fns";
 import { ReactElement } from "react";
-import DayCell from "./DayCell";
+import EmptyCell from "./EmptyCell";
+import FilledCell from "./FilledCell";
 
 interface WeekRowProps {
   startOfWeek: Date;
   currentMonth: Date;
-  onHover: (day: Date | null) => void;
 }
 
 const DAYS_IN_A_WEEK = 7;
 
-function WeekRow({
-  startOfWeek,
-  currentMonth,
-  onHover,
-}: WeekRowProps): ReactElement {
+function WeekRow({ startOfWeek, currentMonth }: WeekRowProps): ReactElement {
   let days: ReactElement[] = [];
   let currentDay = startOfWeek;
 
   for (let i = 0; i < DAYS_IN_A_WEEK; i++) {
     days.push(
-      <DayCell
-        key={currentDay.toDateString()}
-        day={currentDay}
-        currentMonth={currentMonth}
-        onHover={onHover}
-      />
+      isSameMonth(currentDay, currentMonth) ? (
+        <FilledCell key={currentDay.toDateString()} day={currentDay} />
+      ) : (
+        <EmptyCell key={currentDay.toDateString()} />
+      )
     );
     currentDay = addDays(currentDay, 1);
   }

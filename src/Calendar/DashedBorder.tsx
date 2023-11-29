@@ -5,20 +5,12 @@ import {
   isEqual,
   isSameMonth,
   isSaturday,
-  isSunday
+  isSunday,
 } from "date-fns";
+import { useCalendar } from "./CalendarProvider";
 
-export default function DashedBorder({
-  firstDate,
-  secondDate,
-  hoveredDate,
-  day,
-}: {
-  firstDate: Date | null;
-  secondDate: Date | null;
-  hoveredDate: Date | null;
-  day: Date;
-}) {
+export default function DashedBorder({ day }: { day: Date }) {
+  const { firstDate, secondDate, hoveredDate } = useCalendar();
   function getDashedBorder(): string {
     let dashedBorder = "border-dashed border-t-2 border-b-2 border-gray-300";
 

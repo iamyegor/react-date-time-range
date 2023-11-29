@@ -14,15 +14,9 @@ import Highlighted from "./Highlighted";
 
 interface FilledCellProps {
   day: Date;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
 }
 
-function FilledCell({
-  day,
-  onMouseEnter,
-  onMouseLeave,
-}: FilledCellProps): ReactElement {
+function FilledCell({ day }: FilledCellProps): ReactElement {
   const {
     firstDate,
     secondDate,
@@ -30,7 +24,7 @@ function FilledCell({
     setDraggedDate,
     currentMonth,
     handleCellClick,
-    hoveredDate,
+    setHoveredDate,
   } = useCalendar();
 
   function getClassesForDay({
@@ -87,17 +81,12 @@ function FilledCell({
       data-testid="filled-cell"
       className="flex-1 py-1 flex justify-center items-center group relative"
       onClick={() => handleCellClick(day)}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      onMouseEnter={() => setHoveredDate(day)}
+      onMouseLeave={() => setHoveredDate(null)}
       onMouseDown={() => handleMouseDown()}
       onMouseUp={() => setDraggedDate(DraggedDate.None)}
     >
-      <DashedBorder
-        firstDate={firstDate}
-        secondDate={secondDate}
-        day={day}
-        hoveredDate={hoveredDate}
-      />
+      <DashedBorder day={day} />
       <div
         className={`w-8 h-8 flex items-center justify-center text-xs 
         hover:cursor-pointer group-hover:border group-hover:bg-blue-200/50 
@@ -105,7 +94,7 @@ function FilledCell({
       >
         <span>{format(day, "d")}</span>
       </div>
-      <Highlighted firstDate={firstDate} secondDate={secondDate} day={day} />
+      <Highlighted day={day} />
     </div>
   );
 }
