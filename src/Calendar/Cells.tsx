@@ -26,6 +26,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     draggedDate,
     setDraggedDate,
     setShadowSelectedDate,
+    isDragging,
   } = useCalendar();
 
   useEffect(() => {
@@ -51,14 +52,17 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
   }, [hoveredDate, draggedDate]);
 
   useEffect(() => {
-    if (draggedDate === DraggedDate.None) {
+    if (isDragging) {
+      if (draggedDate === DraggedDate.First) {
+        setShadowSelectedDate(firstDate);
+      }
+      if (draggedDate === DraggedDate.Second) {
+        setShadowSelectedDate(secondDate);
+      }
+    } else {
       setShadowSelectedDate(null);
-    } else if (draggedDate === DraggedDate.First) {
-      setShadowSelectedDate(firstDate);
-    } else if (draggedDate === DraggedDate.Second) {
-      setShadowSelectedDate(secondDate);
     }
-  }, [draggedDate]);
+  }, [isDragging]);
 
   const rows = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);

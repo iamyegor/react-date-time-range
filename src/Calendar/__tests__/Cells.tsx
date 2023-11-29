@@ -7,15 +7,7 @@ describe("Cells component", () => {
 
   beforeEach(() => {
     currentMonth = new Date(2023, 6, 15);
-    render(
-      <Cells
-        currentMonth={currentMonth}
-        firstDate={null}
-        secondDate={null}
-        setFirstDate={() => {}}
-        setSecondDate={() => {}}
-      />
-    );
+    render(<Cells currentMonth={currentMonth} />);
   });
 
   it("renders correct number of day elements for a given month", () => {

@@ -16,6 +16,8 @@ type CalendarContextProps = {
   setHoveredDate: (day: Date | null) => void;
   shadowSelectedDate: Date | null;
   setShadowSelectedDate: (day: Date | null) => void;
+  isDragging: boolean;
+  setIsDragging: (isDragging: boolean) => void;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
@@ -32,6 +34,8 @@ const CalendarContext = createContext<CalendarContextProps>({
   setHoveredDate: () => {},
   shadowSelectedDate: null,
   setShadowSelectedDate: () => {},
+  isDragging: false,
+  setIsDragging: () => {},
 });
 
 export function useCalendar() {
@@ -51,6 +55,7 @@ export default function CalendarProvider({
   const [shadowSelectedDate, setShadowSelectedDate] = useState<Date | null>(
     null
   );
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   function handleCellClick(day: Date) {
     // drag date and drop on the same date
@@ -85,6 +90,8 @@ export default function CalendarProvider({
         setHoveredDate,
         shadowSelectedDate,
         setShadowSelectedDate,
+        isDragging,
+        setIsDragging,
       }}
     >
       {children}
