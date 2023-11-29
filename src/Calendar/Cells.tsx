@@ -90,6 +90,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     <div
       className={`flex-shrink-0 w-full ${isDragging ? "cursor-grabbing" : ""}`}
       onMouseLeave={() => setIsDragging(false)}
+      onMouseUp={() => setIsDragging(false)}
     >
       {rows}
     </div>

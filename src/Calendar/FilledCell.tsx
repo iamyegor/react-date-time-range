@@ -62,10 +62,6 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     return isDragging ? "cursor-grabbing" : "";
   }
 
-  function handleMouseUp() {
-    setIsDragging(false);
-  }
-
   return (
     <div
       data-testid="filled-cell"
@@ -75,7 +71,6 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       onMouseEnter={() => setHoveredDate(day)}
       onMouseLeave={() => setHoveredDate(null)}
       onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
     >
       <DashedBorder day={day} />
       <div
