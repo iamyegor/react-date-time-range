@@ -1,5 +1,11 @@
 import classNames from "classnames";
-import { format, isSameDay, isSameMonth, startOfMonth } from "date-fns";
+import {
+  format,
+  isEqual,
+  isSameDay,
+  isSameMonth,
+  startOfMonth,
+} from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
@@ -10,21 +16,18 @@ interface FilledCellProps {
   day: Date;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-  handleDateDrag: () => void;
-  handleDateRelease: () => void;
 }
 
 function FilledCell({
   day,
   onMouseEnter,
   onMouseLeave,
-  handleDateDrag,
-  handleDateRelease,
 }: FilledCellProps): ReactElement {
   const {
     firstDate,
     secondDate,
     draggedDate,
+    setDraggedDate,
     currentMonth,
     handleCellClick,
     hoveredDate,
@@ -71,6 +74,14 @@ function FilledCell({
     return classes;
   }
 
+  function handleMouseDown() {
+    if (firstDate && isEqual(firstDate, day)) {
+      setDraggedDate(DraggedDate.First);
+    } else if (secondDate && isEqual(secondDate, day)) {
+      setDraggedDate(DraggedDate.Second);
+    }
+  }
+
   return (
     <div
       data-testid="filled-cell"
@@ -78,8 +89,8 @@ function FilledCell({
       onClick={() => handleCellClick(day)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      onMouseDown={() => handleDateDrag()}
-      onMouseUp={() => handleDateRelease()}
+      onMouseDown={() => handleMouseDown()}
+      onMouseUp={() => setDraggedDate(DraggedDate.None)}
     >
       <DashedBorder
         firstDate={firstDate}

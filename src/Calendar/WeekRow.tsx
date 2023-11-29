@@ -5,8 +5,6 @@ import DayCell from "./DayCell";
 interface WeekRowProps {
   startOfWeek: Date;
   currentMonth: Date;
-  firstDate: Date | null;
-  secondDate: Date | null;
   onHover: (day: Date | null) => void;
 }
 
@@ -15,8 +13,6 @@ const DAYS_IN_A_WEEK = 7;
 function WeekRow({
   startOfWeek,
   currentMonth,
-  firstDate,
-  secondDate,
   onHover,
 }: WeekRowProps): ReactElement {
   let days: ReactElement[] = [];
@@ -28,8 +24,6 @@ function WeekRow({
         key={currentDay.toDateString()}
         day={currentDay}
         currentMonth={currentMonth}
-        firstDate={firstDate}
-        secondDate={secondDate}
         onHover={onHover}
       />
     );
