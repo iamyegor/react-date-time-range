@@ -15,11 +15,11 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   const {
     firstDate,
     secondDate,
-    draggedDate,
     setDraggedDate,
     handleCellClick,
     setHoveredDate,
     shadowSelectedDate,
+    isDragging,
     setIsDragging,
   } = useCalendar();
 
@@ -32,7 +32,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function getClassesForDay(): string {
     return classNames({
-      "cursor-grabbing": draggedDate != DraggedDate.None,
+      "cursor-grabbing": isDragging,
       "selected-cell cursor-grab": isDateSelected(day),
       "border border-gray-300 rounded-full": isToday,
       "border bg-blue-400/50 text-white":
@@ -59,7 +59,6 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function handleMouseUp() {
     setIsDragging(false);
-    setDraggedDate(DraggedDate.None);
   }
 
   return (

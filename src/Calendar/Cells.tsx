@@ -30,7 +30,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
   } = useCalendar();
 
   useEffect(() => {
-    if (hoveredDate) {
+    if (hoveredDate && isDragging) {
       if (draggedDate === DraggedDate.First) {
         if (secondDate && hoveredDate > secondDate) {
           setFirstDate(secondDate);
@@ -87,9 +87,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
 
   return (
     <div
-      className={`flex-shrink-0 w-full ${
-        draggedDate !== DraggedDate.None ? "cursor-grabbing" : ""
-      }`}
+      className={`flex-shrink-0 w-full ${isDragging ? "cursor-grabbing" : ""}`}
     >
       {rows}
     </div>

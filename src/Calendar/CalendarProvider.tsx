@@ -21,7 +21,7 @@ type CalendarContextProps = {
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
-  draggedDate: DraggedDate.None,
+  draggedDate: DraggedDate.First,
   setDraggedDate: () => {},
   handleCellClick: () => {},
   firstDate: null,
@@ -49,7 +49,9 @@ export default function CalendarProvider({
 }) {
   const [firstDate, setFirstDate] = useState<Date | null>(null);
   const [secondDate, setSecondDate] = useState<Date | null>(null);
-  const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
+  const [draggedDate, setDraggedDate] = useState<DraggedDate>(
+    DraggedDate.First
+  );
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [shadowSelectedDate, setShadowSelectedDate] = useState<Date | null>(
