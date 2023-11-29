@@ -52,18 +52,6 @@ function Cells({
     }
   }, [hoveredDate, draggedDate]);
 
-  const handleCellClick = (day: Date) => {
-    if (firstDate) {
-      if (day < firstDate) {
-        setFirstDate(day);
-      } else {
-        setSecondDate(day);
-      }
-    } else {
-      setFirstDate(day);
-    }
-  };
-
   const rows = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
@@ -81,7 +69,6 @@ function Cells({
           firstDate={firstDate}
           secondDate={secondDate}
           hoveredDate={hoveredDate}
-          onCellClick={handleCellClick}
           onHover={setHoveredDate}
         />
       );

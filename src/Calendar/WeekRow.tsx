@@ -1,6 +1,5 @@
 import { addDays } from "date-fns";
 import { ReactElement } from "react";
-import { DraggedDate } from "./Cells";
 import DayCell from "./DayCell";
 
 interface WeekRowProps {
@@ -9,7 +8,6 @@ interface WeekRowProps {
   firstDate: Date | null;
   secondDate: Date | null;
   hoveredDate: Date | null;
-  onCellClick: (day: Date) => void;
   onHover: (day: Date | null) => void;
 }
 
@@ -21,7 +19,6 @@ function WeekRow({
   firstDate,
   secondDate,
   hoveredDate,
-  onCellClick,
   onHover,
 }: WeekRowProps): ReactElement {
   let days: ReactElement[] = [];
@@ -36,7 +33,6 @@ function WeekRow({
         firstDate={firstDate}
         secondDate={secondDate}
         hoveredDate={hoveredDate}
-        onCellClick={onCellClick}
         onHover={onHover}
       />
     );

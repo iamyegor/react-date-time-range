@@ -5,12 +5,12 @@ import Cells from "./Cells";
 import Days from "./Days";
 import Header from "./Header";
 import "./styles/Calendar.css";
+import { useCalendar } from "./CalendarProvider";
 
 const duration = 250;
 
 function Calendar() {
-  const [firstDate, setFirstDate] = useState<Date | null>(null);
-  const [secondDate, setSecondDate] = useState<Date | null>(null);
+  const { firstDate, secondDate, setFirstDate, setSecondDate } = useCalendar();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<

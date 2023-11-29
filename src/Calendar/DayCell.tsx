@@ -1,19 +1,18 @@
 import classNames from "classnames";
 import {
-  format,
   isEqual,
   isSameDay,
   isSameMonth,
-  startOfMonth,
+  startOfMonth
 } from "date-fns";
 import { ReactElement } from "react";
+import { DraggedDate } from "../types";
+import { useCalendar } from "./CalendarProvider";
 import DashedBorder from "./DashedBorder";
 import EmptyCell from "./EmptyCell";
 import FilledCell from "./FilledCell";
 import Highlighted from "./Highlighted";
 import "./styles/DayCell.css";
-import { DraggedDate } from "../types";
-import { useCalendar } from "./CalendarProvider";
 
 interface DayCellProps {
   day: Date;
@@ -21,7 +20,6 @@ interface DayCellProps {
   firstDate: Date | null;
   secondDate: Date | null;
   hoveredDate: Date | null;
-  onCellClick: (day: Date) => void;
   onHover: (day: Date | null) => void;
 }
 
@@ -31,7 +29,6 @@ function DayCell({
   firstDate,
   secondDate,
   hoveredDate,
-  onCellClick,
   onHover,
 }: DayCellProps): ReactElement {
   const { draggedDate, setDraggedDate } = useCalendar();
@@ -77,12 +74,7 @@ function DayCell({
     return classes;
   }
 
-  const formattedDate = format(day, "d");
   const classes = getDayCellClasses();
-
-  const handleClick = () => onCellClick(day);
-  const handleMouseEnter = () => onHover(day);
-  const handleMouseLeave = () => onHover(null);
 
   if (!isSameMonth(day, currentMonth)) {
     return <EmptyCell />;
@@ -102,10 +94,9 @@ function DayCell({
         <Highlighted firstDate={firstDate} secondDate={secondDate} day={day} />
       }
       classes={classes}
-      formattedDate={formattedDate}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      day={day}
+      onMouseEnter={() => onHover(day)}
+      onMouseLeave={() => onHover(null)}
       handleDateDrag={() => {
         if (firstDate && isEqual(firstDate, day)) {
           console.log(setDraggedDate);
