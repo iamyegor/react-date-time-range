@@ -2,15 +2,11 @@ import {
   addDays,
   endOfMonth,
   endOfWeek,
-  isEqual,
-  isSameDay,
-  isSameMonth,
   startOfMonth,
-  startOfWeek,
+  startOfWeek
 } from "date-fns";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import WeekRow from "./WeekRow";
-import classNames from "classnames";
 
 interface CellsProps {
   currentMonth: Date;
@@ -80,34 +76,6 @@ function Cells({
     }
   };
 
-  const getClassesForDay = ({
-    day,
-    currentMonth,
-  }: {
-    day: Date;
-    currentMonth: Date;
-  }): string => {
-    const monthStart = startOfMonth(currentMonth);
-    let className = "";
-
-    if (draggedDate != DraggedDate.None) {
-      className = "cursor-grabbing";
-    }
-
-    if (!isSameMonth(day, monthStart)) {
-      return classNames("text-gray-400", className);
-    } else if (
-      (firstDate && isSameDay(day, firstDate)) ||
-      (secondDate && isSameDay(day, secondDate))
-    ) {
-      return classNames("selected-cell cursor-grab", className);
-    } else if (isSameDay(day, new Date())) {
-      return classNames("border border-gray-300 rounded-full", className);
-    }
-
-    return className;
-  };
-
   const rows = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
@@ -127,7 +95,6 @@ function Cells({
           hoveredDate={hoveredDate}
           onCellClick={handleCellClick}
           onHover={setHoveredDate}
-          getClassesForDay={getClassesForDay}
           handleDateDrag={handleDateDrag}
           handleDateRelease={handleDateRelease}
           draggedDate={draggedDate}
