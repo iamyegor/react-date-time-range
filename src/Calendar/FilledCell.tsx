@@ -2,9 +2,7 @@ import classNames from "classnames";
 import {
   format,
   isEqual,
-  isSameDay,
-  isSameMonth,
-  startOfMonth,
+  isSameDay
 } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
@@ -23,28 +21,18 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     secondDate,
     draggedDate,
     setDraggedDate,
-    currentMonth,
     handleCellClick,
     setHoveredDate,
   } = useCalendar();
 
-  function getClassesForDay({
-    day,
-    currentMonth,
-  }: {
-    day: Date;
-    currentMonth: Date;
-  }): string {
-    const monthStart = startOfMonth(currentMonth);
+  function getClassesForDay(): string {
     let className = "";
 
     if (draggedDate != DraggedDate.None) {
       className = "cursor-grabbing";
     }
 
-    if (!isSameMonth(day, monthStart)) {
-      return classNames("text-gray-400", className);
-    } else if (
+    if (
       (firstDate && isSameDay(day, firstDate)) ||
       (secondDate && isSameDay(day, secondDate))
     ) {
@@ -57,7 +45,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   }
 
   function getDayCellClasses(): string {
-    let classes = getClassesForDay({ day, currentMonth });
+    let classes = getClassesForDay();
 
     if (classes.includes("selected-cell")) {
       classes = classNames(
