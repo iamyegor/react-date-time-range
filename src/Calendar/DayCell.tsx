@@ -12,7 +12,8 @@ import EmptyCell from "./EmptyCell";
 import FilledCell from "./FilledCell";
 import Highlighted from "./Highlighted";
 import "./styles/DayCell.css";
-import { DraggedDate } from "./Cells";
+import { DraggedDate } from "../types";
+import { useCalendar } from "./CalendarProvider";
 
 interface DayCellProps {
   day: Date;
@@ -22,9 +23,6 @@ interface DayCellProps {
   hoveredDate: Date | null;
   onCellClick: (day: Date) => void;
   onHover: (day: Date | null) => void;
-  handleDateDrag: (draggedDate: DraggedDate) => void;
-  handleDateRelease: () => void;
-  draggedDate: DraggedDate;
 }
 
 function DayCell({
@@ -35,10 +33,9 @@ function DayCell({
   hoveredDate,
   onCellClick,
   onHover,
-  handleDateDrag,
-  handleDateRelease,
-  draggedDate,
 }: DayCellProps): ReactElement {
+  const { draggedDate, setDraggedDate } = useCalendar();
+
   function getClassesForDay({
     day,
     currentMonth,
@@ -111,12 +108,13 @@ function DayCell({
       onMouseLeave={handleMouseLeave}
       handleDateDrag={() => {
         if (firstDate && isEqual(firstDate, day)) {
-          handleDateDrag(DraggedDate.First);
+          console.log(setDraggedDate);
+          setDraggedDate(DraggedDate.First);
         } else if (secondDate && isEqual(secondDate, day)) {
-          handleDateDrag(DraggedDate.Second);
+          setDraggedDate(DraggedDate.Second);
         }
       }}
-      handleDateRelease={() => handleDateRelease()}
+      handleDateRelease={() => setDraggedDate(DraggedDate.None)}
     />
   );
 }

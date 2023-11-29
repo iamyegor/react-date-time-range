@@ -6,7 +6,9 @@ import {
   startOfWeek,
 } from "date-fns";
 import { ReactElement, useEffect, useMemo, useState } from "react";
+import { useCalendar } from "./CalendarProvider";
 import WeekRow from "./WeekRow";
+import { DraggedDate } from "../types";
 
 interface CellsProps {
   currentMonth: Date;
@@ -18,12 +20,6 @@ interface CellsProps {
 
 const DAYS_IN_A_WEEK = 7;
 
-export enum DraggedDate {
-  First = "first",
-  Second = "second",
-  None = "none",
-}
-
 function Cells({
   currentMonth,
   firstDate,
@@ -32,7 +28,7 @@ function Cells({
   setSecondDate,
 }: CellsProps): ReactElement {
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
-  const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
+  const { draggedDate, setDraggedDate } = useCalendar();
 
   useEffect(() => {
     if (hoveredDate) {
@@ -55,14 +51,6 @@ function Cells({
       }
     }
   }, [hoveredDate, draggedDate]);
-
-  function handleDateDrag(draggedDate: DraggedDate) {
-    setDraggedDate(draggedDate);
-  }
-
-  function handleDateRelease() {
-    setDraggedDate(DraggedDate.None);
-  }
 
   const handleCellClick = (day: Date) => {
     if (firstDate) {
@@ -95,9 +83,6 @@ function Cells({
           hoveredDate={hoveredDate}
           onCellClick={handleCellClick}
           onHover={setHoveredDate}
-          handleDateDrag={handleDateDrag}
-          handleDateRelease={handleDateRelease}
-          draggedDate={draggedDate}
         />
       );
       currentDate = addDays(currentDate, DAYS_IN_A_WEEK);

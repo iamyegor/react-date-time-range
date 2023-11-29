@@ -11,9 +11,6 @@ interface WeekRowProps {
   hoveredDate: Date | null;
   onCellClick: (day: Date) => void;
   onHover: (day: Date | null) => void;
-  handleDateDrag: (draggedDate: DraggedDate) => void;
-  handleDateRelease: () => void;
-  draggedDate: DraggedDate;
 }
 
 const DAYS_IN_A_WEEK = 7;
@@ -26,9 +23,6 @@ function WeekRow({
   hoveredDate,
   onCellClick,
   onHover,
-  handleDateDrag,
-  handleDateRelease,
-  draggedDate,
 }: WeekRowProps): ReactElement {
   let days: ReactElement[] = [];
   let currentDay = startOfWeek;
@@ -44,9 +38,6 @@ function WeekRow({
         hoveredDate={hoveredDate}
         onCellClick={onCellClick}
         onHover={onHover}
-        handleDateDrag={handleDateDrag}
-        handleDateRelease={handleDateRelease}
-        draggedDate={draggedDate}
       />
     );
     currentDay = addDays(currentDay, 1);

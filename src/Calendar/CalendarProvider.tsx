@@ -1,31 +1,14 @@
-import {
-  Dispatch,
-  ReactElement,
-  SetStateAction,
-  createContext,
-  useContext,
-  useState,
-} from "react";
-import { DraggedDate } from "./Cells";
+import { ReactElement, createContext, useContext, useState } from "react";
+import { DraggedDate } from "../types";
 
 type CalendarContextProps = {
-  firstDate: Date | null;
-  secondDate: Date | null;
-  setFirstDate: Dispatch<SetStateAction<Date | null>>;
-  setSecondDate: Dispatch<SetStateAction<Date | null>>;
-  hoveredDate: Date | null;
-  setHoveredDate: Dispatch<SetStateAction<Date | null>>;
   draggedDate: DraggedDate;
+  setDraggedDate: (draggedDate: DraggedDate) => void;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
-  firstDate: null,
-  secondDate: null,
-  setFirstDate: () => {},
-  setSecondDate: () => {},
-  hoveredDate: null,
-  setHoveredDate: () => {},
   draggedDate: DraggedDate.None,
+  setDraggedDate: () => {},
 });
 
 export function useCalendar() {
@@ -37,13 +20,10 @@ export default function CalendarProvider({
 }: {
   children: ReactElement;
 }) {
-  const [firstDate, setFirstDate] = useState<Date | null>(null);
-  const [secondDate, setSecondDate] = useState<Date | null>(null);
+  const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
 
   return (
-    <CalendarContext.Provider
-      value={{ firstDate, secondDate, setFirstDate, setSecondDate }}
-    >
+    <CalendarContext.Provider value={{ draggedDate, setDraggedDate }}>
       {children}
     </CalendarContext.Provider>
   );
