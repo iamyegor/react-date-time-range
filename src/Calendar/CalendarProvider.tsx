@@ -1,5 +1,6 @@
 import { ReactElement, createContext, useContext, useState } from "react";
 import { DraggedDate } from "../types";
+import { isSameDay } from "date-fns";
 
 type CalendarContextProps = {
   draggedDate: DraggedDate;
@@ -13,6 +14,8 @@ type CalendarContextProps = {
   setCurrentMonth: (month: Date) => void;
   hoveredDate: Date | null;
   setHoveredDate: (day: Date | null) => void;
+  shadowSelectedDate: Date | null;
+  setShadowSelectedDate: (day: Date | null) => void;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
@@ -27,6 +30,8 @@ const CalendarContext = createContext<CalendarContextProps>({
   setCurrentMonth: () => {},
   hoveredDate: null,
   setHoveredDate: () => {},
+  shadowSelectedDate: null,
+  setShadowSelectedDate: () => {},
 });
 
 export function useCalendar() {
@@ -43,8 +48,16 @@ export default function CalendarProvider({
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(DraggedDate.None);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const [shadowSelectedDate, setShadowSelectedDate] = useState<Date | null>(
+    null
+  );
 
   function handleCellClick(day: Date) {
+    // drag date and drop on the same date
+    if (shadowSelectedDate && isSameDay(day, shadowSelectedDate)) {
+      return;
+    }
+
     if (firstDate) {
       if (day < firstDate) {
         setFirstDate(day);
@@ -70,6 +83,8 @@ export default function CalendarProvider({
         setCurrentMonth,
         hoveredDate,
         setHoveredDate,
+        shadowSelectedDate,
+        setShadowSelectedDate,
       }}
     >
       {children}

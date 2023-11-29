@@ -10,14 +10,7 @@ import { useCalendar } from "./CalendarProvider";
 const duration = 250;
 
 function Calendar() {
-  const {
-    firstDate,
-    secondDate,
-    setFirstDate,
-    setSecondDate,
-    currentMonth,
-    setCurrentMonth,
-  } = useCalendar();
+  const { currentMonth, setCurrentMonth } = useCalendar();
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element; isNext: boolean }[]
@@ -28,29 +21,12 @@ function Calendar() {
 
     const newComponent = {
       id: key,
-      element: (
-        <Cells
-          currentMonth={currentMonth}
-          key={key}
-          firstDate={firstDate}
-          secondDate={secondDate}
-          setFirstDate={handleFirstDateSelect}
-          setSecondDate={handleSecondDateSelect}
-        />
-      ),
+      element: <Cells currentMonth={currentMonth} key={key} />,
       isNext: isNext,
     };
 
     setCellsComponents([newComponent]);
-  }, [currentMonth, firstDate, secondDate]);
-
-  function handleFirstDateSelect(day: Date) {
-    setFirstDate(day);
-  }
-
-  function handleSecondDateSelect(day: Date) {
-    setSecondDate(day);
-  }
+  }, [currentMonth]);
 
   function onPrevMonthClick() {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -64,7 +40,7 @@ function Calendar() {
 
   return (
     <div
-      className="font-sans w-[330px] h-full overflow-hidden 
+      className="font-sans w-[360px] h-full overflow-hidden 
     p-4 box-content border-r"
     >
       <Header

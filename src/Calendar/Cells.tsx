@@ -12,22 +12,21 @@ import WeekRow from "./WeekRow";
 
 interface CellsProps {
   currentMonth: Date;
-  firstDate: Date | null;
-  secondDate: Date | null;
-  setFirstDate: (day: Date) => void;
-  setSecondDate: (day: Date) => void;
 }
 
 const DAYS_IN_A_WEEK = 7;
 
-function Cells({
-  currentMonth,
-  firstDate,
-  secondDate,
-  setFirstDate,
-  setSecondDate,
-}: CellsProps): ReactElement {
-  const { hoveredDate, draggedDate, setDraggedDate } = useCalendar();
+function Cells({ currentMonth }: CellsProps): ReactElement {
+  const {
+    firstDate,
+    secondDate,
+    setFirstDate,
+    setSecondDate,
+    hoveredDate,
+    draggedDate,
+    setDraggedDate,
+    setShadowSelectedDate,
+  } = useCalendar();
 
   useEffect(() => {
     if (hoveredDate) {
@@ -50,6 +49,16 @@ function Cells({
       }
     }
   }, [hoveredDate, draggedDate]);
+
+  useEffect(() => {
+    if (draggedDate === DraggedDate.None) {
+      setShadowSelectedDate(null);
+    } else if (draggedDate === DraggedDate.First) {
+      setShadowSelectedDate(firstDate);
+    } else if (draggedDate === DraggedDate.Second) {
+      setShadowSelectedDate(secondDate);
+    }
+  }, [draggedDate]);
 
   const rows = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);

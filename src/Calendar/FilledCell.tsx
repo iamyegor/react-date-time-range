@@ -19,6 +19,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     setDraggedDate,
     handleCellClick,
     setHoveredDate,
+    shadowSelectedDate,
   } = useCalendar();
 
   const isDateSelected = (date: Date) =>
@@ -33,6 +34,8 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       "cursor-grabbing": draggedDate != DraggedDate.None,
       "selected-cell cursor-grab": isDateSelected(day),
       "border border-gray-300 rounded-full": isToday,
+      "border bg-blue-400/50 text-white":
+        shadowSelectedDate && isSameDay(day, shadowSelectedDate),
     });
   }
 

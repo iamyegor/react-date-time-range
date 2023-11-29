@@ -6,7 +6,7 @@ export default function DateTimeRange() {
   return (
     <div
       className="flex flex-shrink-0 justify-center border 
-    border-gray-400 rounded-md shadow-md bg-white h-[330px]"
+    border-gray-400 rounded-md shadow-md bg-white h-[360px]"
       style={{ userSelect: "none" }}
     >
       <CalendarProvider>
