@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { format, isEqual, isSameDay } from "date-fns";
+import { format, isDate, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
@@ -32,8 +32,9 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function getClassesForDay(): string {
     return classNames({
-      "cursor-grabbing": isDragging,
-      "selected-cell cursor-grab": isDateSelected(day),
+      "selected-cell": isDateSelected(day),
+      "hover:cursor-grabbing": isDragging,
+      "hover:cursor-grab": !isDragging && isDateSelected(day),
       "border border-gray-300 rounded-full": isToday,
       "border bg-blue-400/50 text-white":
         shadowSelectedDate && isSameDay(day, shadowSelectedDate),
@@ -57,6 +58,10 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     }
   }
 
+  function getCursorWhenDragging(): string {
+    return isDragging ? "cursor-grabbing" : "";
+  }
+
   function handleMouseUp() {
     setIsDragging(false);
   }
@@ -64,7 +69,8 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   return (
     <div
       data-testid="filled-cell"
-      className="flex-1 py-1 flex justify-center items-center group relative"
+      className={`flex-1 py-1 flex justify-center items-center group relative 
+      ${getCursorWhenDragging()}`}
       onClick={() => handleCellClick(day)}
       onMouseEnter={() => setHoveredDate(day)}
       onMouseLeave={() => setHoveredDate(null)}
