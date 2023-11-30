@@ -1,4 +1,6 @@
 import { format } from "date-fns";
+import leftArrowSvg from "../assets/icons/left-arrow.svg";
+import rightArrowSvg from "../assets/icons/right-arrow.svg";
 
 interface HeaderProps {
   currentMonth: Date;
@@ -19,7 +21,7 @@ export default function Header({
         onClick={onPrevMonthClick}
         data-testid="left-arrow"
       >
-        &lt;
+        <img src={leftArrowSvg} alt="left-arrow" className="w-5 h-5" />
       </div>
       <div>
         <span>{format(currentMonth, dateFormat)}</span>
@@ -29,7 +31,7 @@ export default function Header({
         onClick={onNextMonthClick}
         data-testid="right-arrow"
       >
-        &gt;
+        <img src={rightArrowSvg} alt="right-arrow" className="w-5 h-5" />
       </div>
     </div>
   );
