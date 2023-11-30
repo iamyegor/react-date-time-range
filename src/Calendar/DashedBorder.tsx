@@ -8,7 +8,6 @@ import {
   isSunday,
 } from "date-fns";
 import { useCalendar } from "./CalendarProvider";
-import "./styles/DashedBorder.css";
 
 const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
 const BORDER_LEFT = "border-l-2 rounded-l-full left-[6px]";
