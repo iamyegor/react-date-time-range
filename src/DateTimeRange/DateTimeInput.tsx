@@ -26,7 +26,11 @@ export default function DateTimeInput() {
   return (
     <div ref={containerRef} className="relative flex flex-col items-center">
       <div ref={dateInputRef}>
-        <DateInput onFocus={() => setShowDateTime(true)} text={"Start date"} />
+        <DateInput
+          onFocus={() => setShowDateTime(true)}
+          text={"Start date"}
+          keepTextOnTop={showDateTime}
+        />
       </div>
       {showDateTime && (
         <div

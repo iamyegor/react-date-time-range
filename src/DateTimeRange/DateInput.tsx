@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react";
 interface InputProps {
   text: string;
   onFocus: () => void;
+  keepTextOnTop?: boolean;
 }
 
-function DateInput({ text, onFocus }: InputProps) {
-  const [isFocused, setIsFocused] = useState<boolean>(false); // [1
+function DateInput({ text, onFocus, keepTextOnTop }: InputProps) {
+  const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
     useState<boolean>(false);
@@ -29,20 +30,26 @@ function DateInput({ text, onFocus }: InputProps) {
     setIsFocused(false);
   }
 
-  const clipPath = isFocused
+  function shouldKeepTextOnTop() {
+    return keepTextOnTop || isFocused;
+  }
+
+  const clipPath = shouldKeepTextOnTop()
     ? `polygon(10px 0, 10px 10%, ${textWidth + 14}px 10%, ${
         textWidth + 14
       }px 0, 100% 0, 100% 100%, 0 100%, 0 0)`
     : "";
 
-  const inputClassNames = `rounded border border-gray-400 text-white 
+  const inputClassNames = `rounded border text-white 
     focus:outline-none w-full h-full transition-colors ${
-      isFocused ? "border-blue-500 border-2" : "group-hover:border-white"
+      shouldKeepTextOnTop()
+        ? "border-blue-500 border-2"
+        : "border-gray-400 group-hover:border-white"
     }`;
 
   const textClassNames = `transition-all absolute left-0 ${
-    isFocused
-      ? "left-3 -top-[0.725rem] text-xs"
+    shouldKeepTextOnTop()
+      ? "left-3 -top-[0.725rem] text-xs text-blue-500"
       : "transform -translate-y-1/2 top-1/2 left-2 text-base"
   }`;
 
