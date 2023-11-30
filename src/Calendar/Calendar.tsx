@@ -46,10 +46,8 @@ function Calendar() {
   }
 
   return (
-    <div
-      className="font-sans w-[360px] h-full overflow-hidden 
-    p-4 box-content border-r"
-    >
+    <div className="font-sans w-[360px] h-full p-4 border-r 
+    overflow-hidden">
       <Header
         currentMonth={currentMonth}
         onPrevMonthClick={onPrevMonthClick}

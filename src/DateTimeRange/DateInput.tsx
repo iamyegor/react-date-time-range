@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 
 interface InputProps {
   text: string;
+  onFocus: () => void;
 }
 
-function Input(props: InputProps) {
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+function DateInput({ text, onFocus }: InputProps) {
+  const [isFocused, setIsFocused] = useState<boolean>(false); // [1
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
     useState<boolean>(false);
@@ -21,6 +22,7 @@ function Input(props: InputProps) {
 
   function handleFocus() {
     setIsFocused(true);
+    onFocus();
   }
 
   function handleBlur() {
@@ -34,7 +36,7 @@ function Input(props: InputProps) {
     : "";
 
   const inputClassNames = `rounded border border-gray-400 text-white 
-    focus:outline-none w-[15rem] h-10 transition-colors ${
+    focus:outline-none w-full h-full transition-colors ${
       isFocused ? "border-blue-500 border-2" : "group-hover:border-white"
     }`;
 
@@ -45,10 +47,14 @@ function Input(props: InputProps) {
   }`;
 
   return (
-    <div className="relative group" onFocus={handleFocus} onBlur={handleBlur}>
+    <div
+      className="relative group w-[15rem] h-10"
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
       <div className={inputClassNames} tabIndex={0} style={{ clipPath }}></div>
       <p className={textClassNames} tabIndex={0}>
-        {props.text}
+        {text}
       </p>
       {!shouldRemoveHiddenText && (
         <p
@@ -57,11 +63,11 @@ function Input(props: InputProps) {
           aria-label="hidden"
           ref={hiddenTextRef}
         >
-          {props.text}
+          {text}
         </p>
       )}
     </div>
   );
 }
 
-export default Input;
+export default DateInput;

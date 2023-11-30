@@ -1,10 +1,10 @@
-import Input from "./DateTimeRange/DateInput";
+import DateTimeInput from "./DateTimeRange/DateTimeInput";
 import "./index.css";
 
 export default function App() {
   return (
-    <div className="flex h-full items-center justify-center bg-sky-900">
-      <Input text={"this is not rocket science"} />
+    <div className="flex h-full pt-10 justify-center bg-sky-900">
+      <DateTimeInput />
     </div>
   );
 }
