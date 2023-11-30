@@ -27,7 +27,6 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     setDraggedDate,
     setShadowSelectedDate,
     isDragging,
-    setIsDragging,
   } = useCalendar();
 
   useEffect(() => {
@@ -86,15 +85,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     return weeks;
   }, [currentMonth, firstDate, secondDate, hoveredDate]);
 
-  return (
-    <div
-      className={`flex-shrink-0 w-full ${isDragging ? "cursor-grabbing" : ""}`}
-      onMouseLeave={() => setIsDragging(false)}
-      onMouseUp={() => setIsDragging(false)}
-    >
-      {rows}
-    </div>
-  );
+  return <div className={`flex-shrink-0 w-full`}>{rows}</div>;
 }
 
 export default Cells;

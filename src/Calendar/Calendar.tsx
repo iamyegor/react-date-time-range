@@ -10,7 +10,8 @@ import "./styles/Calendar.css";
 const duration = 250;
 
 function Calendar() {
-  const { currentMonth, setCurrentMonth } = useCalendar();
+  const { currentMonth, setCurrentMonth, isDragging, setIsDragging } =
+    useCalendar();
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element; isNext: boolean }[]
@@ -46,8 +47,12 @@ function Calendar() {
   }
 
   return (
-    <div className="font-sans w-[360px] h-full p-4 border-r 
-    overflow-hidden">
+    <div
+      className={`font-sans w-[360px] h-full p-4 border-r 
+    overflow-hidden ${isDragging ? "cursor-grabbing" : ""}`}
+      onMouseUp={() => setIsDragging(false)}
+      onMouseLeave={() => setIsDragging(false)}
+    >
       <Header
         currentMonth={currentMonth}
         onPrevMonthClick={onPrevMonthClick}
