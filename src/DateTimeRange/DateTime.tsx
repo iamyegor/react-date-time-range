@@ -2,7 +2,7 @@ import Calendar from "../Calendar/Calendar";
 import CalendarProvider from "../Calendar/CalendarProvider";
 import TimePicker from "../TimePicker/TimePicker";
 
-export default function DateTimeRange() {
+export default function DateTime() {
   return (
     <div
       className="flex flex-shrink-0 justify-center border 
