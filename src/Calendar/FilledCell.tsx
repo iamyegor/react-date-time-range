@@ -35,6 +35,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       "selected-cell": isDateSelected(day),
       "hover:cursor-grabbing": isDragging,
       "hover:cursor-grab": !isDragging && isDateSelected(day),
+      "hover:cursor-pointer": !isDateSelected(day),
       "border border-gray-300 rounded-full": isToday,
       "border bg-blue-400/50 text-white":
         shadowSelectedDate && isSameDay(day, shadowSelectedDate),
@@ -75,7 +76,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       <DashedBorder day={day} />
       <div
         className={`w-9 h-9 flex items-center justify-center text-xs
-        hover:cursor-pointer group-hover:border group-hover:bg-blue-200/50
+        group-hover:border group-hover:bg-blue-200/50
         rounded-full group-hover:border-gray-400 ${getDayCellClasses()} z-10 `}
       >
         <span>{format(day, "d")}</span>
