@@ -6,62 +6,100 @@ import {
   isSameMonth,
   isSaturday,
   isSunday,
+  startOfMonth,
+  subDays,
 } from "date-fns";
+import { ActiveInput } from "../types";
 import { useCalendar } from "./CalendarProvider";
 
 const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
 const BORDER_LEFT = "border-l-2 rounded-l-full left-[6px]";
 const BORDER_RIGHT = "border-r-2 rounded-r-full right-[6px]";
 const BORDER_LENGTHENED_LEFT = "-left-6";
+const BORDER_LENGTHENED_RIGHT = "-right-6";
 
 export default function DashedBorder({ day }: { day: Date }) {
-  const { firstDate, secondDate, hoveredDate } = useCalendar();
+  const { firstDate, secondDate, hoveredDate, activeInput } = useCalendar();
 
-  function shouldApplyDashedBorder(): boolean {
+  function shouldApplyDashedBorder() {
     if (!firstDate || !hoveredDate || !(secondDate || firstDate)) {
       return false;
     }
 
-    const comparisonDate = secondDate || firstDate;
-    return day > comparisonDate && day <= hoveredDate;
+    if (activeInput === ActiveInput.First) {
+      if (!secondDate) {
+        return false;
+      }
+      return day < firstDate && day >= hoveredDate;
+    } else {
+      const comparisonDate = secondDate || firstDate;
+      return day > comparisonDate && day <= hoveredDate;
+    }
   }
 
-  function getLeftBorderStyling(borderStyle: string): string {
-    return isSunday(day) || day.getDate() === 1
-      ? classNames(borderStyle, BORDER_LEFT)
-      : borderStyle;
+  function getLeftBorderStyling() {
+    const isThisDayHovered = hoveredDate && isEqual(hoveredDate, day);
+
+    if (
+      isSunday(day) ||
+      isEqual(day, startOfMonth(day)) ||
+      (activeInput === ActiveInput.First && isThisDayHovered)
+    ) {
+      return BORDER_LEFT;
+    }
+    return "";
   }
 
-  function getRightBorderStyling(borderStyle: string): string {
-    return isSaturday(day) ||
+  function getRightBorderStyling() {
+    const isThisDayHovered = hoveredDate && isEqual(hoveredDate, day);
+    console.log(day);
+    console.log(endOfMonth(day));
+
+    if (
+      isSaturday(day) ||
       day.getDate() === endOfMonth(day).getDate() ||
-      (hoveredDate && isEqual(hoveredDate, day))
-      ? classNames(borderStyle, BORDER_RIGHT)
-      : borderStyle;
+      (activeInput === ActiveInput.Second && isThisDayHovered)
+    ) {
+      return BORDER_RIGHT;
+    }
+    return "";
   }
 
-  function getAdjustedLeftBorder(borderStyle: string): string {
-    return (secondDate && isNextDay(secondDate)) ||
+  function getLengthenedLeftBorder() {
+    if (
+      (secondDate && isNextDay(secondDate)) ||
       (firstDate && isNextDay(firstDate))
-      ? classNames(borderStyle, BORDER_LENGTHENED_LEFT)
-      : classNames(borderStyle, "left-[1px]");
+    ) {
+      return BORDER_LENGTHENED_LEFT;
+    }
+    return "left-[1px]";
   }
 
-  function isNextDay(date: Date): boolean {
+  function getLengthenedRightBorder() {
+    const dayBeforeFirstDate = firstDate && isEqual(day, subDays(firstDate, 1));
+
+    if (dayBeforeFirstDate) {
+      return BORDER_LENGTHENED_RIGHT;
+    }
+    return "right-[1px]";
+  }
+
+  function isNextDay(date: Date) {
     return (
       isEqual(day, addDays(date, 1)) && isSameMonth(day, date) && !isSunday(day)
     );
   }
 
-  function getDashedBorder(): string {
+  function getDashedBorder() {
     if (!shouldApplyDashedBorder()) {
       return "";
     }
 
     let borderStyle = BORDER_DASHED;
-    borderStyle = getLeftBorderStyling(borderStyle);
-    borderStyle = getRightBorderStyling(borderStyle);
-    borderStyle = getAdjustedLeftBorder(borderStyle);
+    borderStyle = classNames(borderStyle, getLeftBorderStyling());
+    borderStyle = classNames(borderStyle, getRightBorderStyling());
+    borderStyle = classNames(borderStyle, getLengthenedRightBorder());
+    borderStyle = classNames(borderStyle, getLengthenedLeftBorder());
 
     return borderStyle;
   }
