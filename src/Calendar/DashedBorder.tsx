@@ -52,8 +52,6 @@ export default function DashedBorder({ day }: { day: Date }) {
 
   function getRightBorderStyling() {
     const isThisDayHovered = hoveredDate && isEqual(hoveredDate, day);
-    console.log(day);
-    console.log(endOfMonth(day));
 
     if (
       isSaturday(day) ||
@@ -106,7 +104,7 @@ export default function DashedBorder({ day }: { day: Date }) {
 
   return (
     <div
-      className={`absolute top-[3px] bottom-[3px] right-[1px] 
+      className={`absolute top-[3px] bottom-[3px]  
         flex items-center justify-center ${getDashedBorder()}`}
     ></div>
   );
