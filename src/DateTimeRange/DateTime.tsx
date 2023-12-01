@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import Calendar from "../Calendar/Calendar";
-import CalendarProvider from "../Calendar/CalendarProvider";
 import TimePicker from "../TimePicker/TimePicker";
 
 export default function DateTime({ className }: { className?: string }) {
@@ -11,9 +10,7 @@ export default function DateTime({ className }: { className?: string }) {
   );
   return (
     <div className={classes} style={{ userSelect: "none" }} tabIndex={0}>
-      <CalendarProvider>
-        <Calendar />
-      </CalendarProvider>
+      <Calendar />
       <TimePicker />
     </div>
   );

@@ -1,17 +1,19 @@
+import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 
 interface InputProps {
   text: string;
+  date: Date | null;
   onFocus: () => void;
   keepTextOnTop?: boolean;
 }
 
-function DateInput({ text, onFocus, keepTextOnTop }: InputProps) {
+function DateInput({ text, date, onFocus, keepTextOnTop }: InputProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
     useState<boolean>(false);
-  const hiddenTextRef = useRef<HTMLParagraphElement>(null);
+  const hiddenTextRef = useRef<HTMLLabelElement>(null);
 
   useEffect(() => {
     if (hiddenTextRef.current) {
@@ -31,7 +33,7 @@ function DateInput({ text, onFocus, keepTextOnTop }: InputProps) {
   }
 
   function shouldKeepTextOnTop() {
-    return keepTextOnTop || isFocused;
+    return keepTextOnTop || isFocused || date;
   }
 
   const clipPath = shouldKeepTextOnTop()
@@ -40,18 +42,16 @@ function DateInput({ text, onFocus, keepTextOnTop }: InputProps) {
       }px 0, 100% 0, 100% 100%, 0 100%, 0 0)`
     : "";
 
-  const inputClassNames = `rounded border text-white 
-    focus:outline-none w-full h-full transition-colors ${
-      shouldKeepTextOnTop()
-        ? "border-blue-500 border-2"
-        : "border-gray-400 group-hover:border-white"
-    }`;
+  const inputClassNames = `rounded border flex items-center p-2
+  focus:outline-none w-full h-full transition-colors border ${
+    isFocused ? "border-blue-500 border-2" : "border-gray-700 group-hover:border-white"
+  }`;
 
   const textClassNames = `transition-all absolute left-0 ${
     shouldKeepTextOnTop()
-      ? "left-3 -top-[0.725rem] text-xs text-blue-500"
+      ? "left-3 -top-[0.725rem] text-xs"
       : "transform -translate-y-1/2 top-1/2 left-2 text-base"
-  }`;
+  } ${isFocused ? "text-blue-500" : "text-gray-800"}`;
 
   return (
     <div
@@ -59,19 +59,21 @@ function DateInput({ text, onFocus, keepTextOnTop }: InputProps) {
       onFocus={handleFocus}
       onBlur={handleBlur}
     >
-      <div className={inputClassNames} tabIndex={0} style={{ clipPath }}></div>
-      <p className={textClassNames} tabIndex={0}>
+      <div className={inputClassNames} tabIndex={0} style={{ clipPath }}>
+        {date && <p>{format(date, "dd/MM/yyyy")}</p>}
+      </div>
+      <label className={textClassNames} tabIndex={0}>
         {text}
-      </p>
+      </label>
       {!shouldRemoveHiddenText && (
-        <p
+        <label
           className="absolute left-2 -top-[0.725rem] text-xs collapse"
           tabIndex={0}
           aria-label="hidden"
           ref={hiddenTextRef}
         >
           {text}
-        </p>
+        </label>
       )}
     </div>
   );

@@ -1,4 +1,10 @@
-import { ReactElement, createContext, useContext, useState } from "react";
+import {
+  Dispatch,
+  ReactElement,
+  createContext,
+  useContext,
+  useState,
+} from "react";
 import { DraggedDate } from "../types";
 import { isSameDay } from "date-fns";
 
@@ -42,12 +48,17 @@ export function useCalendar() {
   return useContext(CalendarContext);
 }
 
+interface CalendarProviderProps {
+  children: ReactElement;
+  firstDate: Date | null;
+  setFirstDate: Dispatch<React.SetStateAction<Date | null>>;
+}
+
 export default function CalendarProvider({
   children,
-}: {
-  children: ReactElement;
-}) {
-  const [firstDate, setFirstDate] = useState<Date | null>(null);
+  firstDate,
+  setFirstDate,
+}: CalendarProviderProps) {
   const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(
     DraggedDate.First
