@@ -5,10 +5,9 @@ interface InputProps {
   text: string;
   date: Date | null;
   onFocus: () => void;
-  keepTextOnTop?: boolean;
 }
 
-function DateInput({ text, date, onFocus, keepTextOnTop }: InputProps) {
+function DateInput({ text, date, onFocus }: InputProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
@@ -33,7 +32,7 @@ function DateInput({ text, date, onFocus, keepTextOnTop }: InputProps) {
   }
 
   function shouldKeepTextOnTop() {
-    return keepTextOnTop || isFocused || date;
+    return isFocused || date;
   }
 
   const clipPath = shouldKeepTextOnTop()
@@ -44,7 +43,9 @@ function DateInput({ text, date, onFocus, keepTextOnTop }: InputProps) {
 
   const inputClassNames = `rounded border flex items-center p-2
   focus:outline-none w-full h-full transition-colors border ${
-    isFocused ? "border-blue-500 border-2" : "border-gray-700 group-hover:border-white"
+    isFocused
+      ? "border-blue-500 border-2"
+      : "border-gray-700 group-hover:border-gray-400"
   }`;
 
   const textClassNames = `transition-all absolute left-0 ${
@@ -53,6 +54,16 @@ function DateInput({ text, date, onFocus, keepTextOnTop }: InputProps) {
       : "transform -translate-y-1/2 top-1/2 left-2 text-base"
   } ${isFocused ? "text-blue-500" : "text-gray-800"}`;
 
+  function getInputText() {
+    if (date) {
+      return format(date, "dd/MM/yyyy");
+    } else {
+      if (shouldKeepTextOnTop()) {
+        return "mm/dd/yyyy";``
+      }
+    }
+  }
+
   return (
     <div
       className="relative group w-[15rem] h-10"
@@ -60,7 +71,7 @@ function DateInput({ text, date, onFocus, keepTextOnTop }: InputProps) {
       onBlur={handleBlur}
     >
       <div className={inputClassNames} tabIndex={0} style={{ clipPath }}>
-        {date && <p>{format(date, "dd/MM/yyyy")}</p>}
+        <p className="transition-all">{getInputText()}</p>
       </div>
       <label className={textClassNames} tabIndex={0}>
         {text}

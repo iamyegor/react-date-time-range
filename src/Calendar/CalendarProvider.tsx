@@ -52,14 +52,17 @@ interface CalendarProviderProps {
   children: ReactElement;
   firstDate: Date | null;
   setFirstDate: Dispatch<React.SetStateAction<Date | null>>;
+  secondDate: Date | null;
+  setSecondDate: Dispatch<React.SetStateAction<Date | null>>;
 }
 
 export default function CalendarProvider({
   children,
   firstDate,
   setFirstDate,
+  secondDate,
+  setSecondDate,
 }: CalendarProviderProps) {
-  const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(
     DraggedDate.First
   );

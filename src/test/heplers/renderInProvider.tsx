@@ -4,7 +4,12 @@ import CalendarProvider from "../../Calendar/CalendarProvider";
 
 export default function renderInProvider(element: ReactElement) {
   render(
-    <CalendarProvider firstDate={null} setFirstDate={() => null}>
+    <CalendarProvider
+      firstDate={null}
+      setFirstDate={() => null}
+      secondDate={null}
+      setSecondDate={() => null}
+    >
       {element}
     </CalendarProvider>
   );
