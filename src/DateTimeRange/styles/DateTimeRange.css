@@ -1,0 +1,21 @@
+.date-time-enter {
+  opacity: 0;
+}
+
+.date-time-enter-active {
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.date-time-exit {
+  opacity: 1;
+}
+
+.date-time-exit-active {
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.date-time-exit-done {
+  opacity: 0;
+}

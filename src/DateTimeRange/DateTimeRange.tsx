@@ -5,6 +5,8 @@ import DateInput from "./DateInput";
 import DateTime from "./DateTime";
 import dashIcon from "../assets/icons/dash.svg";
 import { ActiveInput } from "../types";
+import { CSSTransition } from "react-transition-group";
+import "./styles/DateTimeRange.css";
 
 export default function DateTimeRange() {
   const [firstDate, setFirstDate] = useState<Date | null>(null);
@@ -38,6 +40,8 @@ export default function DateTimeRange() {
     }
   }
 
+  console.log({ showDateTime });
+
   return (
     <div ref={containerRef}>
       <div className="flex items-center justify-center">
@@ -65,7 +69,14 @@ export default function DateTimeRange() {
         onFirstDateChange={() => handleFirstDateChange()}
         onSecondDateChange={() => handleSecondDateChange()}
       >
-        {showDateTime ? <DateTime /> : <></>}
+        <CSSTransition
+          in={showDateTime}
+          timeout={300}
+          classNames="date-time"
+          unmountOnExit
+        >
+          <DateTime />
+        </CSSTransition>
       </CalendarProvider>
     </div>
   );
