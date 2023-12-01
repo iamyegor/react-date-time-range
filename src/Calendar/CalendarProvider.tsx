@@ -3,10 +3,10 @@ import {
   ReactElement,
   createContext,
   useContext,
+  useEffect,
   useState,
 } from "react";
-import { DraggedDate } from "../types";
-import { isSameDay } from "date-fns";
+import { ActiveInput, DraggedDate } from "../types";
 
 type CalendarContextProps = {
   draggedDate: DraggedDate;
@@ -24,6 +24,9 @@ type CalendarContextProps = {
   setShadowSelectedDate: (day: Date | null) => void;
   isDragging: boolean;
   setIsDragging: (isDragging: boolean) => void;
+  activeInput: ActiveInput;
+  setActiveInput: (activeInput: ActiveInput) => void;
+  setDateChangedWhileDragging: (dateChangedWhileDragging: boolean) => void;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
@@ -42,6 +45,9 @@ const CalendarContext = createContext<CalendarContextProps>({
   setShadowSelectedDate: () => {},
   isDragging: false,
   setIsDragging: () => {},
+  activeInput: ActiveInput.None,
+  setActiveInput: () => {},
+  setDateChangedWhileDragging: () => {},
 });
 
 export function useCalendar() {
@@ -54,6 +60,10 @@ interface CalendarProviderProps {
   setFirstDate: Dispatch<React.SetStateAction<Date | null>>;
   secondDate: Date | null;
   setSecondDate: Dispatch<React.SetStateAction<Date | null>>;
+  onFirstDateChange: () => void;
+  onSecondDateChange: () => void;
+  activeInput: ActiveInput;
+  setActiveInput: Dispatch<React.SetStateAction<ActiveInput>>;
 }
 
 export default function CalendarProvider({
@@ -62,6 +72,10 @@ export default function CalendarProvider({
   setFirstDate,
   secondDate,
   setSecondDate,
+  onFirstDateChange,
+  onSecondDateChange,
+  activeInput,
+  setActiveInput,
 }: CalendarProviderProps) {
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(
     DraggedDate.First
@@ -72,23 +86,53 @@ export default function CalendarProvider({
     null
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dateChangedWhileDragging, setDateChangedWhileDragging] =
+    useState<boolean>(false);
 
   function handleCellClick(day: Date) {
-    // drag date and drop on the same date
-    if (shadowSelectedDate && isSameDay(day, shadowSelectedDate)) {
-      return;
-    }
+    setDateBasedOnActiveInput(day);
+  }
 
-    if (firstDate) {
-      if (day < firstDate) {
+  function setDateBasedOnActiveInput(day: Date) {
+    if (activeInput === ActiveInput.First) {
+      setFirstDate(day);
+      if (secondDate && day > secondDate) {
+        setSecondDate(null);
+      }
+    } else if (activeInput === ActiveInput.Second) {
+      if (firstDate && day < firstDate) {
         setFirstDate(day);
+        setSecondDate(null);
       } else {
         setSecondDate(day);
       }
-    } else {
-      setFirstDate(day);
     }
   }
+
+  // not including activeInput in the dependency array 
+  // is essential because in that case, every time user simply
+  // swithes between the inputs this effect will be triggered, 
+  useEffect(() => {
+    if (firstDate && !isDragging && activeInput === ActiveInput.First) {
+      onFirstDateChange();
+    }
+  }, [firstDate, isDragging]);
+
+  useEffect(() => {
+    if (secondDate && !isDragging && activeInput === ActiveInput.Second) {
+      onSecondDateChange();
+    }
+  }, [secondDate, isDragging]);
+
+  useEffect(() => {
+    if (isDragging && dateChangedWhileDragging) {
+      if (draggedDate === DraggedDate.First) {
+        setActiveInput(ActiveInput.First);
+      } else if (draggedDate === DraggedDate.Second) {
+        setActiveInput(ActiveInput.Second);
+      }
+    }
+  }, [draggedDate, isDragging, dateChangedWhileDragging]);
 
   return (
     <CalendarContext.Provider
@@ -108,6 +152,9 @@ export default function CalendarProvider({
         setShadowSelectedDate,
         isDragging,
         setIsDragging,
+        activeInput,
+        setActiveInput,
+        setDateChangedWhileDragging,
       }}
     >
       {children}

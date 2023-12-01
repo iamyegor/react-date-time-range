@@ -2,10 +2,11 @@ import {
   addDays,
   endOfMonth,
   endOfWeek,
+  isEqual,
   startOfMonth,
-  startOfWeek,
+  startOfWeek
 } from "date-fns";
-import { ReactElement, useEffect, useMemo } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import { DraggedDate } from "../types";
 import { useCalendar } from "./CalendarProvider";
 import WeekRow from "./WeekRow";
@@ -27,7 +28,14 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     setDraggedDate,
     setShadowSelectedDate,
     isDragging,
+    setDateChangedWhileDragging,
   } = useCalendar();
+  const [firstDateBeforeDrag, setFirstDateBeforeDrag] = useState<Date | null>(
+    null
+  );
+  const [secondDateBeforeDrag, setSecondDateBeforeDrag] = useState<Date | null>(
+    null
+  );
 
   useEffect(() => {
     if (hoveredDate && isDragging) {
@@ -52,6 +60,20 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
   }, [hoveredDate, draggedDate]);
 
   useEffect(() => {
+    if (hoveredDate && isDragging) {
+      if (firstDateBeforeDrag) {
+        if (!isEqual(firstDateBeforeDrag, hoveredDate)) {
+          setDateChangedWhileDragging(true);
+        }
+      } else if (secondDateBeforeDrag) {
+        if (!isEqual(secondDateBeforeDrag, hoveredDate)) {
+          setDateChangedWhileDragging(true);
+        }
+      }
+    }
+  }, [hoveredDate, isDragging]);
+
+  useEffect(() => {
     if (isDragging) {
       if (draggedDate === DraggedDate.First) {
         setShadowSelectedDate(firstDate);
@@ -61,6 +83,18 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
       }
     } else {
       setShadowSelectedDate(null);
+    }
+  }, [isDragging]);
+
+  useEffect(() => {
+    if (isDragging) {
+      setFirstDateBeforeDrag(firstDate);
+      setSecondDateBeforeDrag(secondDate);
+    } else {
+      setFirstDateBeforeDrag(null);
+      setSecondDateBeforeDrag(null);
+
+      setDateChangedWhileDragging(false);
     }
   }, [isDragging]);
 
