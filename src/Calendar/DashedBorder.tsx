@@ -19,10 +19,15 @@ const BORDER_LENGTHENED_LEFT = "-left-6";
 const BORDER_LENGTHENED_RIGHT = "-right-6";
 
 export default function DashedBorder({ day }: { day: Date }) {
-  const { firstDate, secondDate, hoveredDate, activeInput } = useCalendar();
+  const { firstDate, secondDate, hoveredDate, activeInput, isDragging } =
+    useCalendar();
 
   function shouldApplyDashedBorder() {
     if (!firstDate || !hoveredDate || !(secondDate || firstDate)) {
+      return false;
+    }
+
+    if (isDragging) {
       return false;
     }
 

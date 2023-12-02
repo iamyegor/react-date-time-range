@@ -109,9 +109,9 @@ export default function CalendarProvider({
     }
   }
 
-  // not including activeInput in the dependency array 
+  // not including activeInput in the dependency array
   // is essential because otherwise, every time user simply
-  // swithes between the inputs this effect will be triggered, 
+  // swithes between the inputs this effect will be triggered,
   useEffect(() => {
     if (firstDate && !isDragging && activeInput === ActiveInput.First) {
       onFirstDateChange();
