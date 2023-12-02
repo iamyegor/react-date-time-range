@@ -122,8 +122,6 @@ function TimePicker() {
           testid="periods"
         />
       </div>
-      <hr />
-      <button className="py-2 text-lg">OK</button>
     </div>
   );
 }

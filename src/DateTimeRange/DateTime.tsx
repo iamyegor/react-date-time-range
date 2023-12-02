@@ -1,17 +1,24 @@
-import classNames from "classnames";
 import Calendar from "../Calendar/Calendar";
 import TimePicker from "../TimePicker/TimePicker";
+import OKButton from "./OKButton";
+import "./styles/DateTime.css";
 
-export default function DateTime({ className }: { className?: string }) {
-  const classes = classNames(
-    `flex flex-shrink-0 justify-center border 
-    border-gray-400 rounded-md shadow-md bg-white h-[360px]`,
-    className
-  );
+interface DateTimeProps {
+  onOkButtonClick: () => void;
+}
+
+export default function DateTime({ onOkButtonClick }: DateTimeProps) {
   return (
-    <div className={classes} style={{ userSelect: "none" }} tabIndex={0}>
-      <Calendar />
-      <TimePicker />
+    <div
+      className="border border-gray-400 rounded-md shadow-md bg-white flex flex-col"
+      tabIndex={0}
+    >
+      <div className="flex h-[355px]">
+        <Calendar />
+        <TimePicker />
+      </div>
+      <hr />
+      <OKButton onClick={() => onOkButtonClick()}>OK</OKButton>
     </div>
   );
 }

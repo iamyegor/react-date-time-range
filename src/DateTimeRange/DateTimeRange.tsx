@@ -45,7 +45,7 @@ export default function DateTimeRange() {
   }
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} style={{ userSelect: "none" }}>
       <div className="flex items-center justify-center">
         <DateInput
           isActive={activeInput === ActiveInput.First}
@@ -83,7 +83,7 @@ export default function DateTimeRange() {
           classNames="date-time"
           unmountOnExit
         >
-          <DateTime />
+          <DateTime onOkButtonClick={() => console.log("Ok")} />
         </CSSTransition>
       </DateTimeRangeProvider>
     </div>
