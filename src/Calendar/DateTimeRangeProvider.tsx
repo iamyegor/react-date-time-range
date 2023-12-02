@@ -32,8 +32,6 @@ type DateTimeRangeContextProps = {
   setFirstSelectedTime: Dispatch<SetStateAction<Time | null>>;
   secondSelectedTime: Time | null;
   setSecondSelectedTime: Dispatch<SetStateAction<Time | null>>;
-  setIsFirstDateSetAutomatically: Dispatch<SetStateAction<boolean>>;
-  setIsSecondDateSetAutomatically: Dispatch<SetStateAction<boolean>>;
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
@@ -59,8 +57,6 @@ const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
   setFirstSelectedTime: () => {},
   secondSelectedTime: null,
   setSecondSelectedTime: () => {},
-  setIsFirstDateSetAutomatically: () => {},
-  setIsSecondDateSetAutomatically: () => {},
 });
 
 export function useDateTimeRange() {
@@ -93,8 +89,6 @@ export default function DateTimeRangeProvider({
   setFirstSelectedTime,
   secondSelectedTime,
   setSecondSelectedTime,
-  onFirstDateChange,
-  onSecondDateChange,
   activeInput,
   setActiveInput,
 }: DateTimeRangeProviderProps) {
@@ -108,10 +102,6 @@ export default function DateTimeRangeProvider({
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dateChangedWhileDragging, setDateChangedWhileDragging] =
-    useState<boolean>(false);
-  const [isFirstDateSetAutomatically, setIsFirstDateSetAutomatically] =
-    useState<boolean>(false);
-  const [isSecondDateSetAutomatically, setIsSecondDateSetAutomatically] =
     useState<boolean>(false);
 
   function handleCellClick(day: Date) {
@@ -134,37 +124,6 @@ export default function DateTimeRangeProvider({
     }
   }
 
-  // not including activeInput in the dependency array
-  // is essential because otherwise, every time user simply
-  // swithes between the inputs this effect will be triggered,
-  // useEffect(() => {
-  //   if (
-  //     firstDate &&
-  //     !isDragging &&
-  //     activeInput === ActiveInput.First &&
-  //     !isFirstDateSetAutomatically
-  //   ) {
-  //     onFirstDateChange();
-  //   }
-  //   if (isFirstDateSetAutomatically) {
-  //     setIsFirstDateSetAutomatically(false);
-  //   }
-  // }, [firstDate, isDragging]);
-
-  // useEffect(() => {
-  //   if (
-  //     secondDate &&
-  //     !isDragging &&
-  //     activeInput === ActiveInput.Second &&
-  //     !isSecondDateSetAutomatically
-  //   ) {
-  //     onSecondDateChange();
-  //   }
-  //   if (isSecondDateSetAutomatically) {
-  //     setIsSecondDateSetAutomatically(false);
-  //   }
-  // }, [secondDate, isDragging]);
-
   useEffect(() => {
     if (isDragging && dateChangedWhileDragging) {
       if (draggedDate === DraggedDate.First) {
@@ -174,12 +133,6 @@ export default function DateTimeRangeProvider({
       }
     }
   }, [draggedDate, isDragging, dateChangedWhileDragging]);
-
-  useEffect(() => {
-    if (isFirstDateSetAutomatically) {
-      setIsFirstDateSetAutomatically(false);
-    }
-  }, [firstDate]);
 
   return (
     <DateTimeRangeContext.Provider
@@ -206,8 +159,6 @@ export default function DateTimeRangeProvider({
         setFirstSelectedTime,
         secondSelectedTime,
         setSecondSelectedTime,
-        setIsFirstDateSetAutomatically,
-        setIsSecondDateSetAutomatically,
       }}
     >
       {children}

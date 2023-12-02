@@ -31,8 +31,6 @@ function TimePicker() {
     setFirstSelectedTime,
     setSecondSelectedTime,
     activeInput,
-    setIsFirstDateSetAutomatically,
-    setIsSecondDateSetAutomatically,
   } = useDateTimeRange();
   const [selectedTime, setSelectedTime] = useState<Time | null>(null);
 
@@ -58,14 +56,12 @@ function TimePicker() {
 
   function setFirstDateIfNull() {
     if (!firstDate) {
-      setIsFirstDateSetAutomatically(true);
       setFirstDate(startOfDay(new Date()));
     }
   }
 
   function setSecondDateIfNull() {
     if (!secondDate) {
-      setIsSecondDateSetAutomatically(true);
       setSecondDate(startOfDay(new Date()));
     }
   }
