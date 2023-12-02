@@ -1,35 +1,42 @@
 import {
   Dispatch,
   ReactElement,
+  SetStateAction,
   createContext,
   useContext,
   useEffect,
   useState,
 } from "react";
-import { ActiveInput, DraggedDate } from "../types";
+import { ActiveInput, DraggedDate, Time } from "../types";
 
-type CalendarContextProps = {
+type DateTimeRangeContextProps = {
   draggedDate: DraggedDate;
-  setDraggedDate: (draggedDate: DraggedDate) => void;
+  setDraggedDate: Dispatch<SetStateAction<DraggedDate>>;
   handleCellClick: (day: Date) => void;
   firstDate: Date | null;
   secondDate: Date | null;
-  setFirstDate: (day: Date) => void;
-  setSecondDate: (day: Date) => void;
+  setFirstDate: Dispatch<SetStateAction<Date | null>>;
+  setSecondDate: Dispatch<SetStateAction<Date | null>>;
   currentMonth: Date;
-  setCurrentMonth: (month: Date) => void;
+  setCurrentMonth: Dispatch<SetStateAction<Date>>;
   hoveredDate: Date | null;
-  setHoveredDate: (day: Date | null) => void;
+  setHoveredDate: Dispatch<SetStateAction<Date | null>>;
   shadowSelectedDate: Date | null;
-  setShadowSelectedDate: (day: Date | null) => void;
+  setShadowSelectedDate: Dispatch<SetStateAction<Date | null>>;
   isDragging: boolean;
-  setIsDragging: (isDragging: boolean) => void;
+  setIsDragging: Dispatch<SetStateAction<boolean>>;
   activeInput: ActiveInput;
   setActiveInput: (activeInput: ActiveInput) => void;
-  setDateChangedWhileDragging: (dateChangedWhileDragging: boolean) => void;
+  setDateChangedWhileDragging: Dispatch<SetStateAction<boolean>>;
+  firstSelectedTime: Time | null;
+  setFirstSelectedTime: Dispatch<SetStateAction<Time | null>>;
+  secondSelectedTime: Time | null;
+  setSecondSelectedTime: Dispatch<SetStateAction<Time | null>>;
+  setIsFirstDateSetAutomatically: Dispatch<SetStateAction<boolean>>;
+  setIsSecondDateSetAutomatically: Dispatch<SetStateAction<boolean>>;
 };
 
-const CalendarContext = createContext<CalendarContextProps>({
+const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
   draggedDate: DraggedDate.First,
   setDraggedDate: () => {},
   handleCellClick: () => {},
@@ -48,13 +55,19 @@ const CalendarContext = createContext<CalendarContextProps>({
   activeInput: ActiveInput.None,
   setActiveInput: () => {},
   setDateChangedWhileDragging: () => {},
+  firstSelectedTime: null,
+  setFirstSelectedTime: () => {},
+  secondSelectedTime: null,
+  setSecondSelectedTime: () => {},
+  setIsFirstDateSetAutomatically: () => {},
+  setIsSecondDateSetAutomatically: () => {},
 });
 
-export function useCalendar() {
-  return useContext(CalendarContext);
+export function useDateTimeRange() {
+  return useContext(DateTimeRangeContext);
 }
 
-interface CalendarProviderProps {
+interface DateTimeRangeProviderProps {
   children: ReactElement;
   firstDate: Date | null;
   setFirstDate: Dispatch<React.SetStateAction<Date | null>>;
@@ -64,19 +77,27 @@ interface CalendarProviderProps {
   onSecondDateChange: () => void;
   activeInput: ActiveInput;
   setActiveInput: Dispatch<React.SetStateAction<ActiveInput>>;
+  firstSelectedTime: Time | null;
+  setFirstSelectedTime: Dispatch<React.SetStateAction<Time | null>>;
+  secondSelectedTime: Time | null;
+  setSecondSelectedTime: Dispatch<React.SetStateAction<Time | null>>;
 }
 
-export default function CalendarProvider({
+export default function DateTimeRangeProvider({
   children,
   firstDate,
   setFirstDate,
   secondDate,
   setSecondDate,
+  firstSelectedTime,
+  setFirstSelectedTime,
+  secondSelectedTime,
+  setSecondSelectedTime,
   onFirstDateChange,
   onSecondDateChange,
   activeInput,
   setActiveInput,
-}: CalendarProviderProps) {
+}: DateTimeRangeProviderProps) {
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(
     DraggedDate.First
   );
@@ -87,6 +108,10 @@ export default function CalendarProvider({
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dateChangedWhileDragging, setDateChangedWhileDragging] =
+    useState<boolean>(false);
+  const [isFirstDateSetAutomatically, setIsFirstDateSetAutomatically] =
+    useState<boolean>(false);
+  const [isSecondDateSetAutomatically, setIsSecondDateSetAutomatically] =
     useState<boolean>(false);
 
   function handleCellClick(day: Date) {
@@ -112,17 +137,33 @@ export default function CalendarProvider({
   // not including activeInput in the dependency array
   // is essential because otherwise, every time user simply
   // swithes between the inputs this effect will be triggered,
-  useEffect(() => {
-    if (firstDate && !isDragging && activeInput === ActiveInput.First) {
-      onFirstDateChange();
-    }
-  }, [firstDate, isDragging]);
+  // useEffect(() => {
+  //   if (
+  //     firstDate &&
+  //     !isDragging &&
+  //     activeInput === ActiveInput.First &&
+  //     !isFirstDateSetAutomatically
+  //   ) {
+  //     onFirstDateChange();
+  //   }
+  //   if (isFirstDateSetAutomatically) {
+  //     setIsFirstDateSetAutomatically(false);
+  //   }
+  // }, [firstDate, isDragging]);
 
-  useEffect(() => {
-    if (secondDate && !isDragging && activeInput === ActiveInput.Second) {
-      onSecondDateChange();
-    }
-  }, [secondDate, isDragging]);
+  // useEffect(() => {
+  //   if (
+  //     secondDate &&
+  //     !isDragging &&
+  //     activeInput === ActiveInput.Second &&
+  //     !isSecondDateSetAutomatically
+  //   ) {
+  //     onSecondDateChange();
+  //   }
+  //   if (isSecondDateSetAutomatically) {
+  //     setIsSecondDateSetAutomatically(false);
+  //   }
+  // }, [secondDate, isDragging]);
 
   useEffect(() => {
     if (isDragging && dateChangedWhileDragging) {
@@ -134,8 +175,14 @@ export default function CalendarProvider({
     }
   }, [draggedDate, isDragging, dateChangedWhileDragging]);
 
+  useEffect(() => {
+    if (isFirstDateSetAutomatically) {
+      setIsFirstDateSetAutomatically(false);
+    }
+  }, [firstDate]);
+
   return (
-    <CalendarContext.Provider
+    <DateTimeRangeContext.Provider
       value={{
         draggedDate,
         setDraggedDate,
@@ -155,9 +202,15 @@ export default function CalendarProvider({
         activeInput,
         setActiveInput,
         setDateChangedWhileDragging,
+        firstSelectedTime,
+        setFirstSelectedTime,
+        secondSelectedTime,
+        setSecondSelectedTime,
+        setIsFirstDateSetAutomatically,
+        setIsSecondDateSetAutomatically,
       }}
     >
       {children}
-    </CalendarContext.Provider>
+    </DateTimeRangeContext.Provider>
   );
 }

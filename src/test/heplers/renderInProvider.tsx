@@ -1,16 +1,16 @@
 import { ReactElement } from "react";
 import { render } from "@testing-library/react";
-import CalendarProvider from "../../Calendar/CalendarProvider";
+import DateTimeRangeProvider from "../../Calendar/DateTimeRangeProvider";
 
 export default function renderInProvider(element: ReactElement) {
   render(
-    <CalendarProvider
+    <DateTimeRangeProvider
       firstDate={null}
       setFirstDate={() => null}
       secondDate={null}
       setSecondDate={() => null}
     >
       {element}
-    </CalendarProvider>
+    </DateTimeRangeProvider>
   );
 }

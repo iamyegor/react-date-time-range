@@ -1,14 +1,16 @@
 import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
+import { Time } from "../types";
 
 interface InputProps {
   text: string;
   date: Date | null;
+  time: Time | null;
   onFocus: () => void;
   isActive: boolean;
 }
 
-function DateInput({ text, date, onFocus, isActive }: InputProps) {
+function DateInput({ text, date, time, onFocus, isActive }: InputProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
@@ -33,7 +35,7 @@ function DateInput({ text, date, onFocus, isActive }: InputProps) {
   }
 
   function shouldTextBeOnTop() {
-    return isFocused || date || isActive;
+    return isFocused || date || time || isActive;
   }
 
   function shouldHaveOutline() {
@@ -59,12 +61,24 @@ function DateInput({ text, date, onFocus, isActive }: InputProps) {
       : "transform -translate-y-1/2 top-1/2 left-2 text-base"
   } ${shouldHaveOutline() ? "text-blue-500" : "text-gray-800"}`;
 
-  function getInputText() {
+  function getDateIfDefined() {
     if (date) {
       return format(date, "dd/MM/yyyy");
     } else {
       if (shouldTextBeOnTop()) {
         return "mm/dd/yyyy";
+      }
+    }
+  }
+
+  function getTimeIfDefined() {
+    if (time) {
+      const hours = time.hours.toString().padStart(2, "0");
+      const minutes = time.minutes.toString().padStart(2, "0");
+      return `${hours}:${minutes} ${time.period}`;
+    } else {
+      if (shouldTextBeOnTop()) {
+        return "hh:mm aa";
       }
     }
   }
@@ -76,7 +90,8 @@ function DateInput({ text, date, onFocus, isActive }: InputProps) {
       onBlur={handleBlur}
     >
       <div className={inputClassNames} tabIndex={0} style={{ clipPath }}>
-        <p className="transition-all">{getInputText()}</p>
+        <p className="transition-all mr-1">{getDateIfDefined()}</p>
+        <p className="translate-all">{getTimeIfDefined()}</p>
       </div>
       <label className={textClassNames} tabIndex={0}>
         {text}

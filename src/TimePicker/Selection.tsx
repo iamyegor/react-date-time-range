@@ -3,14 +3,14 @@ import "./styles/Selection.css";
 interface SelectionProps {
   items: string[];
   selectedItem: string;
-  setSelectedItem: (item: string) => void;
+  handleSelect: (item: string) => void;
   testid?: string;
 }
 
 function Selection({
   items,
   selectedItem,
-  setSelectedItem,
+  handleSelect,
   testid = "selection",
 }: SelectionProps) {
   function getClassNames(item: string) {
@@ -29,7 +29,7 @@ function Selection({
         <div
           key={item}
           className={getClassNames(item)}
-          onClick={() => setSelectedItem(item)}
+          onClick={() => handleSelect(item)}
         >
           {item}
         </div>

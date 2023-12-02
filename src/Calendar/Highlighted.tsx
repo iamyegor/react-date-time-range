@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { endOfMonth, isEqual, isSaturday, isSunday } from "date-fns";
-import { useCalendar } from "./CalendarProvider";
+import { useDateTimeRange } from "./DateTimeRangeProvider";
 
 const FIRST_DATE = "rounded-l-full left-2";
 const SECOND_DATE = "rounded-r-full right-2";
@@ -8,7 +8,7 @@ const LEFT_EDGE = "rounded-l-full left-[0.3rem]";
 const RIGHT_EDGE = "rounded-r-full right-[0.3rem]";
 
 export default function Highlighted({ day }: { day: Date }) {
-  const { firstDate, secondDate } = useCalendar();
+  const { firstDate, secondDate } = useDateTimeRange();
   let leftSideChanged = false;
   let rightSideChanged = false;
 

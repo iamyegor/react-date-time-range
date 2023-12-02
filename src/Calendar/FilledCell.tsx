@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { format, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
-import { useCalendar } from "./CalendarProvider";
+import { useDateTimeRange } from "./DateTimeRangeProvider";
 import DashedBorder from "./DashedBorder";
 import Highlighted from "./Highlighted";
 import "./styles/DayCell.css";
@@ -21,7 +21,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     shadowSelectedDate,
     isDragging,
     setIsDragging,
-  } = useCalendar();
+  } = useDateTimeRange();
 
   const isDateSelected = (date: Date) =>
     ((firstDate && isSameDay(date, firstDate)) ||

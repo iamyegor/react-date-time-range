@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
+import { ActiveInput, Time } from "../types";
 import Selection from "./Selection";
+import { startOfDay } from "date-fns";
 
-// Optional: Extract constants
 const hours = Array.from({ length: 11 }, (_, i) =>
   String(i + 1).padStart(2, "0")
 );
@@ -12,42 +14,120 @@ const minutes = Array.from({ length: 12 }, (_, i) =>
 );
 const periods = ["AM", "PM"];
 
+const defaultSelectedTime = {
+  hours: 12,
+  minutes: 0,
+  period: "AM",
+};
+
 function TimePicker() {
-  const [selectedHour, setSelectedHour] = useState("12");
-  const [selectedMinute, setSelectedMinute] = useState("00");
-  const [selectedPeriod, setSelectedPeriod] = useState("AM");
+  const {
+    firstDate,
+    setFirstDate,
+    secondDate,
+    setSecondDate,
+    firstSelectedTime,
+    secondSelectedTime,
+    setFirstSelectedTime,
+    setSecondSelectedTime,
+    activeInput,
+    setIsFirstDateSetAutomatically,
+    setIsSecondDateSetAutomatically,
+  } = useDateTimeRange();
+  const [selectedTime, setSelectedTime] = useState<Time | null>(null);
+
+  useEffect(() => {
+    if (activeInput === ActiveInput.First) {
+      setSelectedTime(firstSelectedTime);
+    } else if (activeInput === ActiveInput.Second) {
+      setSelectedTime(secondSelectedTime);
+    }
+  }, [activeInput, firstSelectedTime, secondSelectedTime]);
+
+  function handleTimeChange(key: "hours" | "minutes", value: number) {
+    if (activeInput === ActiveInput.First) {
+      setFirstSelectedTime((prev) => getUpdatedTime(prev, key, value) as Time);
+      setFirstDateIfNull();
+    } else if (activeInput === ActiveInput.Second) {
+      setSecondSelectedTime((prev) => getUpdatedTime(prev, key, value) as Time);
+      setSecondDateIfNull();
+    }
+
+    setSelectedTime((prev) => getUpdatedTime(prev, key, value) as Time);
+  }
+
+  function setFirstDateIfNull() {
+    if (!firstDate) {
+      setIsFirstDateSetAutomatically(true);
+      setFirstDate(startOfDay(new Date()));
+    }
+  }
+
+  function setSecondDateIfNull() {
+    if (!secondDate) {
+      setIsSecondDateSetAutomatically(true);
+      setSecondDate(startOfDay(new Date()));
+    }
+  }
+
+  function getUpdatedTime(
+    prev: Time | null,
+    key: "hours" | "minutes",
+    value: number
+  ) {
+    const currentTime = prev || defaultSelectedTime;
+    return { ...currentTime, [key]: value };
+  }
+
+  function handlePeriodChange(period: "AM" | "PM") {
+    if (activeInput === ActiveInput.First) {
+      setFirstSelectedTime((prev) => getUpdatedPeriod(prev, period));
+      setFirstDateIfNull();
+    } else if (activeInput === ActiveInput.Second) {
+      setSecondSelectedTime((prev) => getUpdatedPeriod(prev, period));
+      setSecondDateIfNull();
+    }
+
+    setSelectedTime((prev) => getUpdatedPeriod(prev, period));
+  }
+
+  function getUpdatedPeriod(prev: Time | null, period: "AM" | "PM") {
+    const currentTime = prev || defaultSelectedTime;
+    return { ...currentTime, period };
+  }
+
+  function convertTo2DigitString(num: number) {
+    return num.toString().padStart(2, "0");
+  }
 
   return (
     <div className="flex flex-col w-48">
       <div className="flex justify-between px-4 py-2 overflow-hidden">
         <Selection
           items={hours}
-          selectedItem={selectedHour}
-          setSelectedItem={setSelectedHour}
+          selectedItem={
+            selectedTime ? convertTo2DigitString(selectedTime.hours) : ""
+          }
+          handleSelect={(item) => handleTimeChange("hours", Number(item))}
           testid="hours"
         />
         <Selection
           items={minutes}
-          selectedItem={selectedMinute}
-          setSelectedItem={setSelectedMinute}
+          selectedItem={
+            selectedTime ? convertTo2DigitString(selectedTime.minutes) : ""
+          }
+          handleSelect={(item) => handleTimeChange("minutes", Number(item))}
           testid="minutes"
         />
         <Selection
           items={periods}
-          selectedItem={selectedPeriod}
-          setSelectedItem={setSelectedPeriod}
+          selectedItem={selectedTime ? selectedTime.period : ""}
+          handleSelect={(item) => handlePeriodChange(item as "AM" | "PM")}
           testid="periods"
         />
       </div>
       <hr />
-      <button
-        className="py-2 text-lg"
-        onClick={() =>
-          alert(`${selectedHour}:${selectedMinute} ${selectedPeriod}`)
-        }
-      >
-        OK
-      </button>
+      <button className="py-2 text-lg">OK</button>
     </div>
   );
 }

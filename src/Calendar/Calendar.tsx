@@ -1,7 +1,7 @@
 import { addMonths, subMonths } from "date-fns";
 import { useEffect, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import { useCalendar } from "./CalendarProvider";
+import { useDateTimeRange } from "./DateTimeRangeProvider";
 import Cells from "./Cells";
 import Days from "./Days";
 import Header from "./Header";
@@ -11,7 +11,7 @@ const duration = 250;
 
 function Calendar() {
   const { currentMonth, setCurrentMonth, isDragging, setIsDragging } =
-    useCalendar();
+    useDateTimeRange();
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element; isNext: boolean }[]

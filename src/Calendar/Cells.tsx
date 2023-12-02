@@ -8,7 +8,7 @@ import {
 } from "date-fns";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { DraggedDate } from "../types";
-import { useCalendar } from "./CalendarProvider";
+import { useDateTimeRange } from "./DateTimeRangeProvider";
 import WeekRow from "./WeekRow";
 
 interface CellsProps {
@@ -29,7 +29,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     setShadowSelectedDate,
     isDragging,
     setDateChangedWhileDragging,
-  } = useCalendar();
+  } = useDateTimeRange();
   const [firstDateBeforeDrag, setFirstDateBeforeDrag] = useState<Date | null>(
     null
   );
