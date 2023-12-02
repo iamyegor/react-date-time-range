@@ -104,7 +104,7 @@ function TimePicker() {
           selectedItem={
             selectedTime ? convertTo2DigitString(selectedTime.hours) : ""
           }
-          handleSelect={(item) => handleTimeChange("hours", Number(item))}
+          onSelect={(item) => handleTimeChange("hours", Number(item))}
           testid="hours"
         />
         <Selection
@@ -112,13 +112,13 @@ function TimePicker() {
           selectedItem={
             selectedTime ? convertTo2DigitString(selectedTime.minutes) : ""
           }
-          handleSelect={(item) => handleTimeChange("minutes", Number(item))}
+          onSelect={(item) => handleTimeChange("minutes", Number(item))}
           testid="minutes"
         />
         <Selection
           items={periods}
           selectedItem={selectedTime ? selectedTime.period : ""}
-          handleSelect={(item) => handlePeriodChange(item as "AM" | "PM")}
+          onSelect={(item) => handlePeriodChange(item as "AM" | "PM")}
           testid="periods"
         />
       </div>
