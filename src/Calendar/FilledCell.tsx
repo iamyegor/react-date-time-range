@@ -1,11 +1,12 @@
 import classNames from "classnames";
-import { format, isEqual, isSameDay, isWithinInterval } from "date-fns";
+import { format, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 import DashedBorder from "./DashedBorder";
-import Highlighted from "./Highlighted";
+import { useDateTimeRange } from "./DateTimeRangeProvider";
+import Highlight from "./Highlight";
 import "./styles/DayCell.css";
+import HoverHighlight from "./HoverHighlight";
 
 interface FilledCellProps {
   day: Date;
@@ -47,7 +48,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       "group-hover:bg-blue-400 group-hover:border-none": isDateSelected(day),
       "group-hover:border group-hover:bg-blue-100/40 group-hover:border-gray-200":
         !isDateSelected(day),
-      "group-hover:bg-blue-300/50":
+      "group-hover:border-none group-hover:bg-transparent":
         firstDate && secondDate && day > firstDate && day < secondDate,
     });
   }
@@ -69,7 +70,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   return (
     <div
       data-testid="filled-cell"
-      className={`flex-1 py-1 flex justify-center items-center group relative 
+      className={`flex-1 py-1 flex justify-center items-center group relative
       ${getCursorWhenDragging()}`}
       onClick={() => handleCellClick(day)}
       onMouseEnter={() => setHoveredDate(day)}
@@ -83,7 +84,8 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       >
         <span>{format(day, "d")}</span>
       </div>
-      <Highlighted day={day} />
+      <HoverHighlight day={day} />
+      <Highlight day={day} />
     </div>
   );
 }

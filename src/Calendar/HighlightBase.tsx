@@ -1,21 +1,31 @@
 import classNames from "classnames";
 import { endOfMonth, isEqual, isSaturday, isSunday } from "date-fns";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 
-const FIRST_DATE = "rounded-l-full left-2";
-const SECOND_DATE = "rounded-r-full right-2";
+const START = "rounded-l-full left-[0.3rem]";
+const END = "rounded-r-full right-[0.3rem]";
 const LEFT_EDGE = "rounded-l-full left-[0.3rem]";
 const RIGHT_EDGE = "rounded-r-full right-[0.3rem]";
 
-export default function Highlighted({ day }: { day: Date }) {
-  const { firstDate, secondDate } = useDateTimeRange();
+interface HighlightBaseProps {
+  day: Date;
+  stylingClasses: string;
+  start: Date;
+  end: Date;
+}
+
+export default function HighlightBase({
+  day,
+  stylingClasses,
+  start,
+  end,
+}: HighlightBaseProps) {
   let leftSideChanged = false;
   let rightSideChanged = false;
 
   function getHighlightedIfDayIsInRange() {
-    let highlighted = "bg-blue-200/50 border-blue-400";
-    if (firstDate && secondDate) {
-      if (day >= firstDate && day <= secondDate) {
+    let highlighted = stylingClasses;
+    if (start && end) {
+      if (day >= start && day <= end) {
         return classNames(highlighted, getStylingsForDifferentDates());
       }
     }
@@ -25,19 +35,19 @@ export default function Highlighted({ day }: { day: Date }) {
 
   function getStylingsForDifferentDates() {
     let highlighted = "";
-    highlighted = applyStylingForSelectedDates(highlighted);
+    highlighted = applyStylingForStartAndEnd(highlighted);
     highlighted = applyStylingForEdgeDates(highlighted);
     highlighted = applySideOffsetsIfUnchanged(highlighted);
     return highlighted;
   }
 
-  function applyStylingForSelectedDates(style: string) {
-    if (firstDate && isEqual(day, firstDate)) {
-      style = classNames(style, FIRST_DATE);
+  function applyStylingForStartAndEnd(style: string) {
+    if (start && isEqual(day, start)) {
+      style = classNames(style, START);
       leftSideChanged = true;
     }
-    if (secondDate && isEqual(day, secondDate)) {
-      style = classNames(style, SECOND_DATE);
+    if (end && isEqual(day, end)) {
+      style = classNames(style, END);
       rightSideChanged = true;
     }
     return style;
@@ -67,7 +77,7 @@ export default function Highlighted({ day }: { day: Date }) {
 
   return (
     <div
-      className={`absolute top-[3px] bottom-[3px] flex items-center 
+      className={`absolute top-[3px] bottom-[3px] flex items-center  
       justify-center ${getHighlightedIfDayIsInRange()}`}
     ></div>
   );
