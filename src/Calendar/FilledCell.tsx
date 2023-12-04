@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { format, isEqual, isSameDay } from "date-fns";
+import { format, isEqual, isSameDay, isWithinInterval } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import { useDateTimeRange } from "./DateTimeRangeProvider";
@@ -44,8 +44,11 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function getDayCellClasses(): string {
     return classNames(getClassesForDay(), {
-      "group-hover:bg-blue-400 group-hover:border-none":
-        isDateSelected(day) && day instanceof Date,
+      "group-hover:bg-blue-400 group-hover:border-none": isDateSelected(day),
+      "group-hover:border group-hover:bg-blue-100/40 group-hover:border-gray-200":
+        !isDateSelected(day),
+      "group-hover:bg-blue-300/50":
+        firstDate && secondDate && day > firstDate && day < secondDate,
     });
   }
 
@@ -76,8 +79,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       <DashedBorder day={day} />
       <div
         className={`w-9 h-9 flex items-center justify-center text-xs
-        group-hover:border group-hover:bg-blue-200/50
-        rounded-full group-hover:border-gray-400 ${getDayCellClasses()} z-10 `}
+        transition-all rounded-full ${getDayCellClasses()} z-10 `}
       >
         <span>{format(day, "d")}</span>
       </div>

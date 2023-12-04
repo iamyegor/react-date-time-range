@@ -12,7 +12,7 @@ export default function Highlighted({ day }: { day: Date }) {
   let leftSideChanged = false;
   let rightSideChanged = false;
 
-  function getHighlighted() {
+  function getHighlightedIfDayIsInRange() {
     let highlighted = "bg-blue-200/50 border-blue-400";
     if (firstDate && secondDate) {
       if (day >= firstDate && day <= secondDate) {
@@ -68,7 +68,7 @@ export default function Highlighted({ day }: { day: Date }) {
   return (
     <div
       className={`absolute top-[3px] bottom-[3px] flex items-center 
-      justify-center ${getHighlighted()}`}
+      justify-center ${getHighlightedIfDayIsInRange()}`}
     ></div>
   );
 }
