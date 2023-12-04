@@ -31,16 +31,24 @@ export default function DateTimeRange() {
     }
   }, [showDateTime]);
 
-  function handleFirstDateChange() {
-    setActiveInput(ActiveInput.Second);
-  }
+  function handleOKButtonClick() {
+    const areFirstDateAndTimeSelected = firstDate && firstSelectedTime;
+    const areSecondDateAndTimeSelected = secondDate && secondSelectedTime;
 
-  function handleSecondDateChange() {
-    if (firstDate) {
-      setActiveInput(ActiveInput.None);
+    if (!areFirstDateAndTimeSelected && !areSecondDateAndTimeSelected) {
       setShowDateTime(false);
-    } else {
+    } else if (
+      activeInput === ActiveInput.First &&
+      !areSecondDateAndTimeSelected
+    ) {
+      setActiveInput(ActiveInput.Second);
+    } else if (
+      activeInput === ActiveInput.Second &&
+      !areFirstDateAndTimeSelected
+    ) {
       setActiveInput(ActiveInput.First);
+    } else {
+      setShowDateTime(false);
     }
   }
 
@@ -70,8 +78,6 @@ export default function DateTimeRange() {
         setActiveInput={setActiveInput}
         setFirstDate={setFirstDate}
         setSecondDate={setSecondDate}
-        onFirstDateChange={() => handleFirstDateChange()}
-        onSecondDateChange={() => handleSecondDateChange()}
         firstSelectedTime={firstSelectedTime}
         setFirstSelectedTime={setFirstSelectedTime}
         secondSelectedTime={secondSelectedTime}
@@ -83,7 +89,7 @@ export default function DateTimeRange() {
           classNames="date-time"
           unmountOnExit
         >
-          <DateTime onOkButtonClick={() => console.log("Ok")} />
+          <DateTime onOkButtonClick={() => handleOKButtonClick()} />
         </CSSTransition>
       </DateTimeRangeProvider>
     </div>

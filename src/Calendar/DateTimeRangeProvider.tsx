@@ -69,8 +69,6 @@ interface DateTimeRangeProviderProps {
   setFirstDate: Dispatch<React.SetStateAction<Date | null>>;
   secondDate: Date | null;
   setSecondDate: Dispatch<React.SetStateAction<Date | null>>;
-  onFirstDateChange: () => void;
-  onSecondDateChange: () => void;
   activeInput: ActiveInput;
   setActiveInput: Dispatch<React.SetStateAction<ActiveInput>>;
   firstSelectedTime: Time | null;

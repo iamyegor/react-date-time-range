@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
+import "./styles/OKButton.css";
 
 interface OKButtonProps {
   children: ReactNode;
@@ -35,7 +36,7 @@ export default function OKButton({ children, onClick }: OKButtonProps) {
     >
       <p
         className={`p-0.5 px-3 flex justify-center items-center transition-all
-          duration-200 bg-blue-500 text-white rounded  
+          ease-in duration-200 bg-blue-500 text-white rounded 
           ${isClicked ? "active-shadow" : "shadow shadow-blue-500/50"}`}
       >
         {children}
