@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { ActiveInput, DraggedDate, Time } from "../types";
+import { getDefaultSelectedTime } from "../utils";
 
 type DateTimeRangeContextProps = {
   draggedDate: DraggedDate;
@@ -121,6 +122,18 @@ export default function DateTimeRangeProvider({
       }
     }
   }
+
+  useEffect(() => {
+    if (firstDate && !firstSelectedTime) {
+      setFirstSelectedTime(getDefaultSelectedTime());
+    }
+  }, [firstDate]);
+
+  useEffect(() => {
+    if (secondDate && !secondSelectedTime) {
+      setSecondSelectedTime(getDefaultSelectedTime());
+    }
+  }, [secondDate]);
 
   useEffect(() => {
     if (isDragging && dateChangedWhileDragging) {

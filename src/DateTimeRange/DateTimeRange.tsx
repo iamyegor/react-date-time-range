@@ -7,6 +7,7 @@ import { ActiveInput, Time } from "../types";
 import DateInput from "./DateInput";
 import DateTime from "./DateTime";
 import "./styles/DateTimeRange.css";
+import { getDefaultSelectedTime } from "../utils";
 
 export default function DateTimeRange() {
   const [firstDate, setFirstDate] = useState<Date | null>(null);
@@ -30,6 +31,18 @@ export default function DateTimeRange() {
       setActiveInput(ActiveInput.None);
     }
   }, [showDateTime]);
+
+  useEffect(() => {
+    if (firstDate && !firstSelectedTime) {
+      setFirstSelectedTime(getDefaultSelectedTime());
+    }
+  }, [firstDate]);
+
+  useEffect(() => {
+    if (secondDate && !secondSelectedTime) {
+      setSecondSelectedTime(getDefaultSelectedTime());
+    }
+  }, [secondDate]);
 
   function handleOKButtonClick() {
     const areFirstDateAndTimeSelected = firstDate && firstSelectedTime;

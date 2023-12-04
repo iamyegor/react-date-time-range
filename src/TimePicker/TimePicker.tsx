@@ -3,6 +3,7 @@ import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
 import { ActiveInput, Time } from "../types";
 import Selection from "./Selection";
 import { startOfDay } from "date-fns";
+import { getDefaultSelectedTime } from "../utils";
 
 const hours = Array.from({ length: 11 }, (_, i) =>
   String(i + 1).padStart(2, "0")
@@ -13,12 +14,6 @@ const minutes = Array.from({ length: 12 }, (_, i) =>
   String(i * 5).padStart(2, "0")
 );
 const periods = ["AM", "PM"];
-
-const defaultSelectedTime = {
-  hours: 12,
-  minutes: 0,
-  period: "AM",
-};
 
 function TimePicker() {
   const {
@@ -71,7 +66,7 @@ function TimePicker() {
     key: "hours" | "minutes",
     value: number
   ) {
-    const currentTime = prev || defaultSelectedTime;
+    const currentTime = prev || getDefaultSelectedTime();
     return { ...currentTime, [key]: value };
   }
 
@@ -88,7 +83,7 @@ function TimePicker() {
   }
 
   function getUpdatedPeriod(prev: Time | null, period: "AM" | "PM") {
-    const currentTime = prev || defaultSelectedTime;
+    const currentTime = prev || getDefaultSelectedTime();
     return { ...currentTime, period };
   }
 
