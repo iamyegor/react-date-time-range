@@ -92,14 +92,15 @@ function TimePicker() {
   }
 
   return (
-    <div className="flex flex-col w-48">
-      <div className="flex justify-between px-4 py-2 overflow-hidden">
+    <div className="flex flex-col">
+      <div className="flex justify-between overflow-hidden">
         <Selection
           items={hours}
           selectedItem={
             selectedTime ? convertTo2DigitString(selectedTime.hours) : ""
           }
           onSelect={(item) => handleTimeChange("hours", Number(item))}
+          hasBorder
           testid="hours"
         />
         <Selection
@@ -108,6 +109,7 @@ function TimePicker() {
             selectedTime ? convertTo2DigitString(selectedTime.minutes) : ""
           }
           onSelect={(item) => handleTimeChange("minutes", Number(item))}
+          hasBorder
           testid="minutes"
         />
         <Selection

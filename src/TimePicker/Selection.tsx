@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import "./styles/Selection.css";
-import { s } from "vitest/dist/reporters-5f784f42.js";
 
 interface SelectionProps {
   items: string[];
   selectedItem: string;
   onSelect: (item: string) => void;
   testid?: string;
+  hasBorder?: boolean;
 }
 
 function Selection({
@@ -14,6 +14,7 @@ function Selection({
   selectedItem,
   onSelect,
   testid = "selection",
+  hasBorder = false,
 }: SelectionProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRef = useRef<HTMLDivElement | null>(null);
@@ -40,7 +41,7 @@ function Selection({
 
   function getClassNames(item: string) {
     return `cursor-pointer py-2 flex justify-center items-center rounded 
-    flex-shrink-0 w-10 h-10 text-sm transition-all ${
+    flex-shrink-0 w-10 h-9 text-sm transition-all  ${
       selectedItem === item ? "bg-blue-500 text-white" : ""
     }`;
   }
@@ -64,7 +65,8 @@ function Selection({
   return (
     <div
       ref={containerRef}
-      className="flex flex-col selection-scroll overflow-auto"
+      className={`flex flex-col selection-scroll w-12 overflow-hidden 
+      hover:overflow-y-auto py-2 pl-1 ${hasBorder ? "border-r" : ""}`}
       style={{ paddingBottom: `${bottomSpace}px` }}
       data-testid={`${testid}`}
     >
