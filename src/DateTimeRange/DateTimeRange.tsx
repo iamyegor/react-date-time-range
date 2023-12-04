@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import DateTimeRangeProvider from "../Calendar/DateTimeRangeProvider";
-import dashIcon from "../assets/icons/dash.svg";
+import arrowBetweenDates from "../assets/icons/arrow-between-dates.svg";
 import useOutsideClick from "../hooks/useOutsideClick";
 import { ActiveInput, Time } from "../types";
+import { getDefaultSelectedTime } from "../utils";
 import DateInput from "./DateInput";
 import DateTime from "./DateTime";
 import "./styles/DateTimeRange.css";
-import { getDefaultSelectedTime } from "../utils";
 
 export default function DateTimeRange() {
   const [firstDate, setFirstDate] = useState<Date | null>(null);
@@ -75,7 +75,7 @@ export default function DateTimeRange() {
           time={firstSelectedTime}
           onFocus={() => handleInputFocus(ActiveInput.First)}
         />
-        <img src={dashIcon} alt="dash" className="mx-2 w-[12px] h-[12px]" />
+        <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
         <DateInput
           isActive={activeInput === ActiveInput.Second}
           text="End Date"
