@@ -39,7 +39,41 @@ export default function DateInput({ value, setValue }: DateInputProps) {
       } else if (position >= 17 && position <= 19) {
         toggleAMPM();
       }
-    } 
+    } else if (e.key === "ArrowDown") {
+      if (position <= 2) {
+        decrementSection(sections[0], 1, 12);
+      } else if (position >= 3 && position <= 5) {
+        decrementSection(sections[1], 1, 31);
+      } else if (position >= 6 && position <= 10) {
+        decrementSection(sections[2], 1, 9999);
+      } else if (position >= 11 && position <= 13) {
+        decrementSection(sections[3], 1, 12);
+      } else if (position >= 14 && position <= 16) {
+        decrementSection(sections[4], 0, 59);
+      } else if (position >= 17 && position <= 19) {
+        toggleAMPM();
+      }
+    }
+
+    function decrementSection(
+      { start, end }: { start: number; end: number },
+      min: number,
+      max: number
+    ) {
+      const num = getCurrentNumOrDefault(value.slice(start, end), min);
+
+      const newNum = num - 1;
+
+      let newSection = "";
+      if (newNum < min) {
+        max = max !== undefined ? max : 1;
+        newSection = convertToStringWithPads(max, end - start);
+      } else {
+        newSection = convertToStringWithPads(newNum, end - start);
+      }
+
+      setNewSection(newSection, start, end);
+    }
 
     const numKey = parseInt(e.key);
     if (isNaN(numKey) || numKey < 0 || numKey > 9) {
