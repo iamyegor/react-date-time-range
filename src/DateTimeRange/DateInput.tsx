@@ -25,6 +25,22 @@ export default function DateInput({ value, setValue }: DateInputProps) {
       handleAMPMChange(e.key);
     }
 
+    if (e.key === "ArrowUp") {
+      if (position <= 2) {
+        incrementSection(sections[0], 12);
+      } else if (position >= 3 && position <= 5) {
+        incrementSection(sections[1], 31);
+      } else if (position >= 6 && position <= 10) {
+        incrementSection(sections[2], 9999);
+      } else if (position >= 11 && position <= 13) {
+        incrementSection(sections[3], 12);
+      } else if (position >= 14 && position <= 16) {
+        incrementSection(sections[4], 59, 0);
+      } else if (position >= 17 && position <= 19) {
+        toggleAMPM();
+      }
+    } 
+
     const numKey = parseInt(e.key);
     if (isNaN(numKey) || numKey < 0 || numKey > 9) {
       return;
@@ -46,7 +62,7 @@ export default function DateInput({ value, setValue }: DateInputProps) {
   function handleMonthChange(numKey: number) {
     const month = changeMonthBasedOnKey(value.slice(0, 2), numKey);
     const newValue = month + value.slice(2);
-    updateInputValue(newValue, getPosBasedOnMonth(month));
+    updateInputValueAndCaretPos(newValue, getPosBasedOnMonth(month));
     setValue(newValue);
   }
 
@@ -67,7 +83,7 @@ export default function DateInput({ value, setValue }: DateInputProps) {
   function handleDayChange(numKey: number) {
     const day = changeDayBasedOnKey(value.slice(3, 5), numKey);
     const newValue = value.slice(0, 3) + day + value.slice(5);
-    updateInputValue(newValue, getPosBasedOnDay(day));
+    updateInputValueAndCaretPos(newValue, getPosBasedOnDay(day));
     setValue(newValue);
   }
 
@@ -91,7 +107,7 @@ export default function DateInput({ value, setValue }: DateInputProps) {
   function handleYearChange(numKey: number) {
     const year = changeYearBasedOnKey(value.slice(6, 10), numKey);
     const newValue = value.slice(0, 6) + year + value.slice(10);
-    updateInputValue(newValue, getPosBasedOnYear(year));
+    updateInputValueAndCaretPos(newValue, getPosBasedOnYear(year));
     setValue(newValue);
   }
 
@@ -113,7 +129,7 @@ export default function DateInput({ value, setValue }: DateInputProps) {
   function handleHourChange(numKey: number) {
     const hour = changeHourBasedOnKey(value.slice(11, 13), numKey);
     const newValue = value.slice(0, 11) + hour + value.slice(13);
-    updateInputValue(newValue, getPosBasedOnHour(hour));
+    updateInputValueAndCaretPos(newValue, getPosBasedOnHour(hour));
     setValue(newValue);
   }
 
@@ -135,7 +151,7 @@ export default function DateInput({ value, setValue }: DateInputProps) {
   function handleMinuteChange(numKey: number) {
     const minute = changeMinuteBasedOnKey(value.slice(14, 16), numKey);
     const newValue = value.slice(0, 14) + minute + value.slice(16);
-    updateInputValue(newValue, getPosBasedOnMinute(minute));
+    updateInputValueAndCaretPos(newValue, getPosBasedOnMinute(minute));
     setValue(newValue);
   }
 
@@ -165,17 +181,64 @@ export default function DateInput({ value, setValue }: DateInputProps) {
       return;
     }
 
-    updateInputValue(newValue, sections[5]);
+    updateInputValueAndCaretPos(newValue, sections[5]);
     setValue(newValue);
   }
 
-  function updateInputValue(
+  function updateInputValueAndCaretPos(
     newValue: string,
     { start, end }: { start: number; end: number }
   ) {
     if (inputRef.current) {
       inputRef.current.value = newValue;
       inputRef.current.setSelectionRange(start, end);
+    }
+  }
+
+  function incrementSection(
+    { start, end }: { start: number; end: number },
+    max: number,
+    min?: number
+  ) {
+    const num = getCurrentNumOrDefault(value.slice(start, end), min);
+
+    const newNum = num + 1;
+
+    let newSection = "";
+    if (newNum > max) {
+      min = min !== undefined ? min : 1;
+      newSection = convertToStringWithPads(min, end - start);
+    } else {
+      newSection = convertToStringWithPads(newNum, end - start);
+    }
+
+    setNewSection(newSection, start, end);
+  }
+
+  function getCurrentNumOrDefault(section: string, min?: number) {
+    let num = parseInt(section);
+    if (isNaN(num)) {
+      num = min !== undefined ? min - 1 : 0;
+    }
+    return num;
+  }
+
+  function convertToStringWithPads(number: number, sectionLength: number) {
+    return number.toString().padStart(sectionLength, "0");
+  }
+
+  function setNewSection(section: string, start: number, end: number) {
+    const newValue = value.slice(0, start) + section + value.slice(end);
+    updateInputValueAndCaretPos(newValue, { start, end });
+    setValue(newValue);
+  }
+
+  function toggleAMPM() {
+    const AMPM = value.slice(17);
+    if (AMPM === "AM") {
+      handleAMPMChange("p");
+    } else {
+      handleAMPMChange("a");
     }
   }
 
