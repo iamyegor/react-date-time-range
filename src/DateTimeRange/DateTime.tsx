@@ -10,7 +10,7 @@ export default function DateTime({ onOkButtonClick }: DateTimeProps) {
   return (
     <div
       className="border border-gray-400 rounded-md shadow-md bg-white 
-      flex flex-col"
+      flex flex-col w-min"
       tabIndex={0}
     >
       <div className="flex h-[355px]">

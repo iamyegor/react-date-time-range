@@ -93,7 +93,7 @@ function TimePicker() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex justify-between overflow-hidden">
+      <div className="flex overflow-hidden">
         <Selection
           items={hours}
           selectedItem={

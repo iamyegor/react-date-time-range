@@ -3,9 +3,9 @@ import { CSSTransition } from "react-transition-group";
 import DateTimeRangeProvider from "../Calendar/DateTimeRangeProvider";
 import arrowBetweenDates from "../assets/icons/arrow-between-dates.svg";
 import useOutsideClick from "../hooks/useOutsideClick";
-import { ActiveInput, Time } from "../types";
+import { ActiveInput as ActiveInput, Time } from "../types";
 import { getDefaultSelectedTime } from "../utils";
-import DateInput from "./DateInput";
+import DateContainer from "./DateContainer";
 import DateTime from "./DateTime";
 import "./styles/DateTimeRange.css";
 
@@ -67,8 +67,8 @@ export default function DateTimeRange() {
 
   return (
     <div ref={containerRef} style={{ userSelect: "none" }}>
-      <div className="flex items-center justify-center">
-        <DateInput
+      <div className="flex items-center justify-center mb-2">
+        <DateContainer
           isActive={activeInput === ActiveInput.First}
           text="Start Date"
           date={firstDate}
@@ -76,7 +76,7 @@ export default function DateTimeRange() {
           onFocus={() => handleInputFocus(ActiveInput.First)}
         />
         <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
-        <DateInput
+        <DateContainer
           isActive={activeInput === ActiveInput.Second}
           text="End Date"
           date={secondDate}
