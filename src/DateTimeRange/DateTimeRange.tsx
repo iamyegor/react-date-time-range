@@ -22,13 +22,18 @@ export default function DateTimeRange() {
     useOutsideClick(containerRef.current);
   const [isFirstInputValid, setIsFirstInputValid] = useState<boolean>(true);
   const [isSecondInputValid, setIsSecondInputValid] = useState<boolean>(true);
-  console.log("isFirstInputValid", isFirstInputValid);
-  console.log("");
 
-  function handleInputFocus(input: ActiveInput) {
-    setActiveInput(input);
-    setShowDateTime(true);
-  }
+  useEffect(() => {
+    if (firstDate && secondDate) {
+      if (firstDate > secondDate) {
+        setIsFirstInputValid(false);
+        setIsSecondInputValid(false);
+      } else {
+        setIsFirstInputValid(true);
+        setIsSecondInputValid(true);
+      }
+    }
+  }, [firstDate, secondDate]);
 
   useEffect(() => {
     if (!showDateTime) {
@@ -47,6 +52,11 @@ export default function DateTimeRange() {
       setSecondSelectedTime(getDefaultSelectedTime());
     }
   }, [secondDate]);
+
+  function handleInputFocus(input: ActiveInput) {
+    setActiveInput(input);
+    setShowDateTime(true);
+  }
 
   function handleOKButtonClick() {
     const areFirstDateAndTimeSelected = firstDate && firstSelectedTime;
