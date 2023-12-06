@@ -5,285 +5,186 @@ interface DateInputProps {
   setValue: Dispatch<SetStateAction<string>>;
 }
 
-const sections = [
-  { start: 0, end: 2 }, // MM
-  { start: 3, end: 5 }, // dd
-  { start: 6, end: 10 }, // yyyy
-  { start: 11, end: 13 }, // hh
-  { start: 14, end: 16 }, // mm
-  { start: 17, end: 19 }, // aa
+interface Section {
+  start: number;
+  end: number;
+  max: number;
+  min?: number;
+}
+
+const sections: Section[] = [
+  { start: 0, end: 2, max: 12 }, // MM
+  { start: 3, end: 5, max: 31 }, // dd
+  { start: 6, end: 10, max: 9999 }, // yyyy
+  { start: 11, end: 13, max: 12 }, // hh
+  { start: 14, end: 16, max: 59, min: 0 }, // mm
+  { start: 17, end: 19, max: 2 }, // aa
 ];
 
-export default function DateInput({ value, setValue }: DateInputProps) {
+const DateInput: React.FC<DateInputProps> = ({ value, setValue }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
     e.preventDefault();
     const position = inputRef.current?.selectionStart || 0;
+    const section = getSectionByPosition(position);
 
-    if (position >= 17 && position <= 19) {
-      handleAMPMChange(e.key);
-    }
-
-    if (e.key === "ArrowUp") {
-      if (position <= 2) {
-        incrementSection(sections[0], 12);
-      } else if (position >= 3 && position <= 5) {
-        incrementSection(sections[1], 31);
-      } else if (position >= 6 && position <= 10) {
-        incrementSection(sections[2], 9999);
-      } else if (position >= 11 && position <= 13) {
-        incrementSection(sections[3], 12);
-      } else if (position >= 14 && position <= 16) {
-        incrementSection(sections[4], 59, 0);
-      } else if (position >= 17 && position <= 19) {
-        toggleAMPM();
-      }
-    } else if (e.key === "ArrowDown") {
-      if (position <= 2) {
-        decrementSection(sections[0], 1, 12);
-      } else if (position >= 3 && position <= 5) {
-        decrementSection(sections[1], 1, 31);
-      } else if (position >= 6 && position <= 10) {
-        decrementSection(sections[2], 1, 9999);
-      } else if (position >= 11 && position <= 13) {
-        decrementSection(sections[3], 1, 12);
-      } else if (position >= 14 && position <= 16) {
-        decrementSection(sections[4], 0, 59);
-      } else if (position >= 17 && position <= 19) {
-        toggleAMPM();
+    if (section) {
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        adjustSectionValue(section, e.key === "ArrowUp");
+      } else if (!isNaN(parseInt(e.key, 10))) {
+        handleNumericKey(section, parseInt(e.key, 10));
+      } else if (e.key.toLowerCase() === "a" || e.key.toLowerCase() === "p") {
+        if (section === sections[5]) {
+          toggleAMPM(e.key.toLowerCase());
+        }
       }
     }
+  }
 
-    function decrementSection(
-      { start, end }: { start: number; end: number },
-      min: number,
-      max: number
-    ) {
-      const num = getCurrentNumOrDefault(value.slice(start, end), min);
+  function getSectionByPosition(position: number) {
+    return sections.find((sec) => position >= sec.start && position <= sec.end);
+  }
 
-      const newNum = num - 1;
-
-      let newSection = "";
-      if (newNum < min) {
-        max = max !== undefined ? max : 1;
-        newSection = convertToStringWithPads(max, end - start);
-      } else {
-        newSection = convertToStringWithPads(newNum, end - start);
-      }
-
-      setNewSection(newSection, start, end);
-    }
-
-    const numKey = parseInt(e.key);
-    if (isNaN(numKey) || numKey < 0 || numKey > 9) {
+  function adjustSectionValue(section: Section, isIncrement: boolean) {
+    const { start, end, max, min } = section;
+    if (start === 17 && end === 19) {
+      const isPM = value.slice(start, end) === "PM";
+      toggleAMPM(isPM ? "a" : "p");
       return;
     }
 
-    if (position <= 2) {
-      handleMonthChange(numKey);
-    } else if (position >= 3 && position <= 5) {
-      handleDayChange(numKey);
-    } else if (position >= 6 && position <= 10) {
-      handleYearChange(numKey);
-    } else if (position >= 11 && position <= 13) {
-      handleHourChange(numKey);
-    } else if (position >= 14 && position <= 16) {
-      handleMinuteChange(numKey);
+    let currentValue = parseInt(value.slice(start, end)) || 0;
+    currentValue = isIncrement ? currentValue + 1 : currentValue - 1;
+
+    const minThreshold = min !== undefined ? min : 1;
+    if (currentValue < minThreshold) {
+      currentValue = max;
     }
-  }
-
-  function handleMonthChange(numKey: number) {
-    const month = changeMonthBasedOnKey(value.slice(0, 2), numKey);
-    const newValue = month + value.slice(2);
-    updateInputValueAndCaretPos(newValue, getPosBasedOnMonth(month));
-    setValue(newValue);
-  }
-
-  function changeMonthBasedOnKey(mm: string, numKey: number) {
-    if (mm === "01") {
-      return numKey > 2 ? "0" + numKey : "1" + numKey;
+    if (currentValue > max) {
+      currentValue = minThreshold;
     }
-    return "0" + numKey;
+
+    const pads = end - start;
+    updateValue(section, currentValue.toString().padStart(pads, "0"));
   }
 
-  function getPosBasedOnMonth(month: string) {
-    if (month === "01") {
-      return sections[0];
-    }
-    return sections[1];
-  }
+  function handleNumericKey(section: Section, numKey: number) {
+    const { start, end, max } = section;
+    let currentSectionValue = value.slice(start, end);
+    let newSectionValue: string;
+    let newHighlightedSection: Section;
 
-  function handleDayChange(numKey: number) {
-    const day = changeDayBasedOnKey(value.slice(3, 5), numKey);
-    const newValue = value.slice(0, 3) + day + value.slice(5);
-    updateInputValueAndCaretPos(newValue, getPosBasedOnDay(day));
-    setValue(newValue);
-  }
-
-  function changeDayBasedOnKey(dd: string, numKey: number) {
-    if (dd === "02" || dd === "01") {
-      return dd[1] + numKey;
-    } else if (dd === "03") {
-      return numKey > 1 ? "0" + numKey : "3" + numKey;
+    if (section === sections[2]) {
+      newSectionValue = calculateNewSectionValueForYear(
+        currentSectionValue,
+        numKey
+      );
+      newHighlightedSection =
+        calculateNewHighlightedSectionForYear(newSectionValue);
     } else {
-      return "0" + numKey;
+      newSectionValue = calculateNewSectionValue(
+        currentSectionValue,
+        max,
+        numKey
+      );
+      newHighlightedSection = calculateNewHighlightedSection(
+        sections.indexOf(section),
+        newSectionValue,
+        max
+      );
     }
+
+    updateValue(section, newSectionValue, newHighlightedSection);
   }
 
-  function getPosBasedOnDay(day: string) {
-    if (day === "02" || day === "01" || day === "03") {
-      return sections[1];
-    }
-    return sections[2];
-  }
-
-  function handleYearChange(numKey: number) {
-    const year = changeYearBasedOnKey(value.slice(6, 10), numKey);
-    const newValue = value.slice(0, 6) + year + value.slice(10);
-    updateInputValueAndCaretPos(newValue, getPosBasedOnYear(year));
-    setValue(newValue);
-  }
-
-  function changeYearBasedOnKey(yyyy: string, numKey: number) {
-    if (yyyy[0] === "0" || yyyy[0] === "y") {
-      return yyyy.substring(1) + numKey;
+  function calculateNewSectionValueForYear(
+    currentSectionValue: string,
+    numKey: number
+  ) {
+    if (currentSectionValue[0] !== "0") {
+      return "000" + numKey.toString();
     } else {
-      return "000" + numKey;
+      return (currentSectionValue + numKey).slice(-4);
     }
   }
 
-  function getPosBasedOnYear(year: string) {
-    if (year[0] === "0" || year[0] === "y") {
+  function calculateNewHighlightedSectionForYear(currentSectionValue: string) {
+    if (currentSectionValue[0] === "0") {
       return sections[2];
     }
+
     return sections[3];
   }
 
-  function handleHourChange(numKey: number) {
-    const hour = changeHourBasedOnKey(value.slice(11, 13), numKey);
-    const newValue = value.slice(0, 11) + hour + value.slice(13);
-    updateInputValueAndCaretPos(newValue, getPosBasedOnHour(hour));
-    setValue(newValue);
-  }
-
-  function changeHourBasedOnKey(hh: string, numKey: number) {
-    if (hh === "01") {
-      return "1" + numKey;
-    } else {
-      return "0" + numKey;
-    }
-  }
-
-  function getPosBasedOnHour(hour: string) {
-    if (hour === "01") {
-      return sections[3];
-    }
-    return sections[4];
-  }
-
-  function handleMinuteChange(numKey: number) {
-    const minute = changeMinuteBasedOnKey(value.slice(14, 16), numKey);
-    const newValue = value.slice(0, 14) + minute + value.slice(16);
-    updateInputValueAndCaretPos(newValue, getPosBasedOnMinute(minute));
-    setValue(newValue);
-  }
-
-  function changeMinuteBasedOnKey(mm: string, numKey: number) {
-    if (mm[0] === "0" && parseInt(mm[1]) < 6) {
-      return mm[1] + numKey;
-    } else {
-      return "0" + numKey;
-    }
-  }
-
-  function getPosBasedOnMinute(minute: string) {
-    if (minute[0] === "0" && parseInt(minute[1]) < 6) {
-      return sections[4];
-    }
-    return sections[5];
-  }
-
-  function handleAMPMChange(key: string) {
-    let newValue = "";
-
-    if (key === "p") {
-      newValue = value.slice(0, 17) + "PM";
-    } else if (key === "a") {
-      newValue = value.slice(0, 17) + "AM";
-    } else {
-      return;
-    }
-
-    updateInputValueAndCaretPos(newValue, sections[5]);
-    setValue(newValue);
-  }
-
-  function updateInputValueAndCaretPos(
-    newValue: string,
-    { start, end }: { start: number; end: number }
+  function calculateNewSectionValue(
+    currentSectionValue: string,
+    max: number,
+    numKey: number
   ) {
+    const maxFirstDigit = parseInt(max.toString()[0]);
+    const maxSecondDigit = parseInt(max.toString()[1]);
+    const secondDigit = parseInt(currentSectionValue[1]);
+
+    if (currentSectionValue[0] === "0") {
+      if (
+        secondDigit < maxFirstDigit ||
+        (secondDigit === maxFirstDigit && numKey <= maxSecondDigit)
+      ) {
+        return currentSectionValue[1] + numKey.toString();
+      }
+    }
+
+    return numKey === 0 ? currentSectionValue : "0" + numKey.toString();
+  }
+
+  function calculateNewHighlightedSection(
+    currentSectionIndex: number,
+    currentSectionValue: string,
+    max: number
+  ) {
+    const maxFirstDigit = parseInt(max.toString()[0]);
+    const secondDigit = parseInt(currentSectionValue[1]);
+
+    if (currentSectionValue[0] === "0") {
+      if (secondDigit <= maxFirstDigit) {
+        return sections[currentSectionIndex];
+      }
+    }
+
+    return sections[currentSectionIndex + 1];
+  }
+
+  function toggleAMPM(key: string) {
+    const newValue = key === "p" ? "PM" : "AM";
+    updateValue(sections[5], newValue);
+  }
+
+  function updateValue(
+    updatedSection: Section,
+    newSectionValue: string | number,
+    focusSection?: Section
+  ) {
+    const { start, end } = updatedSection;
+    const updatedValue =
+      value.slice(0, start) + newSectionValue + value.slice(end);
+
+    updateInputValue(updatedValue, focusSection || updatedSection);
+    setValue(updatedValue);
+  }
+
+  function updateInputValue(newValue: string, section: Section) {
     if (inputRef.current) {
       inputRef.current.value = newValue;
-      inputRef.current.setSelectionRange(start, end);
-    }
-  }
-
-  function incrementSection(
-    { start, end }: { start: number; end: number },
-    max: number,
-    min?: number
-  ) {
-    const num = getCurrentNumOrDefault(value.slice(start, end), min);
-
-    const newNum = num + 1;
-
-    let newSection = "";
-    if (newNum > max) {
-      min = min !== undefined ? min : 1;
-      newSection = convertToStringWithPads(min, end - start);
-    } else {
-      newSection = convertToStringWithPads(newNum, end - start);
-    }
-
-    setNewSection(newSection, start, end);
-  }
-
-  function getCurrentNumOrDefault(section: string, min?: number) {
-    let num = parseInt(section);
-    if (isNaN(num)) {
-      num = min !== undefined ? min - 1 : 0;
-    }
-    return num;
-  }
-
-  function convertToStringWithPads(number: number, sectionLength: number) {
-    return number.toString().padStart(sectionLength, "0");
-  }
-
-  function setNewSection(section: string, start: number, end: number) {
-    const newValue = value.slice(0, start) + section + value.slice(end);
-    updateInputValueAndCaretPos(newValue, { start, end });
-    setValue(newValue);
-  }
-
-  function toggleAMPM() {
-    const AMPM = value.slice(17);
-    if (AMPM === "AM") {
-      handleAMPMChange("p");
-    } else {
-      handleAMPMChange("a");
+      inputRef.current.setSelectionRange(section.start, section.end);
     }
   }
 
   function highlightSection() {
     if (!inputRef.current) return;
-
     const position = inputRef.current.selectionStart || 0;
+    const section = getSectionByPosition(position);
 
-    const section = sections.find(
-      (sec) => position >= sec.start && position <= sec.end
-    );
     if (section) {
       inputRef.current.setSelectionRange(section.start, section.end);
     }
@@ -292,10 +193,13 @@ export default function DateInput({ value, setValue }: DateInputProps) {
   return (
     <input
       ref={inputRef}
-      className="w-full h-full bg-transparent border-none hover:outline-none outline-none z-10 pl-2"
+      className="w-full h-full bg-transparent border-none hover:outline-none 
+      outline-none z-10 pl-2"
       value={value}
       onSelect={highlightSection}
       onKeyDown={handleKeyDown}
     />
   );
-}
+};
+
+export default DateInput;
