@@ -4,6 +4,6 @@ export function getDefaultSelectedTime(): Time {
   return {
     hours: 12,
     minutes: 0,
-    period: "AM",
+    ampm: "AM",
   };
 }

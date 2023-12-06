@@ -12,5 +12,5 @@ export enum ActiveInput {
 export interface Time {
   hours: number;
   minutes: number;
-  period: "AM" | "PM";
+  ampm: "AM" | "PM";
 }

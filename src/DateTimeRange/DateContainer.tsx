@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import calendarIcon from "../assets/icons/calendar.svg";
 import { Time } from "../types";
 import DateInput from "./DateInput";
@@ -7,7 +7,9 @@ import DateInput from "./DateInput";
 interface DateContainerProps {
   text: string;
   date: Date | null;
+  setDate: Dispatch<SetStateAction<Date | null>>;
   time: Time | null;
+  setTime: Dispatch<SetStateAction<Time | null>>;
   onFocus: () => void;
   isActive: boolean;
 }
@@ -15,7 +17,9 @@ interface DateContainerProps {
 function DateContainer({
   text,
   date,
+  setDate,
   time,
+  setTime,
   onFocus,
   isActive,
 }: DateContainerProps) {
@@ -81,7 +85,7 @@ function DateContainer({
     if (time) {
       const hours = time.hours.toString().padStart(2, "0");
       const minutes = time.minutes.toString().padStart(2, "0");
-      return `${hours}:${minutes} ${time.period}`;
+      return `${hours}:${minutes} ${time.ampm}`;
     } else {
       return "hh:mm aa";
     }
@@ -103,7 +107,14 @@ function DateContainer({
         tabIndex={0}
         style={{ clipPath }}
       >
-        <DateInput value={value} setValue={setValue} />
+        {shouldTextBeOnTop() && (
+          <DateInput
+            date={date}
+            time={time}
+            setDate={setDate}
+            setTime={setTime}
+          />
+        )}
         <img src={calendarIcon} className=" absolute right-2 w-5 h-5" />
       </div>
       <label

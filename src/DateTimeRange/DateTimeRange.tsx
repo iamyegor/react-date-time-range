@@ -72,7 +72,9 @@ export default function DateTimeRange() {
           isActive={activeInput === ActiveInput.First}
           text="Start Date"
           date={firstDate}
+          setDate={setFirstDate}
           time={firstSelectedTime}
+          setTime={setFirstSelectedTime}
           onFocus={() => handleInputFocus(ActiveInput.First)}
         />
         <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
@@ -80,7 +82,9 @@ export default function DateTimeRange() {
           isActive={activeInput === ActiveInput.Second}
           text="End Date"
           date={secondDate}
+          setDate={setSecondDate}
           time={secondSelectedTime}
+          setTime={setSecondSelectedTime}
           onFocus={() => handleInputFocus(ActiveInput.Second)}
         />
       </div>

@@ -114,7 +114,7 @@ function TimePicker() {
         />
         <Selection
           items={periods}
-          selectedItem={selectedTime ? selectedTime.period : ""}
+          selectedItem={selectedTime ? selectedTime.ampm : ""}
           onSelect={(item) => handlePeriodChange(item as "AM" | "PM")}
           testid="periods"
         />

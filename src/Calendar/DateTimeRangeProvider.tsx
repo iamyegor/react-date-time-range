@@ -9,6 +9,7 @@ import {
 } from "react";
 import { ActiveInput, DraggedDate, Time } from "../types";
 import { getDefaultSelectedTime } from "../utils";
+import { startOfDay } from "date-fns";
 
 type DateTimeRangeContextProps = {
   draggedDate: DraggedDate;

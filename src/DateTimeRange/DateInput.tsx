@@ -1,8 +1,19 @@
-import { Dispatch, KeyboardEvent, SetStateAction, useRef } from "react";
+import { isValid } from "date-fns";
+import {
+  Dispatch,
+  KeyboardEvent,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Time } from "../types";
 
 interface DateInputProps {
-  value: string;
-  setValue: Dispatch<SetStateAction<string>>;
+  date: Date | null;
+  setDate: Dispatch<SetStateAction<Date | null>>;
+  time: Time | null;
+  setTime: Dispatch<SetStateAction<Time | null>>;
 }
 
 interface Section {
@@ -21,8 +32,126 @@ const sections: Section[] = [
   { start: 17, end: 19, max: 2 }, // aa
 ];
 
-const DateInput: React.FC<DateInputProps> = ({ value, setValue }) => {
+function DateInput({ date, time, setDate, setTime }: DateInputProps) {
+  const [value, setValue] = useState<string>("");
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const dateFromValue = queryDateFromValue();
+    const timeFromValue = queryTimeFromValue();
+
+    if (dateFromValue && isValid(dateFromValue)) {
+      setDate(dateFromValue);
+    } else {
+      setDate(null);
+    }
+
+    if (timeFromValue) {
+      setTime(timeFromValue);
+    } else {
+      setTime(null);
+    }
+  }, [value]);
+
+  function queryDateFromValue() {
+    const month = parseInt(getSectionValue(sections[0]));
+    const day = parseInt(getSectionValue(sections[1]));
+    const year = parseInt(getSectionValue(sections[2]));
+    if (year < 1899 || year > 2100) {
+      return null;
+    }
+    return new Date(year, month - 1, day);
+  }
+
+  function queryTimeFromValue(): Time | null {
+    const hours = parseInt(getSectionValue(sections[3]));
+    const minutes = parseInt(getSectionValue(sections[4]));
+    const ampm = getSectionValue(sections[5]) as "AM" | "PM";
+
+    if (isTimeValid(hours, minutes, ampm)) {
+      return { hours, minutes, ampm };
+    }
+
+    return null;
+  }
+
+  function getSectionValue(section: Omit<Section, "max">) {
+    return value.slice(section.start, section.end);
+  }
+
+  function isTimeValid(hours: number, minutes: number, ampm: string) {
+    if (hours < 1 || hours > 12) {
+      return false;
+    } else if (minutes < 0 || minutes > 59) {
+      return false;
+    } else if (ampm !== "AM" && ampm !== "PM") {
+      return false;
+    }
+    return true;
+  }
+
+  useEffect(() => {
+    changeDateInValue();
+  }, [date]);
+
+  function changeDateInValue() {
+    const start = sections[0].start;
+    const end = sections[2].end;
+    if (date) {
+      const dateValue = getDateWithPads(date);
+      updateValue({ start, end }, dateValue, getSameHighlight());
+    } else {
+      const dateValue = getSectionValue({ start, end });
+      if (dateValue) {
+        updateValue({ start, end }, dateValue, getSameHighlight());
+      } else {
+        updateValue({ start, end }, `MM/dd/yyyy`, getSameHighlight());
+      }
+    }
+  }
+
+  function getDateWithPads(date: Date) {
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const year = date.getFullYear().toString().padStart(4, "0");
+    return `${month}/${day}/${year}`;
+  }
+
+  useEffect(() => {
+    changeTimeInValue();
+  }, [time]);
+
+  function changeTimeInValue() {
+    const start = sections[3].start;
+    const end = sections[5].end;
+    if (time) {
+      const timeValue = getTimeWithPads(time);
+      updateValue({ start, end }, timeValue, getSameHighlight());
+    } else {
+      const timeValue = getSectionValue({ start, end });
+      if (timeValue) {
+        updateValue({ start, end }, timeValue, getSameHighlight());
+      } else {
+        updateValue({ start, end }, ` hh:mm aa`, getSameHighlight());
+      }
+    }
+  }
+
+  function getTimeWithPads(time: Time) {
+    const hours = time.hours.toString().padStart(2, "0");
+    const minutes = time.minutes.toString().padStart(2, "0");
+    return `${hours}:${minutes} ${time.ampm}`;
+  }
+
+  function getSameHighlight() {
+    if (inputRef.current) {
+      return {
+        start: inputRef.current.selectionStart || 0,
+        end: inputRef.current.selectionEnd || 0,
+      };
+    }
+    return undefined;
+  }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
     e.preventDefault();
@@ -54,6 +183,11 @@ const DateInput: React.FC<DateInputProps> = ({ value, setValue }) => {
     const nextSectionIndex = isNext
       ? currentSectionIndex + 1
       : currentSectionIndex - 1;
+
+    if (nextSectionIndex < 0 || nextSectionIndex > sections.length - 1) {
+      return;
+    }
+
     const nextSection = sections[nextSectionIndex];
     inputRef.current?.setSelectionRange(nextSection.start, nextSection.end);
   }
@@ -177,22 +311,27 @@ const DateInput: React.FC<DateInputProps> = ({ value, setValue }) => {
   }
 
   function updateValue(
-    updatedSection: Section,
+    updatedSection: Omit<Section, "max">,
     newSectionValue: string | number,
-    focusSection?: Section
+    highlightSection?: Omit<Section, "max">
   ) {
     const { start, end } = updatedSection;
+    if (!inputRef.current) {
+      return;
+    }
+
+    const { value } = inputRef.current;
     const updatedValue =
       value.slice(0, start) + newSectionValue + value.slice(end);
 
-    updateInputValue(updatedValue, focusSection || updatedSection);
+    updateInputValue(updatedValue, highlightSection || updatedSection);
     setValue(updatedValue);
   }
 
-  function updateInputValue(newValue: string, section: Section) {
+  function updateInputValue(newValue: string, highlight: Omit<Section, "max">) {
     if (inputRef.current) {
       inputRef.current.value = newValue;
-      inputRef.current.setSelectionRange(section.start, section.end);
+      inputRef.current.setSelectionRange(highlight.start, highlight.end);
     }
   }
 
@@ -212,10 +351,12 @@ const DateInput: React.FC<DateInputProps> = ({ value, setValue }) => {
       className="w-full h-full bg-transparent border-none hover:outline-none 
       outline-none z-10 pl-2"
       value={value}
+      spellCheck={false}
+      onChange={() => {}}
       onSelect={highlightSection}
       onKeyDown={handleKeyDown}
     />
   );
-};
+}
 
 export default DateInput;
