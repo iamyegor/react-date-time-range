@@ -98,7 +98,7 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     const start = sections[0].start;
     const end = sections[2].end;
     if (date) {
-      const dateValue = getDateWithPads(date);
+      const dateValue = formatDate(date);
       updateValue({ start, end }, dateValue, getSameHighlight());
     } else {
       const dateValue = getSectionValue({ start, end });
@@ -110,7 +110,7 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     }
   }
 
-  function getDateWithPads(date: Date) {
+  function formatDate(date: Date) {
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
     const year = date.getFullYear().toString().padStart(4, "0");
@@ -125,7 +125,7 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     const start = sections[3].start;
     const end = sections[5].end;
     if (time) {
-      const timeValue = getTimeWithPads(time);
+      const timeValue = formatTime(time);
       updateValue({ start, end }, timeValue, getSameHighlight());
     } else {
       const timeValue = getSectionValue({ start, end });
@@ -137,7 +137,7 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     }
   }
 
-  function getTimeWithPads(time: Time) {
+  function formatTime(time: Time) {
     const hours = time.hours.toString().padStart(2, "0");
     const minutes = time.minutes.toString().padStart(2, "0");
     return `${hours}:${minutes} ${time.ampm}`;
@@ -236,7 +236,8 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
       newSectionValue = calculateNewSectionValue(
         currentSectionValue,
         max,
-        numKey
+        numKey,
+        section === sections[4]
       );
       newHighlightedSection = calculateNewHighlightedSection(
         sections.indexOf(section),
@@ -270,7 +271,8 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
   function calculateNewSectionValue(
     currentSectionValue: string,
     max: number,
-    numKey: number
+    numKey: number,
+    allowZero: boolean = false
   ) {
     const maxFirstDigit = parseInt(max.toString()[0]);
     const maxSecondDigit = parseInt(max.toString()[1]);
@@ -285,7 +287,13 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
       }
     }
 
-    return numKey === 0 ? currentSectionValue : "0" + numKey.toString();
+    if (!allowZero) {
+      if (numKey === 0) {
+        return currentSectionValue;
+      }
+    }
+
+    return "0" + numKey.toString();
   }
 
   function calculateNewHighlightedSection(
@@ -296,10 +304,11 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     const maxFirstDigit = parseInt(max.toString()[0]);
     const secondDigit = parseInt(currentSectionValue[1]);
 
-    if (currentSectionValue[0] === "0") {
-      if (secondDigit <= maxFirstDigit) {
-        return sections[currentSectionIndex];
-      }
+    if (
+      (currentSectionValue[0] === "0" && secondDigit <= maxFirstDigit) ||
+      !parseInt(currentSectionValue)
+    ) {
+      return sections[currentSectionIndex];
     }
 
     return sections[currentSectionIndex + 1];
