@@ -38,8 +38,24 @@ const DateInput: React.FC<DateInputProps> = ({ value, setValue }) => {
         if (section === sections[5]) {
           toggleAMPM(e.key.toLowerCase());
         }
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        changeHighlightedSection(
+          sections.indexOf(section),
+          e.key === "ArrowRight"
+        );
       }
     }
+  }
+
+  function changeHighlightedSection(
+    currentSectionIndex: number,
+    isNext: boolean
+  ) {
+    const nextSectionIndex = isNext
+      ? currentSectionIndex + 1
+      : currentSectionIndex - 1;
+    const nextSection = sections[nextSectionIndex];
+    inputRef.current?.setSelectionRange(nextSection.start, nextSection.end);
   }
 
   function getSectionByPosition(position: number) {
