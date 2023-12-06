@@ -5,7 +5,6 @@ import {
   SetStateAction,
   useEffect,
   useRef,
-  useState,
 } from "react";
 import { Time } from "../types";
 
@@ -14,6 +13,9 @@ interface DateInputProps {
   setDate: Dispatch<SetStateAction<Date | null>>;
   time: Time | null;
   setTime: Dispatch<SetStateAction<Time | null>>;
+  setIsInputValid: Dispatch<SetStateAction<boolean>>;
+  value: string;
+  setValue: Dispatch<SetStateAction<string>>;
 }
 
 interface Section {
@@ -21,19 +23,30 @@ interface Section {
   end: number;
   max: number;
   min?: number;
+  name: string;
 }
 
 const sections: Section[] = [
-  { start: 0, end: 2, max: 12 }, // MM
-  { start: 3, end: 5, max: 31 }, // dd
-  { start: 6, end: 10, max: 9999 }, // yyyy
-  { start: 11, end: 13, max: 12 }, // hh
-  { start: 14, end: 16, max: 59, min: 0 }, // mm
-  { start: 17, end: 19, max: 2 }, // aa
+  { start: 0, end: 2, max: 12, name: "MM" },
+  { start: 3, end: 5, max: 31, name: "dd" },
+  { start: 6, end: 10, max: 9999, name: "yyyy" },
+  { start: 11, end: 13, max: 12, name: "hh" },
+  { start: 14, end: 16, max: 59, min: 0, name: "mm" },
+  { start: 17, end: 19, max: 2, name: "aa" },
 ];
 
-function DateInput({ date, time, setDate, setTime }: DateInputProps) {
-  const [value, setValue] = useState<string>("");
+const TIME_PLACEHOLDER = `${sections[3].name}:${sections[4].name} ${sections[5].name}`;
+const DATE_PLACEHOLDER = `${sections[0].name}/${sections[1].name}/${sections[2].name}`;
+
+function DateInput({
+  date,
+  time,
+  setDate,
+  setTime,
+  setIsInputValid,
+  value,
+  setValue,
+}: DateInputProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -51,7 +64,22 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     } else {
       setTime(null);
     }
+
+    if (
+      isValuePlaceholder() ||
+      (timeFromValue && dateFromValue && isValid(dateFromValue))
+    ) {
+      setIsInputValid(true);
+    } else {
+      setIsInputValid(false);
+    }
   }, [value]);
+
+  function isValuePlaceholder() {
+    const section = { start: sections[0].start, end: sections[5].end };
+    const value = getSectionValue(section);
+    return value === `${DATE_PLACEHOLDER} ${TIME_PLACEHOLDER}`;
+  }
 
   function queryDateFromValue() {
     const month = parseInt(getSectionValue(sections[0]));
@@ -75,8 +103,8 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     return null;
   }
 
-  function getSectionValue(section: Omit<Section, "max">) {
-    return value.slice(section.start, section.end);
+  function getSectionValue({ start, end }: { start: number; end: number }) {
+    return value.slice(start, end);
   }
 
   function isTimeValid(hours: number, minutes: number, ampm: string) {
@@ -105,7 +133,7 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
       if (dateValue) {
         updateValue({ start, end }, dateValue, getSameHighlight());
       } else {
-        updateValue({ start, end }, `MM/dd/yyyy`, getSameHighlight());
+        updateValue({ start, end }, DATE_PLACEHOLDER, getSameHighlight());
       }
     }
   }
@@ -132,7 +160,7 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
       if (timeValue) {
         updateValue({ start, end }, timeValue, getSameHighlight());
       } else {
-        updateValue({ start, end }, ` hh:mm aa`, getSameHighlight());
+        updateValue({ start, end }, " " + TIME_PLACEHOLDER, getSameHighlight());
       }
     }
   }
@@ -172,8 +200,14 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
           sections.indexOf(section),
           e.key === "ArrowRight"
         );
+      } else if (e.key === "Backspace") {
+        eraseSection(section);
       }
     }
+  }
+
+  function eraseSection(section: Section) {
+    updateValue(section, section.name);
   }
 
   function changeHighlightedSection(
@@ -320,9 +354,9 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
   }
 
   function updateValue(
-    updatedSection: Omit<Section, "max">,
+    updatedSection: { start: number; end: number },
     newSectionValue: string | number,
-    highlightSection?: Omit<Section, "max">
+    highlightSection?: { start: number; end: number }
   ) {
     const { start, end } = updatedSection;
     if (!inputRef.current) {
@@ -337,7 +371,10 @@ function DateInput({ date, time, setDate, setTime }: DateInputProps) {
     setValue(updatedValue);
   }
 
-  function updateInputValue(newValue: string, highlight: Omit<Section, "max">) {
+  function updateInputValue(
+    newValue: string,
+    highlight: { start: number; end: number }
+  ) {
     if (inputRef.current) {
       inputRef.current.value = newValue;
       inputRef.current.setSelectionRange(highlight.start, highlight.end);

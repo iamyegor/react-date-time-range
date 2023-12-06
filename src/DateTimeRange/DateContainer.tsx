@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import calendarIcon from "../assets/icons/calendar.svg";
 import { Time } from "../types";
@@ -12,6 +11,8 @@ interface DateContainerProps {
   setTime: Dispatch<SetStateAction<Time | null>>;
   onFocus: () => void;
   isActive: boolean;
+  isInputValid: boolean;
+  setIsInputValid: Dispatch<SetStateAction<boolean>>;
 }
 
 function DateContainer({
@@ -22,13 +23,15 @@ function DateContainer({
   setTime,
   onFocus,
   isActive,
+  isInputValid,
+  setIsInputValid,
 }: DateContainerProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
     useState<boolean>(false);
   const hiddenTextRef = useRef<HTMLLabelElement>(null);
-  const [value, setValue] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>("");
 
   useEffect(() => {
     if (hiddenTextRef.current) {
@@ -37,18 +40,6 @@ function DateContainer({
       setShouldRemoveHiddenText(true);
     }
   }, []);
-
-  useEffect(() => {
-    if (!shouldTextBeOnTop()) {
-      setValue("");
-    } else {
-      setValue(`${getFormattedDateOrDefault()} ${getFormattedTimeOrDefault()}`);
-    }
-  }, [
-    getFormattedDateOrDefault(),
-    getFormattedTimeOrDefault(),
-    shouldTextBeOnTop(),
-  ]);
 
   function handleFocus() {
     setIsFocused(true);
@@ -60,7 +51,7 @@ function DateContainer({
   }
 
   function shouldTextBeOnTop() {
-    return isFocused || date || time || isActive;
+    return isFocused || date || time || isActive || inputValue;
   }
 
   function shouldHaveOutline() {
@@ -72,24 +63,6 @@ function DateContainer({
         textWidth + 14
       }px 0, 100% 0, 100% 100%, 0 100%, 0 0)`
     : "";
-
-  function getFormattedDateOrDefault() {
-    if (date) {
-      return format(date, "MM/dd/yyyy");
-    } else {
-      return "MM/dd/yyyy";
-    }
-  }
-
-  function getFormattedTimeOrDefault() {
-    if (time) {
-      const hours = time.hours.toString().padStart(2, "0");
-      const minutes = time.minutes.toString().padStart(2, "0");
-      return `${hours}:${minutes} ${time.ampm}`;
-    } else {
-      return "hh:mm aa";
-    }
-  }
 
   return (
     <div
@@ -103,7 +76,9 @@ function DateContainer({
     shouldHaveOutline()
       ? "border-blue-500 border-2"
       : "border-gray-700 group-hover:border-gray-400"
-  }`}
+  }
+  ${!isInputValid ? "border-red-600 border-2 group-hover:border-red-600" : ""}
+  `}
         tabIndex={0}
         style={{ clipPath }}
       >
@@ -113,6 +88,9 @@ function DateContainer({
             time={time}
             setDate={setDate}
             setTime={setTime}
+            setIsInputValid={setIsInputValid}
+            value={inputValue}
+            setValue={setInputValue}
           />
         )}
         <img src={calendarIcon} className=" absolute right-2 w-5 h-5" />
@@ -122,7 +100,9 @@ function DateContainer({
           shouldTextBeOnTop()
             ? "left-3 -top-[0.725rem] text-xs"
             : "transform -translate-y-1/2 top-1/2 left-2 text-base"
-        } ${shouldHaveOutline() ? "text-blue-500" : "text-gray-800"}`}
+        } ${shouldHaveOutline() ? "text-blue-500" : "text-gray-800"}
+        ${!isInputValid ? "text-red-600" : ""}
+        `}
         tabIndex={0}
       >
         {text}

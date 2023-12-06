@@ -20,6 +20,10 @@ export default function DateTimeRange() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { isVisible: showDateTime, setIsVisible: setShowDateTime } =
     useOutsideClick(containerRef.current);
+  const [isFirstInputValid, setIsFirstInputValid] = useState<boolean>(true);
+  const [isSecondInputValid, setIsSecondInputValid] = useState<boolean>(true);
+  console.log("isFirstInputValid", isFirstInputValid);
+  console.log("");
 
   function handleInputFocus(input: ActiveInput) {
     setActiveInput(input);
@@ -76,6 +80,8 @@ export default function DateTimeRange() {
           time={firstSelectedTime}
           setTime={setFirstSelectedTime}
           onFocus={() => handleInputFocus(ActiveInput.First)}
+          isInputValid={isFirstInputValid}
+          setIsInputValid={setIsFirstInputValid}
         />
         <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
         <DateContainer
@@ -86,6 +92,8 @@ export default function DateTimeRange() {
           time={secondSelectedTime}
           setTime={setSecondSelectedTime}
           onFocus={() => handleInputFocus(ActiveInput.Second)}
+          isInputValid={isSecondInputValid}
+          setIsInputValid={setIsSecondInputValid}
         />
       </div>
       <DateTimeRangeProvider
