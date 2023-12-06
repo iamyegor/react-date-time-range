@@ -70,21 +70,21 @@ function TimePicker() {
     return { ...currentTime, [key]: value };
   }
 
-  function handlePeriodChange(period: "AM" | "PM") {
+  function handlePeriodChange(ampm: "AM" | "PM") {
     if (activeInput === ActiveInput.First) {
-      setFirstSelectedTime((prev) => getUpdatedPeriod(prev, period));
+      setFirstSelectedTime((prev) => getUpdatedPeriod(prev, ampm));
       setFirstDateIfNull();
     } else if (activeInput === ActiveInput.Second) {
-      setSecondSelectedTime((prev) => getUpdatedPeriod(prev, period));
+      setSecondSelectedTime((prev) => getUpdatedPeriod(prev, ampm));
       setSecondDateIfNull();
     }
 
-    setSelectedTime((prev) => getUpdatedPeriod(prev, period));
+    setSelectedTime((prev) => getUpdatedPeriod(prev, ampm));
   }
 
-  function getUpdatedPeriod(prev: Time | null, period: "AM" | "PM") {
+  function getUpdatedPeriod(prev: Time | null, ampm: "AM" | "PM") {
     const currentTime = prev || getDefaultSelectedTime();
-    return { ...currentTime, period };
+    return { ...currentTime, ampm };
   }
 
   function convertTo2DigitString(num: number) {
@@ -115,7 +115,7 @@ function TimePicker() {
         <Selection
           items={periods}
           selectedItem={selectedTime ? selectedTime.ampm : ""}
-          onSelect={(item) => handlePeriodChange(item as "AM" | "PM")}
+          onSelect={(ampm) => handlePeriodChange(ampm as "AM" | "PM")}
           testid="periods"
         />
       </div>
