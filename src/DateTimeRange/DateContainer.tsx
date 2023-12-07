@@ -83,13 +83,9 @@ function DateContainer({
   ${
     shouldHaveOutline()
       ? "border-blue-500 border-2"
-      : "border-gray-700 group-hover:border-gray-400"
+      : "border-gray-700 group-hover:border-gray-400 border-1"
   }
-  ${
-    shouldInvalidateInput()
-      ? "border-red-600 border-2 group-hover:border-red-600"
-      : ""
-  }
+  ${shouldInvalidateInput() ? "border-red-600 group-hover:border-red-600" : ""}
   `}
         tabIndex={0}
         style={{ clipPath }}
