@@ -7,9 +7,9 @@ import {
   useEffect,
   useState,
 } from "react";
+import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater";
 import { ActiveInput, DraggedDate, Time } from "../types";
 import { getDefaultSelectedTime } from "../utils";
-import { startOfDay } from "date-fns";
 
 type DateTimeRangeContextProps = {
   draggedDate: DraggedDate;

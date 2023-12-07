@@ -24,50 +24,6 @@ export default function DateTimeRange() {
   const [isSecondInputValid, setIsSecondInputValid] = useState<boolean>(true);
 
   useEffect(() => {
-    if (
-      isDateGreater(firstDate, secondDate) ||
-      (isDateEqual(firstDate, secondDate) &&
-        isTimeGreaterOrEqual(firstSelectedTime, secondSelectedTime))
-    ) {
-      setIsFirstInputValid(false);
-      setIsSecondInputValid(false);
-    } else {
-      setIsFirstInputValid(true);
-      setIsSecondInputValid(true);
-    }
-  }, [firstDate, secondDate, firstSelectedTime, secondSelectedTime]);
-
-  function isDateGreater(firstDate: Date | null, secondDate: Date | null) {
-    return firstDate && secondDate && firstDate > secondDate;
-  }
-
-  function isDateEqual(firstDate: Date | null, secondDate: Date | null) {
-    return firstDate && secondDate && firstDate >= secondDate;
-  }
-
-  function isTimeGreaterOrEqual(
-    firstTime: Time | null,
-    secondTime: Time | null
-  ) {
-    if (!firstTime || !secondTime) {
-      return false;
-    }
-
-    const firstTimeHours = hoursIn24HourFormat(firstTime);
-    const secondTimeHours = hoursIn24HourFormat(secondTime);
-
-    return (
-      firstTimeHours > secondTimeHours ||
-      (firstTimeHours === secondTimeHours &&
-        firstTime.minutes >= secondTime.minutes)
-    );
-  }
-
-  function hoursIn24HourFormat(time: Time) {
-    return time.ampm == "PM" ? time.hours + 12 : time.hours;
-  }
-
-  useEffect(() => {
     if (!showDateTime) {
       setActiveInput(ActiveInput.None);
     }
@@ -112,44 +68,44 @@ export default function DateTimeRange() {
   }
 
   return (
-    <div ref={containerRef} style={{ userSelect: "none" }}>
-      <div className="flex items-center justify-center mb-2">
-        <DateContainer
-          isActive={activeInput === ActiveInput.First}
-          text="Start Date"
-          date={firstDate}
-          setDate={setFirstDate}
-          time={firstSelectedTime}
-          setTime={setFirstSelectedTime}
-          onFocus={() => handleInputFocus(ActiveInput.First)}
-          isInputValid={isFirstInputValid}
-          setIsInputValid={setIsFirstInputValid}
-        />
-        <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
-        <DateContainer
-          isActive={activeInput === ActiveInput.Second}
-          text="End Date"
-          date={secondDate}
-          setDate={setSecondDate}
-          time={secondSelectedTime}
-          setTime={setSecondSelectedTime}
-          onFocus={() => handleInputFocus(ActiveInput.Second)}
-          isInputValid={isSecondInputValid}
-          setIsInputValid={setIsSecondInputValid}
-        />
-      </div>
-      <DateTimeRangeProvider
-        firstDate={firstDate}
-        secondDate={secondDate}
-        activeInput={activeInput}
-        setActiveInput={setActiveInput}
-        setFirstDate={setFirstDate}
-        setSecondDate={setSecondDate}
-        firstSelectedTime={firstSelectedTime}
-        setFirstSelectedTime={setFirstSelectedTime}
-        secondSelectedTime={secondSelectedTime}
-        setSecondSelectedTime={setSecondSelectedTime}
-      >
+    <DateTimeRangeProvider
+      firstDate={firstDate}
+      secondDate={secondDate}
+      activeInput={activeInput}
+      setActiveInput={setActiveInput}
+      setFirstDate={setFirstDate}
+      setSecondDate={setSecondDate}
+      firstSelectedTime={firstSelectedTime}
+      setFirstSelectedTime={setFirstSelectedTime}
+      secondSelectedTime={secondSelectedTime}
+      setSecondSelectedTime={setSecondSelectedTime}
+    >
+      <div ref={containerRef} style={{ userSelect: "none" }}>
+        <div className="flex items-center justify-center mb-2">
+          <DateContainer
+            isActive={activeInput === ActiveInput.First}
+            text="Start Date"
+            date={firstDate}
+            setDate={setFirstDate}
+            time={firstSelectedTime}
+            setTime={setFirstSelectedTime}
+            onFocus={() => handleInputFocus(ActiveInput.First)}
+            isInputValid={isFirstInputValid}
+            setIsInputValid={setIsFirstInputValid}
+          />
+          <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
+          <DateContainer
+            isActive={activeInput === ActiveInput.Second}
+            text="End Date"
+            date={secondDate}
+            setDate={setSecondDate}
+            time={secondSelectedTime}
+            setTime={setSecondSelectedTime}
+            onFocus={() => handleInputFocus(ActiveInput.Second)}
+            isInputValid={isSecondInputValid}
+            setIsInputValid={setIsSecondInputValid}
+          />
+        </div>
         <CSSTransition
           in={showDateTime}
           timeout={300}
@@ -158,7 +114,7 @@ export default function DateTimeRange() {
         >
           <DateTime onOkButtonClick={() => handleOKButtonClick()} />
         </CSSTransition>
-      </DateTimeRangeProvider>
-    </div>
+      </div>
+    </DateTimeRangeProvider>
   );
 }

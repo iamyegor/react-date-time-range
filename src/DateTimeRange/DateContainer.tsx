@@ -2,6 +2,8 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import calendarIcon from "../assets/icons/calendar.svg";
 import { Time } from "../types";
 import DateInput from "./DateInput";
+import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
+import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater";
 
 interface DateContainerProps {
   text: string;
@@ -32,6 +34,7 @@ function DateContainer({
     useState<boolean>(false);
   const hiddenTextRef = useRef<HTMLLabelElement>(null);
   const [inputValue, setInputValue] = useState<string>("");
+  const firstDateTimeIsGreater = useFirstDateTimeIsGreater();
 
   useEffect(() => {
     if (hiddenTextRef.current) {
@@ -58,6 +61,10 @@ function DateContainer({
     return isFocused || isActive;
   }
 
+  function shouldInvalidateInput() {
+    return !isInputValid || firstDateTimeIsGreater;
+  }
+
   const clipPath = shouldTextBeOnTop()
     ? `polygon(10px 0, 10px 10%, ${textWidth + 14}px 10%, ${
         textWidth + 14
@@ -72,12 +79,17 @@ function DateContainer({
     >
       <div
         className={`rounded border flex justify-between items-center relative
-  focus:outline-none h-full transition-colors ${
+  focus:outline-none h-full transition-colors 
+  ${
     shouldHaveOutline()
       ? "border-blue-500 border-2"
       : "border-gray-700 group-hover:border-gray-400"
   }
-  ${!isInputValid ? "border-red-600 border-2 group-hover:border-red-600" : ""}
+  ${
+    shouldInvalidateInput()
+      ? "border-red-600 border-2 group-hover:border-red-600"
+      : ""
+  }
   `}
         tabIndex={0}
         style={{ clipPath }}
@@ -101,7 +113,7 @@ function DateContainer({
             ? "left-3 -top-[0.725rem] text-xs"
             : "transform -translate-y-1/2 top-1/2 left-2 text-base"
         } ${shouldHaveOutline() ? "text-blue-500" : "text-gray-800"}
-        ${!isInputValid ? "text-red-600" : ""}
+        ${shouldInvalidateInput() ? "text-red-600" : ""}
         `}
         tabIndex={0}
       >
