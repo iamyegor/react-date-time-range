@@ -25,9 +25,8 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   } = useDateTimeRange();
 
   const isDateSelected = (date: Date) =>
-    ((firstDate && isSameDay(date, firstDate)) ||
-      (secondDate && isSameDay(date, secondDate))) &&
-    date instanceof Date;
+    (firstDate && isSameDay(date, firstDate)) ||
+    (secondDate && isSameDay(date, secondDate));
 
   const isToday = isSameDay(day, new Date());
 

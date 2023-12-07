@@ -14,3 +14,8 @@ export interface Time {
   minutes: number;
   ampm: "AM" | "PM";
 }
+
+export enum DashedBorderDirection {
+  Left = "left",
+  Right = "right",
+}

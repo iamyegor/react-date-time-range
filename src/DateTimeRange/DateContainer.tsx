@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import calendarIcon from "../assets/icons/calendar.svg";
-import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater";
 import { Time } from "../types";
 import DateInput from "./DateInput";
+import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider.tsx";
 
 interface DateContainerProps {
   text: string;
@@ -33,7 +33,7 @@ function DateContainer({
     useState<boolean>(false);
   const hiddenTextRef = useRef<HTMLLabelElement>(null);
   const [inputValue, setInputValue] = useState<string>("");
-  const firstDateTimeIsGreater = useFirstDateTimeIsGreater();
+  const { firstDateTimeIsGreater } = useDateTimeRange();
 
   useEffect(() => {
     if (hiddenTextRef.current) {

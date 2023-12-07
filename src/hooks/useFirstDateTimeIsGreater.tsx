@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Time } from "../types";
-import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
 
-export default function useFirstDateTimeIsGreater() {
-  const { firstDate, secondDate, firstSelectedTime, secondSelectedTime } =
-    useDateTimeRange();
-
+export default function useFirstDateTimeIsGreater(
+  firstDate: Date | null,
+  secondDate: Date | null,
+  firstSelectedTime: Time | null,
+  secondSelectedTime: Time | null,
+) {
   const [firstDateTimeIsGreater, setFirstDateTimeIsGreater] =
     useState<boolean>(false);
 
@@ -14,7 +15,7 @@ export default function useFirstDateTimeIsGreater() {
     const datesAreEqual = isDateEqual(firstDate, secondDate);
     const firstTimeIsGreaterOrEqual = isTimeGreaterOrEqual(
       firstSelectedTime,
-      secondSelectedTime
+      secondSelectedTime,
     );
 
     if (firstDateIsGreater || (datesAreEqual && firstTimeIsGreaterOrEqual)) {
@@ -34,7 +35,7 @@ export default function useFirstDateTimeIsGreater() {
 
   function isTimeGreaterOrEqual(
     firstTime: Time | null,
-    secondTime: Time | null
+    secondTime: Time | null,
   ) {
     if (!firstTime || !secondTime) {
       return false;

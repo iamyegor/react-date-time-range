@@ -7,8 +7,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { ActiveInput, DraggedDate, Time } from "../types";
+import { ActiveInput, DashedBorderDirection, DraggedDate, Time } from "../types";
 import { getDefaultSelectedTime } from "../utils";
+import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater.tsx";
+import useEdgeSelectedDate from "../hooks/useEdgeSelectedDate.tsx";
+import useCurrentDirection from "../hooks/useCurrentDirection.tsx";
 
 type DateTimeRangeContextProps = {
   draggedDate: DraggedDate;
@@ -33,6 +36,9 @@ type DateTimeRangeContextProps = {
   onFirstSelectedTimeChange: (time: Time | null) => void;
   secondSelectedTime: Time | null;
   onSecondSelectedTimeChange: (time: Time | null) => void;
+  firstDateTimeIsGreater: boolean;
+  edgeSelectedDate: Date | null;
+  dashedBorderDirection: DashedBorderDirection;
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
@@ -58,6 +64,9 @@ const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
   onFirstSelectedTimeChange: () => {},
   secondSelectedTime: null,
   onSecondSelectedTimeChange: () => {},
+  firstDateTimeIsGreater: false,
+  edgeSelectedDate: null,
+  dashedBorderDirection: DashedBorderDirection.Left,
 });
 
 export function useDateTimeRange() {
@@ -102,6 +111,24 @@ export default function DateTimeRangeProvider({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dateChangedWhileDragging, setDateChangedWhileDragging] =
     useState<boolean>(false);
+  const firstDateTimeIsGreater = useFirstDateTimeIsGreater(
+    firstDate,
+    secondDate,
+    firstSelectedTime,
+    secondSelectedTime,
+  );
+
+  const dashedBorderDirection = useCurrentDirection(activeInput);
+
+  const edgeSelectedDate = useEdgeSelectedDate(
+    firstDate,
+    secondDate,
+    dashedBorderDirection,
+  );
+  
+  console.log("edgeSelectedDate", edgeSelectedDate)
+  console.log("dashedBorderDirection", dashedBorderDirection);
+  console.log("");
 
   function handleCellClick(day: Date) {
     setDateBasedOnActiveInput(day);
@@ -175,6 +202,9 @@ export default function DateTimeRangeProvider({
         onFirstSelectedTimeChange,
         secondSelectedTime,
         onSecondSelectedTimeChange,
+        firstDateTimeIsGreater,
+        edgeSelectedDate,
+        dashedBorderDirection,
       }}
     >
       {children}

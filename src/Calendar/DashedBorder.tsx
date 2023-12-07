@@ -3,13 +3,12 @@ import {
   addDays,
   endOfMonth,
   isEqual,
-  isSameMonth,
   isSaturday,
   isSunday,
   startOfMonth,
   subDays,
 } from "date-fns";
-import { ActiveInput } from "../types";
+import { ActiveInput, DashedBorderDirection } from "../types";
 import { useDateTimeRange } from "./DateTimeRangeProvider";
 
 const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
@@ -19,8 +18,16 @@ const BORDER_LENGTHENED_LEFT = "-left-6";
 const BORDER_LENGTHENED_RIGHT = "-right-6";
 
 export default function DashedBorder({ day }: { day: Date }) {
-  const { firstDate, secondDate, hoveredDate, activeInput, isDragging } =
-    useDateTimeRange();
+  const {
+    firstDate,
+    secondDate,
+    hoveredDate,
+    activeInput,
+    isDragging,
+    firstDateTimeIsGreater,
+    edgeSelectedDate,
+    dashedBorderDirection,
+  } = useDateTimeRange();
 
   function shouldApplyDashedBorder() {
     if (!firstDate || !hoveredDate || !(secondDate || firstDate)) {
@@ -35,10 +42,18 @@ export default function DashedBorder({ day }: { day: Date }) {
       if (!secondDate) {
         return false;
       }
-      return day < firstDate && day >= hoveredDate;
+      if (firstDateTimeIsGreater) {
+        return day < secondDate && day >= hoveredDate;
+      } else {
+        return day < firstDate && day >= hoveredDate;
+      }
     } else {
-      const comparisonDate = secondDate || firstDate;
-      return day > comparisonDate && day <= hoveredDate;
+      if (secondDate && firstDateTimeIsGreater) {
+        return day > firstDate && day <= hoveredDate;
+      } else {
+        const comparisonDate = secondDate || firstDate;
+        return day > comparisonDate && day <= hoveredDate;
+      }
     }
   }
 
@@ -69,28 +84,25 @@ export default function DashedBorder({ day }: { day: Date }) {
   }
 
   function getLengthenedLeftBorder() {
-    if (
-      (secondDate && isNextDay(secondDate)) ||
-      (firstDate && isNextDay(firstDate))
-    ) {
-      return BORDER_LENGTHENED_LEFT;
+    if (edgeSelectedDate) {
+      if (dashedBorderDirection === DashedBorderDirection.Right) {
+        if (isEqual(day, addDays(edgeSelectedDate, 1))) {
+          return BORDER_LENGTHENED_LEFT;
+        }
+      }
     }
     return "left-[1px]";
   }
 
   function getLengthenedRightBorder() {
-    const dayBeforeFirstDate = firstDate && isEqual(day, subDays(firstDate, 1));
-
-    if (dayBeforeFirstDate) {
-      return BORDER_LENGTHENED_RIGHT;
+    if (edgeSelectedDate) {
+      if (dashedBorderDirection === DashedBorderDirection.Left) {
+        if (isEqual(day, subDays(edgeSelectedDate, 1))) {
+          return BORDER_LENGTHENED_RIGHT;
+        }
+      }
     }
     return "right-[1px]";
-  }
-
-  function isNextDay(date: Date) {
-    return (
-      isEqual(day, addDays(date, 1)) && isSameMonth(day, date) && !isSunday(day)
-    );
   }
 
   function getDashedBorder() {
