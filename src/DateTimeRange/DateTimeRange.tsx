@@ -3,7 +3,7 @@ import { CSSTransition } from "react-transition-group";
 import DateTimeRangeProvider from "../Calendar/DateTimeRangeProvider";
 import arrowBetweenDates from "../assets/icons/arrow-between-dates.svg";
 import useOutsideClick from "../hooks/useOutsideClick";
-import { ActiveInput as ActiveInput, Time } from "../types";
+import { ActiveInput, Time } from "../types";
 import { getDefaultSelectedTime } from "../utils";
 import DateContainer from "./DateContainer";
 import DateTime from "./DateTime";
@@ -24,16 +24,48 @@ export default function DateTimeRange() {
   const [isSecondInputValid, setIsSecondInputValid] = useState<boolean>(true);
 
   useEffect(() => {
-    if (firstDate && secondDate) {
-      if (firstDate > secondDate) {
-        setIsFirstInputValid(false);
-        setIsSecondInputValid(false);
-      } else {
-        setIsFirstInputValid(true);
-        setIsSecondInputValid(true);
-      }
+    if (
+      isDateGreater(firstDate, secondDate) ||
+      (isDateEqual(firstDate, secondDate) &&
+        isTimeGreaterOrEqual(firstSelectedTime, secondSelectedTime))
+    ) {
+      setIsFirstInputValid(false);
+      setIsSecondInputValid(false);
+    } else {
+      setIsFirstInputValid(true);
+      setIsSecondInputValid(true);
     }
-  }, [firstDate, secondDate]);
+  }, [firstDate, secondDate, firstSelectedTime, secondSelectedTime]);
+
+  function isDateGreater(firstDate: Date | null, secondDate: Date | null) {
+    return firstDate && secondDate && firstDate > secondDate;
+  }
+
+  function isDateEqual(firstDate: Date | null, secondDate: Date | null) {
+    return firstDate && secondDate && firstDate >= secondDate;
+  }
+
+  function isTimeGreaterOrEqual(
+    firstTime: Time | null,
+    secondTime: Time | null
+  ) {
+    if (!firstTime || !secondTime) {
+      return false;
+    }
+
+    const firstTimeHours = hoursIn24HourFormat(firstTime);
+    const secondTimeHours = hoursIn24HourFormat(secondTime);
+
+    return (
+      firstTimeHours > secondTimeHours ||
+      (firstTimeHours === secondTimeHours &&
+        firstTime.minutes >= secondTime.minutes)
+    );
+  }
+
+  function hoursIn24HourFormat(time: Time) {
+    return time.ampm == "PM" ? time.hours + 12 : time.hours;
+  }
 
   useEffect(() => {
     if (!showDateTime) {
