@@ -1,13 +1,12 @@
 import {
+  createContext,
   Dispatch,
   ReactElement,
   SetStateAction,
-  createContext,
   useContext,
   useEffect,
   useState,
 } from "react";
-import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater";
 import { ActiveInput, DraggedDate, Time } from "../types";
 import { getDefaultSelectedTime } from "../utils";
 
@@ -31,9 +30,9 @@ type DateTimeRangeContextProps = {
   setActiveInput: (activeInput: ActiveInput) => void;
   setDateChangedWhileDragging: Dispatch<SetStateAction<boolean>>;
   firstSelectedTime: Time | null;
-  setFirstSelectedTime: Dispatch<SetStateAction<Time | null>>;
+  onFirstSelectedTimeChange: (time: Time | null) => void;
   secondSelectedTime: Time | null;
-  setSecondSelectedTime: Dispatch<SetStateAction<Time | null>>;
+  onSecondSelectedTimeChange: (time: Time | null) => void;
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
@@ -56,9 +55,9 @@ const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
   setActiveInput: () => {},
   setDateChangedWhileDragging: () => {},
   firstSelectedTime: null,
-  setFirstSelectedTime: () => {},
+  onFirstSelectedTimeChange: () => {},
   secondSelectedTime: null,
-  setSecondSelectedTime: () => {},
+  onSecondSelectedTimeChange: () => {},
 });
 
 export function useDateTimeRange() {
@@ -74,9 +73,9 @@ interface DateTimeRangeProviderProps {
   activeInput: ActiveInput;
   setActiveInput: Dispatch<React.SetStateAction<ActiveInput>>;
   firstSelectedTime: Time | null;
-  setFirstSelectedTime: Dispatch<React.SetStateAction<Time | null>>;
+  onFirstSelectedTimeChange: (time: Time | null) => void;
   secondSelectedTime: Time | null;
-  setSecondSelectedTime: Dispatch<React.SetStateAction<Time | null>>;
+  onSecondSelectedTimeChange: (time: Time | null) => void;
 }
 
 export default function DateTimeRangeProvider({
@@ -86,19 +85,19 @@ export default function DateTimeRangeProvider({
   secondDate,
   setSecondDate,
   firstSelectedTime,
-  setFirstSelectedTime,
+  onFirstSelectedTimeChange,
   secondSelectedTime,
-  setSecondSelectedTime,
+  onSecondSelectedTimeChange,
   activeInput,
   setActiveInput,
 }: DateTimeRangeProviderProps) {
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(
-    DraggedDate.First
+    DraggedDate.First,
   );
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [shadowSelectedDate, setShadowSelectedDate] = useState<Date | null>(
-    null
+    null,
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dateChangedWhileDragging, setDateChangedWhileDragging] =
@@ -106,35 +105,40 @@ export default function DateTimeRangeProvider({
 
   function handleCellClick(day: Date) {
     setDateBasedOnActiveInput(day);
+    setTimeIfNotSet();
+  }
+
+  function setTimeIfNotSet() {
+    if (activeInput === ActiveInput.First && !firstSelectedTime) {
+      onFirstSelectedTimeChange(getDefaultSelectedTime());
+    } else if (activeInput === ActiveInput.Second && !secondSelectedTime) {
+      onSecondSelectedTimeChange(getDefaultSelectedTime());
+    }
   }
 
   function setDateBasedOnActiveInput(day: Date) {
     if (activeInput === ActiveInput.First) {
-      setFirstDate(day);
-      if (secondDate && day > secondDate) {
-        setSecondDate(null);
-      }
+      setDateForFirstInput(day);
     } else if (activeInput === ActiveInput.Second) {
-      if (firstDate && day < firstDate) {
-        setFirstDate(day);
-        setSecondDate(null);
-      } else {
-        setSecondDate(day);
-      }
+      setDateForSecondInput(day);
     }
   }
 
-  useEffect(() => {
-    if (firstDate && !firstSelectedTime) {
-      setFirstSelectedTime(getDefaultSelectedTime());
+  function setDateForFirstInput(day: Date) {
+    setFirstDate(day);
+    if (secondDate && day > secondDate) {
+      setSecondDate(null);
     }
-  }, [firstDate]);
+  }
 
-  useEffect(() => {
-    if (secondDate && !secondSelectedTime) {
-      setSecondSelectedTime(getDefaultSelectedTime());
+  function setDateForSecondInput(day: Date) {
+    if (firstDate && day < firstDate) {
+      setFirstDate(day);
+      setSecondDate(null);
+    } else {
+      setSecondDate(day);
     }
-  }, [secondDate]);
+  }
 
   useEffect(() => {
     if (isDragging && dateChangedWhileDragging) {
@@ -168,9 +172,9 @@ export default function DateTimeRangeProvider({
         setActiveInput,
         setDateChangedWhileDragging,
         firstSelectedTime,
-        setFirstSelectedTime,
+        onFirstSelectedTimeChange,
         secondSelectedTime,
-        setSecondSelectedTime,
+        onSecondSelectedTimeChange,
       }}
     >
       {children}

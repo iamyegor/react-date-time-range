@@ -6,12 +6,12 @@ import { startOfDay } from "date-fns";
 import { getDefaultSelectedTime } from "../utils";
 
 const hours = Array.from({ length: 11 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
+  String(i + 1).padStart(2, "0"),
 );
 hours.unshift("12");
 
 const minutes = Array.from({ length: 60 }, (_, i) =>
-  String(i).padStart(2, "0")
+  String(i).padStart(2, "0"),
 );
 const periods = ["AM", "PM"];
 
@@ -23,8 +23,8 @@ function TimePicker() {
     setSecondDate,
     firstSelectedTime,
     secondSelectedTime,
-    setFirstSelectedTime,
-    setSecondSelectedTime,
+    onFirstSelectedTimeChange,
+    onSecondSelectedTimeChange,
     activeInput,
   } = useDateTimeRange();
   const [selectedTime, setSelectedTime] = useState<Time | null>(null);
@@ -39,10 +39,14 @@ function TimePicker() {
 
   function handleTimeChange(key: "hours" | "minutes", value: number) {
     if (activeInput === ActiveInput.First) {
-      setFirstSelectedTime((prev) => getUpdatedTime(prev, key, value) as Time);
+      onFirstSelectedTimeChange(
+        getUpdatedTime(firstSelectedTime, key, value) as Time,
+      );
       setFirstDateIfNull();
     } else if (activeInput === ActiveInput.Second) {
-      setSecondSelectedTime((prev) => getUpdatedTime(prev, key, value) as Time);
+      onSecondSelectedTimeChange(
+        getUpdatedTime(secondSelectedTime, key, value) as Time,
+      );
       setSecondDateIfNull();
     }
 
@@ -64,7 +68,7 @@ function TimePicker() {
   function getUpdatedTime(
     prev: Time | null,
     key: "hours" | "minutes",
-    value: number
+    value: number,
   ) {
     const currentTime = prev || getDefaultSelectedTime();
     return { ...currentTime, [key]: value };
@@ -72,10 +76,10 @@ function TimePicker() {
 
   function handlePeriodChange(ampm: "AM" | "PM") {
     if (activeInput === ActiveInput.First) {
-      setFirstSelectedTime((prev) => getUpdatedPeriod(prev, ampm));
+      onFirstSelectedTimeChange(getUpdatedPeriod(firstSelectedTime, ampm));
       setFirstDateIfNull();
     } else if (activeInput === ActiveInput.Second) {
-      setSecondSelectedTime((prev) => getUpdatedPeriod(prev, ampm));
+      onSecondSelectedTimeChange(getUpdatedPeriod(secondSelectedTime, ampm));
       setSecondDateIfNull();
     }
 

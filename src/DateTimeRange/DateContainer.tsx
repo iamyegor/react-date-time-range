@@ -1,16 +1,15 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import calendarIcon from "../assets/icons/calendar.svg";
+import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater";
 import { Time } from "../types";
 import DateInput from "./DateInput";
-import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
-import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater";
 
 interface DateContainerProps {
   text: string;
   date: Date | null;
   setDate: Dispatch<SetStateAction<Date | null>>;
   time: Time | null;
-  setTime: Dispatch<SetStateAction<Time | null>>;
+  onTimeChange: (time: Time | null) => void;
   onFocus: () => void;
   isActive: boolean;
   isInputValid: boolean;
@@ -22,7 +21,7 @@ function DateContainer({
   date,
   setDate,
   time,
-  setTime,
+  onTimeChange,
   onFocus,
   isActive,
   isInputValid,
@@ -95,7 +94,8 @@ function DateContainer({
             date={date}
             time={time}
             setDate={setDate}
-            setTime={setTime}
+            onTimeChange={onTimeChange}
+            isInputValid={isInputValid}
             setIsInputValid={setIsInputValid}
             value={inputValue}
             setValue={setInputValue}

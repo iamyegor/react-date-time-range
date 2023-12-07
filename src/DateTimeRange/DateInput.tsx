@@ -12,7 +12,8 @@ interface DateInputProps {
   date: Date | null;
   setDate: Dispatch<SetStateAction<Date | null>>;
   time: Time | null;
-  setTime: Dispatch<SetStateAction<Time | null>>;
+  onTimeChange: (time: Time | null) => void;
+  isInputValid: boolean;
   setIsInputValid: Dispatch<SetStateAction<boolean>>;
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
@@ -42,7 +43,8 @@ function DateInput({
   date,
   time,
   setDate,
-  setTime,
+  onTimeChange,
+  isInputValid,
   setIsInputValid,
   value,
   setValue,
@@ -53,27 +55,31 @@ function DateInput({
     const dateFromValue = queryDateFromValue();
     const timeFromValue = queryTimeFromValue();
 
-    if (dateFromValue && isValid(dateFromValue)) {
+    if (validateDate(dateFromValue)) {
       setDate(dateFromValue);
     } else {
       setDate(null);
     }
 
     if (timeFromValue) {
-      setTime(timeFromValue);
+      onTimeChange(timeFromValue);
     } else {
-      setTime(null);
+      onTimeChange(null);
     }
 
     if (
       isValuePlaceholder() ||
-      (timeFromValue && dateFromValue && isValid(dateFromValue))
+      (timeFromValue && validateDate(dateFromValue))
     ) {
       setIsInputValid(true);
     } else {
       setIsInputValid(false);
     }
   }, [value]);
+
+  function validateDate(date: Date | null) {
+    return date && isValid(date);
+  }
 
   function isValuePlaceholder() {
     const section = { start: sections[0].start, end: sections[5].end };
@@ -85,10 +91,12 @@ function DateInput({
     const month = parseInt(getSectionValue(sections[0]));
     const day = parseInt(getSectionValue(sections[1]));
     const year = parseInt(getSectionValue(sections[2]));
-    if (year < 1899 || year > 2100) {
-      return null;
+
+    if (year > 1899 && year < 2101) {
+      return new Date(year, month - 1, day);
     }
-    return new Date(year, month - 1, day);
+
+    return null;
   }
 
   function queryTimeFromValue(): Time | null {
@@ -108,7 +116,9 @@ function DateInput({
   }
 
   function isTimeValid(hours: number, minutes: number, ampm: string) {
-    if (hours < 1 || hours > 12) {
+    if (isNaN(hours) || isNaN(minutes)) {
+      return false;
+    } else if (hours < 1 || hours > 12) {
       return false;
     } else if (minutes < 0 || minutes > 59) {
       return false;
@@ -130,7 +140,7 @@ function DateInput({
       updateValue({ start, end }, dateValue, getSameHighlight());
     } else {
       const dateValue = getSectionValue({ start, end });
-      if (dateValue) {
+      if (dateValue && !isInputValid) {
         updateValue({ start, end }, dateValue, getSameHighlight());
       } else {
         updateValue({ start, end }, DATE_PLACEHOLDER, getSameHighlight());
@@ -157,7 +167,7 @@ function DateInput({
       updateValue({ start, end }, timeValue, getSameHighlight());
     } else {
       const timeValue = getSectionValue({ start, end });
-      if (timeValue) {
+      if (timeValue && !isInputValid) {
         updateValue({ start, end }, timeValue, getSameHighlight());
       } else {
         updateValue({ start, end }, " " + TIME_PLACEHOLDER, getSameHighlight());

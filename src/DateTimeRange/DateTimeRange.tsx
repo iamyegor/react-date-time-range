@@ -4,7 +4,6 @@ import DateTimeRangeProvider from "../Calendar/DateTimeRangeProvider";
 import arrowBetweenDates from "../assets/icons/arrow-between-dates.svg";
 import useOutsideClick from "../hooks/useOutsideClick";
 import { ActiveInput, Time } from "../types";
-import { getDefaultSelectedTime } from "../utils";
 import DateContainer from "./DateContainer";
 import DateTime from "./DateTime";
 import "./styles/DateTimeRange.css";
@@ -14,7 +13,7 @@ export default function DateTimeRange() {
   const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [firstSelectedTime, setFirstSelectedTime] = useState<Time | null>(null);
   const [secondSelectedTime, setSecondSelectedTime] = useState<Time | null>(
-    null
+    null,
   );
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -28,18 +27,6 @@ export default function DateTimeRange() {
       setActiveInput(ActiveInput.None);
     }
   }, [showDateTime]);
-
-  useEffect(() => {
-    if (firstDate && !firstSelectedTime) {
-      setFirstSelectedTime(getDefaultSelectedTime());
-    }
-  }, [firstDate]);
-
-  useEffect(() => {
-    if (secondDate && !secondSelectedTime) {
-      setSecondSelectedTime(getDefaultSelectedTime());
-    }
-  }, [secondDate]);
 
   function handleInputFocus(input: ActiveInput) {
     setActiveInput(input);
@@ -67,6 +54,14 @@ export default function DateTimeRange() {
     }
   }
 
+  function handleFirstTimeChange(time: Time | null) {
+    setFirstSelectedTime(time);
+  }
+
+  function handleSecondTimeChange(time: Time | null) {
+    setSecondSelectedTime(time);
+  }
+
   return (
     <DateTimeRangeProvider
       firstDate={firstDate}
@@ -76,9 +71,9 @@ export default function DateTimeRange() {
       setFirstDate={setFirstDate}
       setSecondDate={setSecondDate}
       firstSelectedTime={firstSelectedTime}
-      setFirstSelectedTime={setFirstSelectedTime}
+      onFirstSelectedTimeChange={handleFirstTimeChange}
       secondSelectedTime={secondSelectedTime}
-      setSecondSelectedTime={setSecondSelectedTime}
+      onSecondSelectedTimeChange={handleSecondTimeChange}
     >
       <div ref={containerRef} style={{ userSelect: "none" }}>
         <div className="flex items-center justify-center mb-2">
@@ -88,7 +83,7 @@ export default function DateTimeRange() {
             date={firstDate}
             setDate={setFirstDate}
             time={firstSelectedTime}
-            setTime={setFirstSelectedTime}
+            onTimeChange={handleFirstTimeChange}
             onFocus={() => handleInputFocus(ActiveInput.First)}
             isInputValid={isFirstInputValid}
             setIsInputValid={setIsFirstInputValid}
@@ -100,7 +95,7 @@ export default function DateTimeRange() {
             date={secondDate}
             setDate={setSecondDate}
             time={secondSelectedTime}
-            setTime={setSecondSelectedTime}
+            onTimeChange={handleSecondTimeChange}
             onFocus={() => handleInputFocus(ActiveInput.Second)}
             isInputValid={isSecondInputValid}
             setIsInputValid={setIsSecondInputValid}
