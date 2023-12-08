@@ -13,7 +13,7 @@ export default function DateTimeRange() {
   const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [firstSelectedTime, setFirstSelectedTime] = useState<Time | null>(null);
   const [secondSelectedTime, setSecondSelectedTime] = useState<Time | null>(
-    null,
+    null
   );
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -62,14 +62,34 @@ export default function DateTimeRange() {
     setSecondSelectedTime(time);
   }
 
+  function handleFirstDateChange(date: Date | null) {
+    setFirstDate(date);
+  }
+
+  function handleSecondDateChange(date: Date | null) {
+    setSecondDate(date);
+  }
+
+  function handleActiveInputChange(input: ActiveInput) {
+    setActiveInput(input);
+  }
+
+  function handleIsFirstInputValidChange(isValid: boolean) {
+    setIsFirstInputValid(isValid);
+  }
+
+  function handleIsSecondInputValidChange(isValid: boolean) {
+    setIsSecondInputValid(isValid);
+  }
+
   return (
     <DateTimeRangeProvider
       firstDate={firstDate}
       secondDate={secondDate}
       activeInput={activeInput}
-      setActiveInput={setActiveInput}
-      setFirstDate={setFirstDate}
-      setSecondDate={setSecondDate}
+      onActiveInputChange={handleActiveInputChange}
+      onFirstDateChange={handleFirstDateChange}
+      onSecondDateChange={handleSecondDateChange}
       firstSelectedTime={firstSelectedTime}
       onFirstSelectedTimeChange={handleFirstTimeChange}
       secondSelectedTime={secondSelectedTime}
@@ -81,24 +101,24 @@ export default function DateTimeRange() {
             isActive={activeInput === ActiveInput.First}
             text="Start Date"
             date={firstDate}
-            setDate={setFirstDate}
+            onDateChange={handleFirstDateChange}
             time={firstSelectedTime}
             onTimeChange={handleFirstTimeChange}
             onFocus={() => handleInputFocus(ActiveInput.First)}
             isInputValid={isFirstInputValid}
-            setIsInputValid={setIsFirstInputValid}
+            onIsInputValidChange={handleIsFirstInputValidChange}
           />
           <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
           <DateContainer
             isActive={activeInput === ActiveInput.Second}
             text="End Date"
             date={secondDate}
-            setDate={setSecondDate}
+            onDateChange={setSecondDate}
             time={secondSelectedTime}
             onTimeChange={handleSecondTimeChange}
             onFocus={() => handleInputFocus(ActiveInput.Second)}
             isInputValid={isSecondInputValid}
-            setIsInputValid={setIsSecondInputValid}
+            onIsInputValidChange={handleIsSecondInputValidChange}
           />
         </div>
         <CSSTransition

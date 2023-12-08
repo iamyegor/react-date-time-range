@@ -1,22 +1,20 @@
 import { isValid } from "date-fns";
 import {
-  Dispatch,
   KeyboardEvent,
-  SetStateAction,
   useEffect,
-  useRef,
+  useRef
 } from "react";
 import { Time } from "../types";
 
 interface DateInputProps {
   date: Date | null;
-  setDate: Dispatch<SetStateAction<Date | null>>;
+  onDateChange: (date: Date | null) => void;
   time: Time | null;
   onTimeChange: (time: Time | null) => void;
   isInputValid: boolean;
-  setIsInputValid: Dispatch<SetStateAction<boolean>>;
+  onIsInputValidChange: (isValid: boolean) => void;
   value: string;
-  setValue: Dispatch<SetStateAction<string>>;
+  onValueChange: (value: string) => void;
 }
 
 interface Section {
@@ -42,12 +40,12 @@ const DATE_PLACEHOLDER = `${sections[0].name}/${sections[1].name}/${sections[2].
 function DateInput({
   date,
   time,
-  setDate,
+  onDateChange,
   onTimeChange,
   isInputValid,
-  setIsInputValid,
+  onIsInputValidChange,
   value,
-  setValue,
+  onValueChange,
 }: DateInputProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -56,9 +54,9 @@ function DateInput({
     const timeFromValue = queryTimeFromValue();
 
     if (validateDate(dateFromValue)) {
-      setDate(dateFromValue);
+      onDateChange(dateFromValue);
     } else {
-      setDate(null);
+      onDateChange(null);
     }
 
     if (timeFromValue) {
@@ -71,9 +69,9 @@ function DateInput({
       isValuePlaceholder() ||
       (timeFromValue && validateDate(dateFromValue))
     ) {
-      setIsInputValid(true);
+      onIsInputValidChange(true);
     } else {
-      setIsInputValid(false);
+      onIsInputValidChange(false);
     }
   }, [value]);
 
@@ -378,7 +376,7 @@ function DateInput({
       value.slice(0, start) + newSectionValue + value.slice(end);
 
     updateInputValue(updatedValue, highlightSection || updatedSection);
-    setValue(updatedValue);
+    onValueChange(updatedValue);
   }
 
   function updateInputValue(

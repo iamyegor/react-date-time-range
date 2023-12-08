@@ -1,37 +1,40 @@
 import {
   createContext,
-  Dispatch,
   ReactElement,
-  SetStateAction,
   useContext,
   useEffect,
   useState,
 } from "react";
-import { ActiveInput, DashedBorderDirection, DraggedDate, Time } from "../types";
-import { getDefaultSelectedTime } from "../utils";
-import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater.tsx";
-import useEdgeSelectedDate from "../hooks/useEdgeSelectedDate.tsx";
 import useCurrentDirection from "../hooks/useCurrentDirection.tsx";
+import useEdgeSelectedDate from "../hooks/useEdgeSelectedDate.tsx";
+import useFirstDateTimeIsGreater from "../hooks/useFirstDateTimeIsGreater.tsx";
+import {
+  ActiveInput,
+  DashedBorderDirection,
+  DraggedDate,
+  Time,
+} from "../types";
+import { getDefaultSelectedTime } from "../utils";
 
 type DateTimeRangeContextProps = {
   draggedDate: DraggedDate;
-  setDraggedDate: Dispatch<SetStateAction<DraggedDate>>;
+  onDraggedDateChange: (date: DraggedDate) => void;
   handleCellClick: (day: Date) => void;
   firstDate: Date | null;
   secondDate: Date | null;
-  setFirstDate: Dispatch<SetStateAction<Date | null>>;
-  setSecondDate: Dispatch<SetStateAction<Date | null>>;
+  onFirstDateChange: (date: Date | null) => void;
+  onSecondDateChange: (date: Date | null) => void;
   currentMonth: Date;
-  setCurrentMonth: Dispatch<SetStateAction<Date>>;
+  onCurrentMonthChange: (date: Date) => void;
   hoveredDate: Date | null;
-  setHoveredDate: Dispatch<SetStateAction<Date | null>>;
+  onHoveredDateChange: (date: Date | null) => void;
   shadowSelectedDate: Date | null;
-  setShadowSelectedDate: Dispatch<SetStateAction<Date | null>>;
+  onShadowSelectedDateChange: (date: Date | null) => void;
   isDragging: boolean;
-  setIsDragging: Dispatch<SetStateAction<boolean>>;
+  onIsDraggingChange: (isDragging: boolean) => void;
   activeInput: ActiveInput;
-  setActiveInput: (activeInput: ActiveInput) => void;
-  setDateChangedWhileDragging: Dispatch<SetStateAction<boolean>>;
+  onActiveInputChange: (activeInput: ActiveInput) => void;
+  onDateChangedWhileDraggingChange: (dateChangedWhileDragging: boolean) => void;
   firstSelectedTime: Time | null;
   onFirstSelectedTimeChange: (time: Time | null) => void;
   secondSelectedTime: Time | null;
@@ -43,23 +46,23 @@ type DateTimeRangeContextProps = {
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
   draggedDate: DraggedDate.First,
-  setDraggedDate: () => {},
+  onDraggedDateChange: () => {},
   handleCellClick: () => {},
   firstDate: null,
   secondDate: null,
-  setFirstDate: () => {},
-  setSecondDate: () => {},
+  onFirstDateChange: () => {},
+  onSecondDateChange: () => {},
   currentMonth: new Date(),
-  setCurrentMonth: () => {},
+  onCurrentMonthChange: () => {},
   hoveredDate: null,
-  setHoveredDate: () => {},
+  onHoveredDateChange: () => {},
   shadowSelectedDate: null,
-  setShadowSelectedDate: () => {},
+  onShadowSelectedDateChange: () => {},
   isDragging: false,
-  setIsDragging: () => {},
+  onIsDraggingChange: () => {},
   activeInput: ActiveInput.None,
-  setActiveInput: () => {},
-  setDateChangedWhileDragging: () => {},
+  onActiveInputChange: () => {},
+  onDateChangedWhileDraggingChange: () => {},
   firstSelectedTime: null,
   onFirstSelectedTimeChange: () => {},
   secondSelectedTime: null,
@@ -76,11 +79,11 @@ export function useDateTimeRange() {
 interface DateTimeRangeProviderProps {
   children: ReactElement;
   firstDate: Date | null;
-  setFirstDate: Dispatch<React.SetStateAction<Date | null>>;
+  onFirstDateChange: (date: Date | null) => void;
   secondDate: Date | null;
-  setSecondDate: Dispatch<React.SetStateAction<Date | null>>;
+  onSecondDateChange: (date: Date | null) => void;
   activeInput: ActiveInput;
-  setActiveInput: Dispatch<React.SetStateAction<ActiveInput>>;
+  onActiveInputChange: (date: ActiveInput) => void;
   firstSelectedTime: Time | null;
   onFirstSelectedTimeChange: (time: Time | null) => void;
   secondSelectedTime: Time | null;
@@ -90,23 +93,23 @@ interface DateTimeRangeProviderProps {
 export default function DateTimeRangeProvider({
   children,
   firstDate,
-  setFirstDate,
+  onFirstDateChange,
   secondDate,
-  setSecondDate,
+  onSecondDateChange,
   firstSelectedTime,
   onFirstSelectedTimeChange,
   secondSelectedTime,
   onSecondSelectedTimeChange,
   activeInput,
-  setActiveInput,
+  onActiveInputChange,
 }: DateTimeRangeProviderProps) {
   const [draggedDate, setDraggedDate] = useState<DraggedDate>(
-    DraggedDate.First,
+    DraggedDate.First
   );
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [shadowSelectedDate, setShadowSelectedDate] = useState<Date | null>(
-    null,
+    null
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dateChangedWhileDragging, setDateChangedWhileDragging] =
@@ -115,7 +118,7 @@ export default function DateTimeRangeProvider({
     firstDate,
     secondDate,
     firstSelectedTime,
-    secondSelectedTime,
+    secondSelectedTime
   );
 
   const dashedBorderDirection = useCurrentDirection(activeInput);
@@ -123,12 +126,8 @@ export default function DateTimeRangeProvider({
   const edgeSelectedDate = useEdgeSelectedDate(
     firstDate,
     secondDate,
-    dashedBorderDirection,
+    dashedBorderDirection
   );
-  
-  console.log("edgeSelectedDate", edgeSelectedDate)
-  console.log("dashedBorderDirection", dashedBorderDirection);
-  console.log("");
 
   function handleCellClick(day: Date) {
     setDateBasedOnActiveInput(day);
@@ -152,52 +151,78 @@ export default function DateTimeRangeProvider({
   }
 
   function setDateForFirstInput(day: Date) {
-    setFirstDate(day);
+    onFirstDateChange(day);
     if (secondDate && day > secondDate) {
-      setSecondDate(null);
+      onSecondDateChange(null);
     }
   }
 
   function setDateForSecondInput(day: Date) {
     if (firstDate && day < firstDate) {
-      setFirstDate(day);
-      setSecondDate(null);
+      onFirstDateChange(day);
+      onSecondDateChange(null);
     } else {
-      setSecondDate(day);
+      onSecondDateChange(day);
     }
   }
 
   useEffect(() => {
     if (isDragging && dateChangedWhileDragging) {
       if (draggedDate === DraggedDate.First) {
-        setActiveInput(ActiveInput.First);
+        onActiveInputChange(ActiveInput.First);
       } else if (draggedDate === DraggedDate.Second) {
-        setActiveInput(ActiveInput.Second);
+        onActiveInputChange(ActiveInput.Second);
       }
     }
   }, [draggedDate, isDragging, dateChangedWhileDragging]);
+
+  function handleDraggedDateChange(date: DraggedDate) {
+    setDraggedDate(date);
+  }
+
+  function handleCurrentMonthChange(date: Date) {
+    setCurrentMonth(date);
+  }
+
+  function handleHoveredDateChange(date: Date | null) {
+    setHoveredDate(date);
+  }
+
+  function handleShadowSelectedDateChange(date: Date | null) {
+    setShadowSelectedDate(date);
+  }
+
+  function handleIsDraggingChange(isDragging: boolean) {
+    setIsDragging(isDragging);
+  }
+
+  function handleDateChangedWhileDraggingChange(
+    dateChangedWhileDragging: boolean
+  ) {
+    setDateChangedWhileDragging(dateChangedWhileDragging);
+  }
 
   return (
     <DateTimeRangeContext.Provider
       value={{
         draggedDate,
-        setDraggedDate,
+        onDraggedDateChange: handleDraggedDateChange,
         handleCellClick,
         firstDate,
         secondDate,
-        setFirstDate,
-        setSecondDate,
+        onFirstDateChange,
+        onSecondDateChange,
         currentMonth,
-        setCurrentMonth,
+        onCurrentMonthChange: handleCurrentMonthChange,
         hoveredDate,
-        setHoveredDate,
+        onHoveredDateChange: handleHoveredDateChange,
         shadowSelectedDate,
-        setShadowSelectedDate,
+        onShadowSelectedDateChange: handleShadowSelectedDateChange,
         isDragging,
-        setIsDragging,
+        onIsDraggingChange: handleIsDraggingChange,
         activeInput,
-        setActiveInput,
-        setDateChangedWhileDragging,
+        onActiveInputChange,
+        onDateChangedWhileDraggingChange: handleDateChangedWhileDraggingChange,
         firstSelectedTime,
         onFirstSelectedTimeChange,
         secondSelectedTime,

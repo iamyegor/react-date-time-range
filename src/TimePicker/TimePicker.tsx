@@ -18,9 +18,9 @@ const periods = ["AM", "PM"];
 function TimePicker() {
   const {
     firstDate,
-    setFirstDate,
+    onFirstDateChange,
     secondDate,
-    setSecondDate,
+    onSecondDateChange,
     firstSelectedTime,
     secondSelectedTime,
     onFirstSelectedTimeChange,
@@ -55,13 +55,13 @@ function TimePicker() {
 
   function setFirstDateIfNull() {
     if (!firstDate) {
-      setFirstDate(startOfDay(new Date()));
+      onFirstDateChange(startOfDay(new Date()));
     }
   }
 
   function setSecondDateIfNull() {
     if (!secondDate) {
-      setSecondDate(startOfDay(new Date()));
+      onSecondDateChange(startOfDay(new Date()));
     }
   }
 

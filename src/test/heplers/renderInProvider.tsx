@@ -6,9 +6,9 @@ export default function renderInProvider(element: ReactElement) {
   render(
     <DateTimeRangeProvider
       firstDate={null}
-      setFirstDate={() => null}
+      onFirstDateChange={() => null}
       secondDate={null}
-      setSecondDate={() => null}
+      onSecondDateChange={() => null}
     >
       {element}
     </DateTimeRangeProvider>

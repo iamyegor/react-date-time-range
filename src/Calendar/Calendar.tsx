@@ -10,7 +10,7 @@ import "./styles/Calendar.css";
 const duration = 250;
 
 function Calendar() {
-  const { currentMonth, setCurrentMonth, isDragging, setIsDragging } =
+  const { currentMonth, onCurrentMonthChange, isDragging, onIsDraggingChange } =
     useDateTimeRange();
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
@@ -37,12 +37,12 @@ function Calendar() {
   }, [currentMonth]);
 
   function onPrevMonthClick() {
-    setCurrentMonth(subMonths(currentMonth, 1));
+    onCurrentMonthChange(subMonths(currentMonth, 1));
     setIsNext(false);
   }
 
   function onNextMonthClick() {
-    setCurrentMonth(addMonths(currentMonth, 1));
+    onCurrentMonthChange(addMonths(currentMonth, 1));
     setIsNext(true);
   }
 
@@ -50,8 +50,8 @@ function Calendar() {
     <div
       className={`font-sans w-[360px] h-full p-4 border-r 
     overflow-hidden ${isDragging ? "cursor-grabbing" : ""}`}
-      onMouseUp={() => setIsDragging(false)}
-      onMouseLeave={() => setIsDragging(false)}
+      onMouseUp={() => onIsDraggingChange(false)}
+      onMouseLeave={() => onIsDraggingChange(false)}
     >
       <Header
         currentMonth={currentMonth}

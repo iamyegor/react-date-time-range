@@ -1,31 +1,31 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider.tsx";
 import calendarIcon from "../assets/icons/calendar.svg";
 import { Time } from "../types";
 import DateInput from "./DateInput";
-import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider.tsx";
 
 interface DateContainerProps {
   text: string;
   date: Date | null;
-  setDate: Dispatch<SetStateAction<Date | null>>;
+  onDateChange: (date: Date | null) => void;
   time: Time | null;
   onTimeChange: (time: Time | null) => void;
   onFocus: () => void;
   isActive: boolean;
   isInputValid: boolean;
-  setIsInputValid: Dispatch<SetStateAction<boolean>>;
+  onIsInputValidChange: (date: boolean) => void;
 }
 
 function DateContainer({
   text,
   date,
-  setDate,
+  onDateChange,
   time,
   onTimeChange,
   onFocus,
   isActive,
   isInputValid,
-  setIsInputValid,
+  onIsInputValidChange,
 }: DateContainerProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
@@ -64,6 +64,10 @@ function DateContainer({
     return !isInputValid || firstDateTimeIsGreater;
   }
 
+  function handleValueChange(value: string) {
+    setInputValue(value);
+  }
+
   const clipPath = shouldTextBeOnTop()
     ? `polygon(10px 0, 10px 10%, ${textWidth + 14}px 10%, ${
         textWidth + 14
@@ -93,12 +97,12 @@ function DateContainer({
           <DateInput
             date={date}
             time={time}
-            setDate={setDate}
+            onDateChange={onDateChange}
             onTimeChange={onTimeChange}
             isInputValid={isInputValid}
-            setIsInputValid={setIsInputValid}
+            onIsInputValidChange={onIsInputValidChange}
             value={inputValue}
-            setValue={setInputValue}
+            onValueChange={handleValueChange}
           />
         )}
         <img src={calendarIcon} className=" absolute right-2 w-5 h-5" />

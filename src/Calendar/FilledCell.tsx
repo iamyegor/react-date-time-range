@@ -16,12 +16,12 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   const {
     firstDate,
     secondDate,
-    setDraggedDate,
+    onDraggedDateChange,
     handleCellClick,
-    setHoveredDate,
+    onHoveredDateChange,
     shadowSelectedDate,
     isDragging,
-    setIsDragging,
+    onIsDraggingChange,
   } = useDateTimeRange();
 
   const isDateSelected = (date: Date) =>
@@ -54,11 +54,11 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function handleMouseDown() {
     if (firstDate && isEqual(firstDate, day)) {
-      setIsDragging(true);
-      setDraggedDate(DraggedDate.First);
+      onIsDraggingChange(true);
+      onDraggedDateChange(DraggedDate.First);
     } else if (secondDate && isEqual(secondDate, day)) {
-      setIsDragging(true);
-      setDraggedDate(DraggedDate.Second);
+      onIsDraggingChange(true);
+      onDraggedDateChange(DraggedDate.Second);
     }
   }
 
@@ -72,8 +72,8 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
       className={`flex-1 py-1 flex justify-center items-center group relative
       ${getCursorWhenDragging()}`}
       onClick={() => handleCellClick(day)}
-      onMouseEnter={() => setHoveredDate(day)}
-      onMouseLeave={() => setHoveredDate(null)}
+      onMouseEnter={() => onHoveredDateChange(day)}
+      onMouseLeave={() => onHoveredDateChange(null)}
       onMouseDown={handleMouseDown}
     >
       <DashedBorder day={day} />
