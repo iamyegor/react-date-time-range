@@ -24,35 +24,29 @@ export default function DashedBorder({ day }: { day: Date }) {
     hoveredDate,
     activeInput,
     isDragging,
-    firstDateTimeIsGreater,
     edgeSelectedDate,
     dashedBorderDirection,
   } = useDateTimeRange();
 
   function shouldApplyDashedBorder() {
-    if (!firstDate || !hoveredDate || !(secondDate || firstDate)) {
+    if (!hoveredDate || isDragging || !edgeSelectedDate) {
       return false;
     }
 
-    if (isDragging) {
+    if (
+      (dashedBorderDirection === DashedBorderDirection.Left && !secondDate) ||
+      (dashedBorderDirection === DashedBorderDirection.Right && !firstDate)
+    ) {
       return false;
     }
 
-    if (activeInput === ActiveInput.First) {
-      if (!secondDate) {
-        return false;
+    if (dashedBorderDirection === DashedBorderDirection.Left) {
+      if (day < edgeSelectedDate && day >= hoveredDate) {
+        return true;
       }
-      if (firstDateTimeIsGreater) {
-        return day < secondDate && day >= hoveredDate;
-      } else {
-        return day < firstDate && day >= hoveredDate;
-      }
-    } else {
-      if (secondDate && firstDateTimeIsGreater) {
-        return day > firstDate && day <= hoveredDate;
-      } else {
-        const comparisonDate = secondDate || firstDate;
-        return day > comparisonDate && day <= hoveredDate;
+    } else if (dashedBorderDirection === DashedBorderDirection.Right) {
+      if (day > edgeSelectedDate && day <= hoveredDate) {
+        return true;
       }
     }
   }
