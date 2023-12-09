@@ -8,7 +8,13 @@ import DateTimeContainer from "./DateTimeContainer";
 import DateTime from "./DateTime";
 import "./styles/DateTimeRange.css";
 
-export default function DateTimeRange() {
+interface DateTimeRangeProps {
+  bannedDates?: Date[];
+}
+
+export default function DateTimeRange({
+  bannedDates = [],
+}: DateTimeRangeProps) {
   const [firstDate, setFirstDate] = useState<Date | null>(null);
   const [secondDate, setSecondDate] = useState<Date | null>(null);
   const [firstSelectedTime, setFirstSelectedTime] = useState<Time | null>(null);
@@ -94,6 +100,7 @@ export default function DateTimeRange() {
       onFirstSelectedTimeChange={handleFirstTimeChange}
       secondSelectedTime={secondSelectedTime}
       onSecondSelectedTimeChange={handleSecondTimeChange}
+      bannedDates={bannedDates}
     >
       <div ref={containerRef} style={{ userSelect: "none" }}>
         <div className="flex items-center justify-center mb-2">

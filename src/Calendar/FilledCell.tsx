@@ -22,6 +22,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     shadowSelectedDate,
     isDragging,
     onIsDraggingChange,
+    bannedDates,
   } = useDateTimeRange();
 
   const isDateSelected = (date: Date) =>
@@ -49,6 +50,8 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
         !isDateSelected(day),
       "group-hover:border-none group-hover:bg-transparent":
         firstDate && secondDate && day > firstDate && day < secondDate,
+      "line-through text-gray-500 group-hover:cursor-default":
+        bannedDates.some((date) => isSameDay(date, day)),
     });
   }
 

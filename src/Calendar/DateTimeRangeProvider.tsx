@@ -42,6 +42,7 @@ type DateTimeRangeContextProps = {
   firstDateTimeIsGreater: boolean;
   edgeSelectedDate: Date | null;
   dashedBorderDirection: DashedBorderDirection;
+  bannedDates: Date[];
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
@@ -70,6 +71,7 @@ const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
   firstDateTimeIsGreater: false,
   edgeSelectedDate: null,
   dashedBorderDirection: DashedBorderDirection.Left,
+  bannedDates: [],
 });
 
 export function useDateTimeRange() {
@@ -88,9 +90,11 @@ interface DateTimeRangeProviderProps {
   onFirstSelectedTimeChange: (time: Time | null) => void;
   secondSelectedTime: Time | null;
   onSecondSelectedTimeChange: (time: Time | null) => void;
+  bannedDates: Date[];
 }
 
 export default function DateTimeRangeProvider({
+  bannedDates,
   children,
   firstDate,
   onFirstDateChange,
@@ -230,6 +234,7 @@ export default function DateTimeRangeProvider({
         firstDateTimeIsGreater,
         edgeSelectedDate,
         dashedBorderDirection,
+        bannedDates,
       }}
     >
       {children}
