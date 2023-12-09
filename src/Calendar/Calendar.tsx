@@ -22,7 +22,7 @@ function Calendar() {
   } = useDateTimeRange();
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
-    { id: string; element: JSX.Element; isNext: boolean }[]
+    { id: string; element: JSX.Element }[]
   >([]);
   const [isCellsFirstRender, setIsCellsFirstRender] = useState(true);
 
@@ -53,7 +53,6 @@ function Calendar() {
       const newComponent = {
         id: key,
         element: <Cells currentMonth={currentMonth} key={key} />,
-        isNext: isNext,
       };
 
       setCellsComponents([newComponent]);

@@ -20,22 +20,28 @@ function Selection({
   const itemRef = useRef<HTMLDivElement | null>(null);
   const [containerHeight, setContainerHeight] = useState<number>(0);
   const [itemHeight, setItemHeight] = useState<number>(0);
+  const [isItemFirstRender, setIsItemFirstRender] = useState<boolean>(true);
 
   useEffect(() => {
     if (itemRef.current) {
       setItemHeight(itemRef.current.offsetHeight);
     }
+
     if (containerRef.current) {
       setContainerHeight(containerRef.current.clientHeight);
     }
   }, []);
 
   useEffect(() => {
+    if (selectedItem && isItemFirstRender) {
+      setIsItemFirstRender(false);
+    }
+
     if (!selectedItem) {
-      scrollToItem(0);
+      scrollToItem(0, !isItemFirstRender);
     } else {
       const index = items.indexOf(selectedItem);
-      scrollToItem(index);
+      scrollToItem(index, !isItemFirstRender);
     }
   }, [selectedItem]);
 
@@ -51,11 +57,11 @@ function Selection({
     onSelect(item);
   }
 
-  function scrollToItem(index: number) {
+  function scrollToItem(index: number, isSmooth = true) {
     if (containerRef.current) {
       containerRef.current.scrollTo({
         top: index * itemHeight,
-        behavior: "smooth",
+        behavior: isSmooth ? "smooth" : "instant",
       });
     }
   }
