@@ -4,7 +4,7 @@ import DateTimeRangeProvider from "../Calendar/DateTimeRangeProvider";
 import arrowBetweenDates from "../assets/icons/arrow-between-dates.svg";
 import useOutsideClick from "../hooks/useOutsideClick";
 import { ActiveInput, Time } from "../types";
-import DateContainer from "./DateContainer";
+import DateTimeContainer from "./DateTimeContainer";
 import DateTime from "./DateTime";
 import "./styles/DateTimeRange.css";
 
@@ -97,7 +97,7 @@ export default function DateTimeRange() {
     >
       <div ref={containerRef} style={{ userSelect: "none" }}>
         <div className="flex items-center justify-center mb-2">
-          <DateContainer
+          <DateTimeContainer
             isActive={activeInput === ActiveInput.First}
             text="Start Date"
             date={firstDate}
@@ -109,7 +109,7 @@ export default function DateTimeRange() {
             onIsInputValidChange={handleIsFirstInputValidChange}
           />
           <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
-          <DateContainer
+          <DateTimeContainer
             isActive={activeInput === ActiveInput.Second}
             text="End Date"
             date={secondDate}
@@ -123,7 +123,7 @@ export default function DateTimeRange() {
         </div>
         <CSSTransition
           in={showDateTime}
-          timeout={300}
+          timeout={200}
           classNames="date-time"
           unmountOnExit
         >

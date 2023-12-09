@@ -1,12 +1,14 @@
 import { isValid } from "date-fns";
+import { KeyboardEvent, useEffect, useRef } from "react";
 import {
-  KeyboardEvent,
-  useEffect,
-  useRef
-} from "react";
-import { Time } from "../types";
+  DATE_PLACEHOLDER,
+  DATE_TIME_PLACEHOLDER,
+  TIME_PLACEHOLDER,
+  sections,
+} from "../globals";
+import { Section, Time } from "../types";
 
-interface DateInputProps {
+interface DateTimeInputProps {
   date: Date | null;
   onDateChange: (date: Date | null) => void;
   time: Time | null;
@@ -17,27 +19,7 @@ interface DateInputProps {
   onValueChange: (value: string) => void;
 }
 
-interface Section {
-  start: number;
-  end: number;
-  max: number;
-  min?: number;
-  name: string;
-}
-
-const sections: Section[] = [
-  { start: 0, end: 2, max: 12, name: "MM" },
-  { start: 3, end: 5, max: 31, name: "dd" },
-  { start: 6, end: 10, max: 9999, name: "yyyy" },
-  { start: 11, end: 13, max: 12, name: "hh" },
-  { start: 14, end: 16, max: 59, min: 0, name: "mm" },
-  { start: 17, end: 19, max: 2, name: "aa" },
-];
-
-const TIME_PLACEHOLDER = `${sections[3].name}:${sections[4].name} ${sections[5].name}`;
-const DATE_PLACEHOLDER = `${sections[0].name}/${sections[1].name}/${sections[2].name}`;
-
-function DateInput({
+function DateTimeInput({
   date,
   time,
   onDateChange,
@@ -46,7 +28,7 @@ function DateInput({
   onIsInputValidChange,
   value,
   onValueChange,
-}: DateInputProps) {
+}: DateTimeInputProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -82,7 +64,7 @@ function DateInput({
   function isValuePlaceholder() {
     const section = { start: sections[0].start, end: sections[5].end };
     const value = getSectionValue(section);
-    return value === `${DATE_PLACEHOLDER} ${TIME_PLACEHOLDER}`;
+    return value === `${DATE_TIME_PLACEHOLDER}`;
   }
 
   function queryDateFromValue() {
@@ -133,15 +115,19 @@ function DateInput({
   function changeDateInValue() {
     const start = sections[0].start;
     const end = sections[2].end;
+    const newDateValue = calculateNewDateValue({ start, end });
+    updateValue({ start, end }, newDateValue, getSameHighlight());
+  }
+
+  function calculateNewDateValue(section: { start: number; end: number }) {
     if (date) {
-      const dateValue = formatDate(date);
-      updateValue({ start, end }, dateValue, getSameHighlight());
+      return formatDate(date);
     } else {
-      const dateValue = getSectionValue({ start, end });
+      const dateValue = getSectionValue(section);
       if (dateValue && !isInputValid) {
-        updateValue({ start, end }, dateValue, getSameHighlight());
+        return dateValue;
       } else {
-        updateValue({ start, end }, DATE_PLACEHOLDER, getSameHighlight());
+        return DATE_PLACEHOLDER;
       }
     }
   }
@@ -160,15 +146,23 @@ function DateInput({
   function changeTimeInValue() {
     const start = sections[3].start;
     const end = sections[5].end;
+    let newTimeValue = calculateNewTimeValue({ start, end });
+
+    const alreadyHasSpace = value.slice(start - 1, start) === " ";
+    const spaceOrEmpty = alreadyHasSpace ? "" : " ";
+    newTimeValue = `${spaceOrEmpty}${newTimeValue}`;
+    updateValue({ start, end }, newTimeValue, getSameHighlight());
+  }
+
+  function calculateNewTimeValue(section: { start: number; end: number }) {
     if (time) {
-      const timeValue = formatTime(time);
-      updateValue({ start, end }, timeValue, getSameHighlight());
+      return formatTime(time);
     } else {
-      const timeValue = getSectionValue({ start, end });
+      const timeValue = getSectionValue(section);
       if (timeValue && !isInputValid) {
-        updateValue({ start, end }, timeValue, getSameHighlight());
+        return timeValue;
       } else {
-        updateValue({ start, end }, " " + TIME_PLACEHOLDER, getSameHighlight());
+        return TIME_PLACEHOLDER;
       }
     }
   }
@@ -413,4 +407,4 @@ function DateInput({
   );
 }
 
-export default DateInput;
+export default DateTimeInput;

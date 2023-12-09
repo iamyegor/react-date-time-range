@@ -19,3 +19,11 @@ export enum DashedBorderDirection {
   Left = "left",
   Right = "right",
 }
+
+export interface Section {
+  start: number;
+  end: number;
+  max: number;
+  min?: number;
+  name: string;
+}

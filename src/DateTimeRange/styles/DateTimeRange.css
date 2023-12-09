@@ -6,7 +6,7 @@
 .date-time-enter-active {
   opacity: 1;
   scale: 1;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .date-time-exit {
@@ -17,7 +17,7 @@
 .date-time-exit-active {
   opacity: 0;
   scale: 0.6;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .date-time-exit-done {

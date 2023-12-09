@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider.tsx";
 import calendarIcon from "../assets/icons/calendar.svg";
-import { Time } from "../types";
-import DateInput from "./DateInput";
+import { DATE_TIME_PLACEHOLDER } from "../globals.ts";
+import { Time } from "../types.tsx";
+import DateTimeInput from "./DateTimeInput.tsx";
 
-interface DateContainerProps {
+interface DateTimeConatinerProps {
   text: string;
   date: Date | null;
   onDateChange: (date: Date | null) => void;
@@ -16,7 +17,7 @@ interface DateContainerProps {
   onIsInputValidChange: (date: boolean) => void;
 }
 
-function DateContainer({
+function DateTimeContainer({
   text,
   date,
   onDateChange,
@@ -26,7 +27,7 @@ function DateContainer({
   isActive,
   isInputValid,
   onIsInputValidChange,
-}: DateContainerProps) {
+}: DateTimeConatinerProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
@@ -53,7 +54,13 @@ function DateContainer({
   }
 
   function shouldTextBeOnTop() {
-    return isFocused || date || time || isActive || inputValue;
+    return (
+      isFocused ||
+      date ||
+      time ||
+      isActive ||
+      (inputValue && inputValue !== `${DATE_TIME_PLACEHOLDER}`)
+    );
   }
 
   function shouldHaveOutline() {
@@ -94,7 +101,7 @@ function DateContainer({
         style={{ clipPath }}
       >
         {shouldTextBeOnTop() && (
-          <DateInput
+          <DateTimeInput
             date={date}
             time={time}
             onDateChange={onDateChange}
@@ -133,4 +140,4 @@ function DateContainer({
   );
 }
 
-export default DateContainer;
+export default DateTimeContainer;
