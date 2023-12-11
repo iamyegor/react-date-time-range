@@ -12,7 +12,7 @@ export enum ActiveInput {
 export interface Time {
   hours: number;
   minutes: number;
-  ampm: "AM" | "PM";
+  ampm: "AM" | "PM" | "24";
 }
 
 export enum DashedBorderDirection {

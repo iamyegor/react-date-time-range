@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider.tsx";
 import calendarIcon from "../assets/icons/calendar.svg";
-import { DATE_TIME_PLACEHOLDER } from "../globals.ts";
 import { Time } from "../types.tsx";
 import DateTimeInput from "./DateTimeInput.tsx";
+import { getDateTimePlaceholder } from "../globals.ts";
 
 interface DateTimeConatinerProps {
   text: string;
@@ -35,6 +35,7 @@ function DateTimeContainer({
   const hiddenTextRef = useRef<HTMLLabelElement>(null);
   const [inputValue, setInputValue] = useState<string>("");
   const { firstDateTimeIsGreater } = useDateTimeRange();
+  const { useAMPM } = useDateTimeRange();
 
   useEffect(() => {
     if (hiddenTextRef.current) {
@@ -59,7 +60,7 @@ function DateTimeContainer({
       date ||
       time ||
       isActive ||
-      (inputValue && inputValue !== `${DATE_TIME_PLACEHOLDER}`)
+      (inputValue && inputValue !== getDateTimePlaceholder(useAMPM))
     );
   }
 

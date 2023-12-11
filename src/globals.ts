@@ -9,6 +9,12 @@ export const sections: Section[] = [
   { start: 17, end: 19, max: 2, name: "aa" },
 ];
 
-export const TIME_PLACEHOLDER = `${sections[3].name}:${sections[4].name} ${sections[5].name}`;
 export const DATE_PLACEHOLDER = `${sections[0].name}/${sections[1].name}/${sections[2].name}`;
-export const DATE_TIME_PLACEHOLDER = `${DATE_PLACEHOLDER} ${TIME_PLACEHOLDER}`;
+export const TIME_PLACEHOLDER_AMPM = `${sections[3].name}:${sections[4].name} ${sections[5].name}`;
+export const TIME_PLACEHOLDER_24 = `${sections[3].name}:${sections[4].name}`;
+
+export function getDateTimePlaceholder(ampm: boolean) {
+  return ampm
+    ? `${DATE_PLACEHOLDER} ${TIME_PLACEHOLDER_AMPM}`
+    : `${DATE_PLACEHOLDER} ${TIME_PLACEHOLDER_24}`;
+}

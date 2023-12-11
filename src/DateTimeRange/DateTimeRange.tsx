@@ -10,10 +10,12 @@ import "./styles/DateTimeRange.css";
 
 interface DateTimeRangeProps {
   bannedDates?: Date[];
+  useAMPM?: boolean;
 }
 
 export default function DateTimeRange({
   bannedDates = [],
+  useAMPM = false,
 }: DateTimeRangeProps) {
   const [firstDate, setFirstDate] = useState<Date | null>(null);
   const [secondDate, setSecondDate] = useState<Date | null>(null);
@@ -101,6 +103,7 @@ export default function DateTimeRange({
       secondSelectedTime={secondSelectedTime}
       onSecondSelectedTimeChange={handleSecondTimeChange}
       bannedDates={bannedDates}
+      useAMPM={useAMPM}
     >
       <div ref={containerRef} style={{ userSelect: "none" }}>
         <div className="flex items-center justify-center mb-2">

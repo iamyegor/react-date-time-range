@@ -43,6 +43,7 @@ type DateTimeRangeContextProps = {
   edgeSelectedDate: Date | null;
   dashedBorderDirection: DashedBorderDirection;
   bannedDates: Date[];
+  useAMPM: boolean;
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
@@ -72,6 +73,7 @@ const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
   edgeSelectedDate: null,
   dashedBorderDirection: DashedBorderDirection.Left,
   bannedDates: [],
+  useAMPM: false,
 });
 
 export function useDateTimeRange() {
@@ -91,9 +93,11 @@ interface DateTimeRangeProviderProps {
   secondSelectedTime: Time | null;
   onSecondSelectedTimeChange: (time: Time | null) => void;
   bannedDates: Date[];
+  useAMPM: boolean;
 }
 
 export default function DateTimeRangeProvider({
+  useAMPM,
   bannedDates,
   children,
   firstDate,
@@ -140,9 +144,9 @@ export default function DateTimeRangeProvider({
 
   function setTimeIfNotSet() {
     if (activeInput === ActiveInput.First && !firstSelectedTime) {
-      onFirstSelectedTimeChange(getDefaultSelectedTime());
+      onFirstSelectedTimeChange(getDefaultSelectedTime(useAMPM));
     } else if (activeInput === ActiveInput.Second && !secondSelectedTime) {
-      onSecondSelectedTimeChange(getDefaultSelectedTime());
+      onSecondSelectedTimeChange(getDefaultSelectedTime(useAMPM));
     }
   }
 
@@ -235,6 +239,7 @@ export default function DateTimeRangeProvider({
         edgeSelectedDate,
         dashedBorderDirection,
         bannedDates,
+        useAMPM,
       }}
     >
       {children}

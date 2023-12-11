@@ -21,6 +21,7 @@ function Selection({
   const [containerHeight, setContainerHeight] = useState<number>(0);
   const [itemHeight, setItemHeight] = useState<number>(0);
   const [isItemFirstRender, setIsItemFirstRender] = useState<boolean>(true);
+  const [currenScollIndex, setCurrentScrollIndex] = useState<number>(0);
 
   useEffect(() => {
     if (itemRef.current) {
@@ -37,11 +38,9 @@ function Selection({
       setIsItemFirstRender(false);
     }
 
-    if (!selectedItem) {
-      scrollToItem(0, !isItemFirstRender);
-    } else {
-      const index = items.indexOf(selectedItem);
-      scrollToItem(index, !isItemFirstRender);
+    const itemIndex = items.indexOf(selectedItem) || 0;
+    if (itemIndex !== currenScollIndex) {
+      scrollToItem(itemIndex, !isItemFirstRender);
     }
   }, [selectedItem]);
 
@@ -63,6 +62,7 @@ function Selection({
         top: index * itemHeight,
         behavior: isSmooth ? "smooth" : "instant",
       });
+      setCurrentScrollIndex(index);
     }
   }
 

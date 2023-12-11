@@ -2,11 +2,13 @@ import { isValid } from "date-fns";
 import { KeyboardEvent, useEffect, useRef } from "react";
 import {
   DATE_PLACEHOLDER,
-  DATE_TIME_PLACEHOLDER,
-  TIME_PLACEHOLDER,
+  TIME_PLACEHOLDER_24,
+  TIME_PLACEHOLDER_AMPM,
+  getDateTimePlaceholder,
   sections,
 } from "../globals";
 import { Section, Time } from "../types";
+import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
 
 interface DateTimeInputProps {
   date: Date | null;
@@ -29,6 +31,7 @@ function DateTimeInput({
   value,
   onValueChange,
 }: DateTimeInputProps) {
+  const { useAMPM } = useDateTimeRange();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -64,7 +67,7 @@ function DateTimeInput({
   function isValuePlaceholder() {
     const section = { start: sections[0].start, end: sections[5].end };
     const value = getSectionValue(section);
-    return value === `${DATE_TIME_PLACEHOLDER}`;
+    return value === getDateTimePlaceholder(useAMPM);
   }
 
   function queryDateFromValue() {
@@ -79,13 +82,13 @@ function DateTimeInput({
     return null;
   }
 
-  function queryTimeFromValue(): Time | null {
+  function queryTimeFromValue() {
     const hours = parseInt(getSectionValue(sections[3]));
     const minutes = parseInt(getSectionValue(sections[4]));
-    const ampm = getSectionValue(sections[5]) as "AM" | "PM";
+    const ampm = useAMPM ? getSectionValue(sections[5]) : "24";
 
     if (isTimeValid(hours, minutes, ampm)) {
-      return { hours, minutes, ampm };
+      return { hours, minutes, ampm } as Time;
     }
 
     return null;
@@ -96,16 +99,26 @@ function DateTimeInput({
   }
 
   function isTimeValid(hours: number, minutes: number, ampm: string) {
-    if (isNaN(hours) || isNaN(minutes)) {
-      return false;
-    } else if (hours < 1 || hours > 12) {
-      return false;
-    } else if (minutes < 0 || minutes > 59) {
-      return false;
-    } else if (ampm !== "AM" && ampm !== "PM") {
-      return false;
+    if (ampm === "24") {
+      return !(
+        isNaN(hours) ||
+        isNaN(minutes) ||
+        hours > 23 ||
+        hours < 1 ||
+        minutes < 0 ||
+        minutes > 59
+      );
+    } else {
+      return !(
+        isNaN(hours) ||
+        isNaN(minutes) ||
+        hours < 1 ||
+        hours > 12 ||
+        minutes < 0 ||
+        minutes > 59 ||
+        (ampm !== "AM" && ampm !== "PM")
+      );
     }
-    return true;
   }
 
   useEffect(() => {
@@ -140,37 +153,64 @@ function DateTimeInput({
   }
 
   useEffect(() => {
-    changeTimeInValue();
+    updateTimeInValue();
   }, [time]);
 
-  function changeTimeInValue() {
-    const start = sections[3].start;
-    const end = sections[5].end;
-    let newTimeValue = calculateNewTimeValue({ start, end });
+  function updateTimeInValue(): void {
+    const sectionStart = sections[3].start;
+    const sectionEnd = useAMPM ? sections[5].end : sections[4].end;
+    const formattedTime = getFormattedTime(sectionStart, sectionEnd);
 
-    const alreadyHasSpace = value.slice(start - 1, start) === " ";
-    const spaceOrEmpty = alreadyHasSpace ? "" : " ";
-    newTimeValue = `${spaceOrEmpty}${newTimeValue}`;
-    updateValue({ start, end }, newTimeValue, getSameHighlight());
+    updateValueWithTime(sectionStart, sectionEnd, formattedTime);
   }
 
-  function calculateNewTimeValue(section: { start: number; end: number }) {
-    if (time) {
-      return formatTime(time);
-    } else {
-      const timeValue = getSectionValue(section);
-      if (timeValue && !isInputValid) {
-        return timeValue;
-      } else {
-        return TIME_PLACEHOLDER;
-      }
-    }
+  function getFormattedTime(start: number, end: number) {
+    return useAMPM
+      ? getFormattedTimeAMPM(start, end)
+      : getFormattedTime24(start, end);
   }
 
-  function formatTime(time: Time) {
+  function getFormattedTime24(start: number, end: number) {
+    return time
+      ? formatTime24(time)
+      : getTimeValueOrDefault(start, end, TIME_PLACEHOLDER_24);
+  }
+
+  function getFormattedTimeAMPM(start: number, end: number) {
+    return time
+      ? formatTimeAM(time)
+      : getTimeValueOrDefault(start, end, TIME_PLACEHOLDER_AMPM);
+  }
+
+  function getTimeValueOrDefault(
+    start: number,
+    end: number,
+    placeholder: string
+  ) {
+    const timeValue = getSectionValue({ start, end });
+    return timeValue && !isInputValid ? timeValue : placeholder;
+  }
+
+  function updateValueWithTime(start: number, end: number, timeValue: string) {
+    const shouldAddSpace = value.slice(start - 1, start) !== " ";
+    const spaceOrEmpty = shouldAddSpace ? " " : "";
+    const newValue = `${spaceOrEmpty}${timeValue}`;
+
+    updateValue({ start, end }, newValue, getSameHighlight());
+  }
+
+  function formatTime24(time: Time) {
+    return formatTime(time, "");
+  }
+
+  function formatTimeAM(time: Time) {
+    return formatTime(time, ` ${time.ampm}`);
+  }
+
+  function formatTime(time: Time, suffix: string) {
     const hours = time.hours.toString().padStart(2, "0");
     const minutes = time.minutes.toString().padStart(2, "0");
-    return `${hours}:${minutes} ${time.ampm}`;
+    return `${hours}:${minutes}${suffix}`;
   }
 
   function getSameHighlight() {
@@ -194,17 +234,19 @@ function DateTimeInput({
       } else if (!isNaN(parseInt(e.key, 10))) {
         handleNumericKey(section, parseInt(e.key, 10));
       } else if (e.key.toLowerCase() === "a" || e.key.toLowerCase() === "p") {
-        if (section === sections[5]) {
-          toggleAMPM(e.key.toLowerCase());
-        }
+        handleAMPMKey(section, e.key.toLowerCase());
       } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-        changeHighlightedSection(
-          sections.indexOf(section),
-          e.key === "ArrowRight"
-        );
+        const isNext = e.key === "ArrowRight";
+        changeHighlightedSection(sections.indexOf(section), isNext);
       } else if (e.key === "Backspace") {
         eraseSection(section);
       }
+    }
+  }
+
+  function handleAMPMKey(section: Section, key: string) {
+    if (section === sections[5]) {
+      toggleAMPM(key);
     }
   }
 
@@ -220,7 +262,8 @@ function DateTimeInput({
       ? currentSectionIndex + 1
       : currentSectionIndex - 1;
 
-    if (nextSectionIndex < 0 || nextSectionIndex > sections.length - 1) {
+    const sectionsLength = useAMPM ? sections.length - 1 : sections.length - 2;
+    if (nextSectionIndex < 0 || nextSectionIndex > sectionsLength) {
       return;
     }
 
@@ -233,7 +276,8 @@ function DateTimeInput({
   }
 
   function adjustSectionValue(section: Section, isIncrement: boolean) {
-    const { start, end, max, min } = section;
+    const { start, end, min } = section;
+
     if (start === 17 && end === 19) {
       const isPM = value.slice(start, end) === "PM";
       toggleAMPM(isPM ? "a" : "p");
@@ -244,15 +288,24 @@ function DateTimeInput({
     currentValue = isIncrement ? currentValue + 1 : currentValue - 1;
 
     const minThreshold = min !== undefined ? min : 1;
+    const maxThreshold = getMaxThreshold(section);
     if (currentValue < minThreshold) {
-      currentValue = max;
+      currentValue = maxThreshold;
     }
-    if (currentValue > max) {
+    if (currentValue > maxThreshold) {
       currentValue = minThreshold;
     }
 
     const pads = end - start;
     updateValue(section, currentValue.toString().padStart(pads, "0"));
+  }
+
+  function getMaxThreshold(section: Section) {
+    if (section === sections[3]) {
+      return useAMPM ? 12 : 23;
+    }
+
+    return section.max;
   }
 
   function handleNumericKey(section: Section, numKey: number) {

@@ -1,17 +1,21 @@
+import { startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
 import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
 import { ActiveInput, Time } from "../types";
+import { getDefaultSelectedTime, isTimeEqual } from "../utils";
 import Selection from "./Selection";
-import { startOfDay } from "date-fns";
-import { getDefaultSelectedTime } from "../utils";
 
-const hours = Array.from({ length: 11 }, (_, i) =>
-  String(i + 1).padStart(2, "0"),
+const hours12 = Array.from({ length: 11 }, (_, i) =>
+  String(i + 1).padStart(2, "0")
 );
-hours.unshift("12");
+hours12.unshift("12");
+
+const hours24 = Array.from({ length: 23 }, (_, i) =>
+  String(i + 1).padStart(2, "0")
+);
 
 const minutes = Array.from({ length: 60 }, (_, i) =>
-  String(i).padStart(2, "0"),
+  String(i).padStart(2, "0")
 );
 const periods = ["AM", "PM"];
 
@@ -26,6 +30,7 @@ function TimePicker() {
     onFirstSelectedTimeChange,
     onSecondSelectedTimeChange,
     activeInput,
+    useAMPM,
   } = useDateTimeRange();
   const [selectedTime, setSelectedTime] = useState<Time | null>(null);
 
@@ -37,58 +42,45 @@ function TimePicker() {
     }
   }, [activeInput, firstSelectedTime, secondSelectedTime]);
 
-  function handleTimeChange(key: "hours" | "minutes", value: number) {
-    if (activeInput === ActiveInput.First) {
-      onFirstSelectedTimeChange(
-        getUpdatedTime(firstSelectedTime, key, value) as Time,
-      );
-      setFirstDateIfNull();
-    } else if (activeInput === ActiveInput.Second) {
-      onSecondSelectedTimeChange(
-        getUpdatedTime(secondSelectedTime, key, value) as Time,
-      );
-      setSecondDateIfNull();
+  useEffect(() => {
+    if (!selectedTime) {
+      return;
     }
 
-    setSelectedTime((prev) => getUpdatedTime(prev, key, value) as Time);
+    if (
+      activeInput === ActiveInput.First &&
+      !isTimeEqual(selectedTime, firstSelectedTime)
+    ) {
+      onFirstSelectedTimeChange(selectedTime);
+    } else if (
+      activeInput === ActiveInput.Second &&
+      !isTimeEqual(selectedTime, secondSelectedTime)
+    ) {
+      onSecondSelectedTimeChange(selectedTime);
+    }
+  }, [selectedTime]);
+
+  function handleTimeChange(key: string, value: number | string) {
+    updateSelectedTime(key, value);
+    setDateIfNotSet();
   }
 
-  function setFirstDateIfNull() {
-    if (!firstDate) {
+  function setDateIfNotSet() {
+    if (activeInput === ActiveInput.First && !firstDate) {
       onFirstDateChange(startOfDay(new Date()));
-    }
-  }
-
-  function setSecondDateIfNull() {
-    if (!secondDate) {
+    } else if (activeInput === ActiveInput.Second && !secondDate) {
       onSecondDateChange(startOfDay(new Date()));
     }
   }
 
-  function getUpdatedTime(
-    prev: Time | null,
-    key: "hours" | "minutes",
-    value: number,
-  ) {
-    const currentTime = prev || getDefaultSelectedTime();
-    return { ...currentTime, [key]: value };
-  }
-
-  function handlePeriodChange(ampm: "AM" | "PM") {
-    if (activeInput === ActiveInput.First) {
-      onFirstSelectedTimeChange(getUpdatedPeriod(firstSelectedTime, ampm));
-      setFirstDateIfNull();
-    } else if (activeInput === ActiveInput.Second) {
-      onSecondSelectedTimeChange(getUpdatedPeriod(secondSelectedTime, ampm));
-      setSecondDateIfNull();
-    }
-
-    setSelectedTime((prev) => getUpdatedPeriod(prev, ampm));
-  }
-
-  function getUpdatedPeriod(prev: Time | null, ampm: "AM" | "PM") {
-    const currentTime = prev || getDefaultSelectedTime();
-    return { ...currentTime, ampm };
+  function updateSelectedTime(key: string, value: number | string) {
+    setSelectedTime((prev) => {
+      if (prev) {
+        return { ...prev, [key]: value } as Time;
+      } else {
+        return { ...getDefaultSelectedTime(useAMPM), [key]: value } as Time;
+      }
+    });
   }
 
   function convertTo2DigitString(num: number) {
@@ -99,11 +91,11 @@ function TimePicker() {
     <div className="flex flex-col">
       <div className="flex overflow-hidden">
         <Selection
-          items={hours}
+          items={useAMPM ? hours12 : hours24}
           selectedItem={
             selectedTime ? convertTo2DigitString(selectedTime.hours) : ""
           }
-          onSelect={(item) => handleTimeChange("hours", Number(item))}
+          onSelect={(item) => handleTimeChange("hours", parseInt(item))}
           hasBorder
           testid="hours"
         />
@@ -112,16 +104,18 @@ function TimePicker() {
           selectedItem={
             selectedTime ? convertTo2DigitString(selectedTime.minutes) : ""
           }
-          onSelect={(item) => handleTimeChange("minutes", Number(item))}
+          onSelect={(item) => handleTimeChange("minutes", parseInt(item))}
           hasBorder
           testid="minutes"
         />
-        <Selection
-          items={periods}
-          selectedItem={selectedTime ? selectedTime.ampm : ""}
-          onSelect={(ampm) => handlePeriodChange(ampm as "AM" | "PM")}
-          testid="periods"
-        />
+        {useAMPM && (
+          <Selection
+            items={periods}
+            selectedItem={selectedTime ? selectedTime.ampm : ""}
+            onSelect={(ampm) => handleTimeChange("ampm", ampm)}
+            testid="periods"
+          />
+        )}
       </div>
     </div>
   );
