@@ -11,9 +11,11 @@ interface HighlightBaseProps {
   stylingClasses: string;
   start: Date;
   end: Date;
+  testid?: string;
 }
 
 export default function HighlightBase({
+  testid = "highlight",
   day,
   stylingClasses,
   start,
@@ -22,12 +24,20 @@ export default function HighlightBase({
   let leftSideChanged = false;
   let rightSideChanged = false;
 
-  function getHighlightedIfDayIsInRange() {
-    let highlighted = stylingClasses;
+  function shouldHighlight() {
     if (start && end) {
       if (day >= start && day <= end) {
-        return classNames(highlighted, getStylingsForDifferentDates());
+        return true;
       }
+    }
+
+    return false;
+  }
+
+  function getHighlightedIfDayIsInRange() {
+    let highlighted = stylingClasses;
+    if (shouldHighlight()) {
+      return classNames(highlighted, getStylingsForDifferentDates());
     }
 
     return "";
@@ -79,6 +89,7 @@ export default function HighlightBase({
     <div
       className={`absolute top-[3px] bottom-[3px] flex items-center  
       justify-center ${getHighlightedIfDayIsInRange()}`}
+      data-testid={`${shouldHighlight() ? testid : ""}`}
     ></div>
   );
 }

@@ -3,6 +3,7 @@ import {
   addDays,
   endOfMonth,
   isEqual,
+  isSameDay,
   isSaturday,
   isSunday,
   startOfMonth,
@@ -117,6 +118,9 @@ export default function DashedBorder({ day }: { day: Date }) {
     <div
       className={`absolute top-[3px] bottom-[3px]  
         flex items-center justify-center ${getDashedBorder()}`}
+      data-testid={`${
+        shouldApplyDashedBorder() ? "dashed-border" : "no-dashed-border"
+      }`}
     ></div>
   );
 }

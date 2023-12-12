@@ -97,7 +97,7 @@ function TimePicker() {
           }
           onSelect={(item) => handleTimeChange("hours", parseInt(item))}
           hasBorder
-          testid="hours"
+          testid="hour-option"
         />
         <Selection
           items={minutes}
@@ -106,14 +106,14 @@ function TimePicker() {
           }
           onSelect={(item) => handleTimeChange("minutes", parseInt(item))}
           hasBorder
-          testid="minutes"
+          testid="minute-option"
         />
         {useAMPM && (
           <Selection
             items={periods}
             selectedItem={selectedTime ? selectedTime.ampm : ""}
             onSelect={(ampm) => handleTimeChange("ampm", ampm)}
-            testid="periods"
+            testid="period-option"
           />
         )}
       </div>

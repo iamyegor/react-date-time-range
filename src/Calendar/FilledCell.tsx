@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { format, isEqual, isSameDay } from "date-fns";
+import { format, isDate, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import DashedBorder from "./DashedBorder";
@@ -50,8 +50,9 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
         !isDateSelected(day),
       "group-hover:border-none group-hover:bg-transparent":
         firstDate && secondDate && day > firstDate && day < secondDate,
-      "line-through text-gray-500 group-hover:cursor-default":
-        bannedDates.some((date) => isSameDay(date, day)),
+      "line-through text-gray-500 group-hover:cursor-default": bannedDates.some(
+        (date) => isSameDay(date, day)
+      ),
     });
   }
 
@@ -71,20 +72,23 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   return (
     <div
-      data-testid="filled-cell"
       className={`flex-1 py-1 flex justify-center items-center group relative
       ${getCursorWhenDragging()}`}
       onClick={() => handleCellClick(day)}
       onMouseEnter={() => onHoveredDateChange(day)}
       onMouseLeave={() => onHoveredDateChange(null)}
       onMouseDown={handleMouseDown}
+      data-testid="filled-cell"
     >
       <DashedBorder day={day} />
       <div
         className={`w-9 h-9 flex items-center justify-center text-xs
         transition-all rounded-full ${getDayCellClasses()} z-10 `}
+        data-testid={`${
+          isDateSelected(day) ? "selected-cell" : "not-selected-cell"
+        }`}
       >
-        <span>{format(day, "d")}</span>
+        {format(day, "d")}
       </div>
       <HoverHighlight day={day} />
       <Highlight day={day} />

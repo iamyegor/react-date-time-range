@@ -12,6 +12,7 @@ export default function Highlight({ day }: { day: Date }) {
         stylingClasses="bg-blue-200/50 border-blue-400"
         start={firstDate}
         end={secondDate}
+        testid={"highlight-between-dates"}
       />
     )
   );

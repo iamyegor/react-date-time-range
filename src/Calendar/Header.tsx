@@ -19,7 +19,7 @@ export default function Header({
       <div
         className="cursor-pointer"
         onClick={onPrevMonthClick}
-        data-testid="left-arrow"
+        data-testid="prev-month-button"
       >
         <img src={leftArrowSvg} alt="left-arrow" className="w-5 h-5" />
       </div>
@@ -29,9 +29,13 @@ export default function Header({
       <div
         className="cursor-pointer"
         onClick={onNextMonthClick}
-        data-testid="right-arrow"
+        data-testid="next-month-button"
       >
-        <img src={rightArrowSvg} alt="right-arrow" className="w-5 h-5" />
+        <img
+          src={rightArrowSvg}
+          alt="right-arrow"
+          className="w-5 h-5"
+        />
       </div>
     </div>
   );

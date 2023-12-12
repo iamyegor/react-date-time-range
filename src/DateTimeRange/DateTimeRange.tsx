@@ -11,11 +11,13 @@ import "./styles/DateTimeRange.css";
 interface DateTimeRangeProps {
   bannedDates?: Date[];
   useAMPM?: boolean;
+  inputText: { start: string; end: string };
 }
 
 export default function DateTimeRange({
   bannedDates = [],
   useAMPM = false,
+  inputText,
 }: DateTimeRangeProps) {
   const [firstDate, setFirstDate] = useState<Date | null>(null);
   const [secondDate, setSecondDate] = useState<Date | null>(null);
@@ -109,7 +111,7 @@ export default function DateTimeRange({
         <div className="flex items-center justify-center mb-2">
           <DateTimeContainer
             isActive={activeInput === ActiveInput.First}
-            text="Start Date"
+            text={inputText.start}
             date={firstDate}
             onDateChange={handleFirstDateChange}
             time={firstSelectedTime}
@@ -117,11 +119,12 @@ export default function DateTimeRange({
             onFocus={() => handleInputFocus(ActiveInput.First)}
             isInputValid={isFirstInputValid}
             onIsInputValidChange={handleIsFirstInputValidChange}
+            testid="first-date-time-container"
           />
           <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
           <DateTimeContainer
             isActive={activeInput === ActiveInput.Second}
-            text="End Date"
+            text={inputText.end}
             date={secondDate}
             onDateChange={setSecondDate}
             time={secondSelectedTime}
@@ -129,6 +132,7 @@ export default function DateTimeRange({
             onFocus={() => handleInputFocus(ActiveInput.Second)}
             isInputValid={isSecondInputValid}
             onIsInputValidChange={handleIsSecondInputValidChange}
+            testid="second-date-time-container"
           />
         </div>
         <CSSTransition

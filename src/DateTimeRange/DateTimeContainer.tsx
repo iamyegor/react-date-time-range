@@ -15,9 +15,11 @@ interface DateTimeConatinerProps {
   isActive: boolean;
   isInputValid: boolean;
   onIsInputValidChange: (date: boolean) => void;
+  testid?: string;
 }
 
 function DateTimeContainer({
+  testid = "date-time-container",
   text,
   date,
   onDateChange,
@@ -87,6 +89,7 @@ function DateTimeContainer({
       className="relative group w-[15rem] h-10 cursor-text"
       onFocus={handleFocus}
       onBlur={handleBlur}
+      data-testid={testid}
     >
       <div
         className={`rounded border flex justify-between items-center relative

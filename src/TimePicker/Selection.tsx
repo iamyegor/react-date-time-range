@@ -74,7 +74,6 @@ function Selection({
       className={`flex flex-col selection-scroll w-12 overflow-hidden 
       hover:overflow-y-auto py-2 pl-1 ${hasBorder ? "border-r" : ""}`}
       style={{ paddingBottom: `${bottomSpace}px` }}
-      data-testid={`${testid}`}
     >
       {items.map((item, index) => (
         <div
@@ -82,6 +81,7 @@ function Selection({
           key={item}
           className={getClassNames(item)}
           onClick={() => handleClick(item, index)}
+          data-testid={`${testid}`}
         >
           {item}
         </div>

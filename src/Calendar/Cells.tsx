@@ -119,7 +119,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     return weeks;
   }, [currentMonth, firstDate, secondDate, hoveredDate]);
 
-  return <div className={`flex-shrink-0 w-full`}>{rows}</div>;
+  return <div data-testid="cells" className={`flex-shrink-0 w-full`}>{rows}</div>;
 }
 
 export default Cells;
