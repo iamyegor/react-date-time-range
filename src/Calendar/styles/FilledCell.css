@@ -1,0 +1,11 @@
+.disabled-cell {
+  @apply text-gray-400 group-hover:cursor-default;
+}
+
+.selected-cell {
+  @apply group-hover:bg-blue-400 group-hover:border-none;
+}
+
+.hovered-cell {
+  @apply group-hover:border group-hover:bg-blue-100/40 group-hover:border-gray-200;
+}

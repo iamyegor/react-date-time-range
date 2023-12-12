@@ -14,6 +14,7 @@ export default function App() {
         bannedDates={bannedDates}
         inputText={{ start: "Start date", end: "End date" }}
         useAMPM={false}
+        minDate={new Date()}
       />
     </div>
   );

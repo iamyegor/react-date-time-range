@@ -3,7 +3,6 @@ import {
   addDays,
   endOfMonth,
   isEqual,
-  isSameDay,
   isSaturday,
   isSunday,
   startOfMonth,
@@ -27,10 +26,18 @@ export default function DashedBorder({ day }: { day: Date }) {
     isDragging,
     edgeSelectedDate,
     dashedBorderDirection,
+    minDate,
   } = useDateTimeRange();
+  const hoveredDateIsLesserThanMinDate =
+    hoveredDate && minDate && hoveredDate < minDate;
 
   function shouldApplyDashedBorder() {
-    if (!hoveredDate || isDragging || !edgeSelectedDate) {
+    if (
+      !hoveredDate ||
+      isDragging ||
+      !edgeSelectedDate ||
+      hoveredDateIsLesserThanMinDate
+    ) {
       return false;
     }
 

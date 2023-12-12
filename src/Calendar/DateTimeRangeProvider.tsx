@@ -44,9 +44,11 @@ type DateTimeRangeContextProps = {
   dashedBorderDirection: DashedBorderDirection;
   bannedDates: Date[];
   useAMPM: boolean;
+  minDate?: Date;
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
+  minDate: undefined,
   draggedDate: DraggedDate.First,
   onDraggedDateChange: () => {},
   handleCellClick: () => {},
@@ -94,9 +96,11 @@ interface DateTimeRangeProviderProps {
   onSecondSelectedTimeChange: (time: Time | null) => void;
   bannedDates: Date[];
   useAMPM: boolean;
+  minDate?: Date;
 }
 
 export default function DateTimeRangeProvider({
+  minDate,
   useAMPM,
   bannedDates,
   children,
@@ -240,6 +244,7 @@ export default function DateTimeRangeProvider({
         dashedBorderDirection,
         bannedDates,
         useAMPM,
+        minDate,
       }}
     >
       {children}

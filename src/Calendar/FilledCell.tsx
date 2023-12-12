@@ -1,12 +1,13 @@
 import classNames from "classnames";
-import { format, isDate, isEqual, isSameDay } from "date-fns";
+import { format, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
 import { DraggedDate } from "../types";
 import DashedBorder from "./DashedBorder";
 import { useDateTimeRange } from "./DateTimeRangeProvider";
 import Highlight from "./Highlight";
-import "./styles/DayCell.css";
 import HoverHighlight from "./HoverHighlight";
+import "./styles/DayCell.css";
+import "./styles/FilledCell.css";
 
 interface FilledCellProps {
   day: Date;
@@ -23,7 +24,9 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     isDragging,
     onIsDraggingChange,
     bannedDates,
+    minDate,
   } = useDateTimeRange();
+  const isDateDisabled = minDate && day < minDate;
 
   const isDateSelected = (date: Date) =>
     (firstDate && isSameDay(date, firstDate)) ||
@@ -45,14 +48,14 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function getDayCellClasses(): string {
     return classNames(getClassesForDay(), {
-      "group-hover:bg-blue-400 group-hover:border-none": isDateSelected(day),
-      "group-hover:border group-hover:bg-blue-100/40 group-hover:border-gray-200":
-        !isDateSelected(day),
+      "selected-cell": isDateSelected(day),
+      "hovered-cell": !isDateSelected(day) && !isDateDisabled,
       "group-hover:border-none group-hover:bg-transparent":
         firstDate && secondDate && day > firstDate && day < secondDate,
       "line-through text-gray-500 group-hover:cursor-default": bannedDates.some(
         (date) => isSameDay(date, day)
       ),
+      "disabled-cell": minDate && day < minDate,
     });
   }
 
@@ -70,11 +73,17 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     return isDragging ? "cursor-grabbing" : "";
   }
 
+  function handleClick() {
+    if (!isDateDisabled) {
+      handleCellClick(day);
+    }
+  }
+
   return (
     <div
       className={`flex-1 py-1 flex justify-center items-center group relative
       ${getCursorWhenDragging()}`}
-      onClick={() => handleCellClick(day)}
+      onClick={() => handleClick()}
       onMouseEnter={() => onHoveredDateChange(day)}
       onMouseLeave={() => onHoveredDateChange(null)}
       onMouseDown={handleMouseDown}

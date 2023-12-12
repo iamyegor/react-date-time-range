@@ -41,6 +41,15 @@ describe("DateTimeRange", () => {
     renderDateTimeRange({ useAMPM: true });
   });
 
+  function renderWithMinDate(day: number) {
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth();
+    const minDate = new Date(year, month, day);
+
+    renderDateTimeRange({ minDate: minDate, useAMPM: true });
+    return minDate;
+  }
+
   function expectSelected(first: number, second: number) {
     const cells = screen.getByTestId("cells");
     const firstSelectedCell = within(cells).getByText(first.toString());
@@ -72,12 +81,14 @@ describe("DateTimeRange", () => {
 
   function renderDateTimeRange({
     useAMPM = false,
-  }: { useAMPM?: boolean } = {}) {
+    minDate,
+  }: { useAMPM?: boolean; minDate?: Date } = {}) {
     cleanup();
     return render(
       <DateTimeRange
         inputText={{ start: "Start Date", end: "End Date" }}
         useAMPM={useAMPM}
+        minDate={minDate}
       />
     );
   }
@@ -143,9 +154,7 @@ describe("DateTimeRange", () => {
       const highlight = screen.getAllByTestId("highlight-between-dates")[i];
       const selectedCell = within(cells).getByText(date);
 
-      expect(highlight.parentElement).toEqual(
-        selectedCell.parentElement
-      );
+      expect(highlight.parentElement).toEqual(selectedCell.parentElement);
     });
   }
 
@@ -451,5 +460,56 @@ describe("DateTimeRange", () => {
     await selectCell("19");
 
     expectSelected(15, 19);
+  });
+
+  it("disables the date if it's lesser than the min date", async () => {
+    const minDate = renderWithMinDate(15);
+    await clickFirstInput();
+
+    for (let i = 1; i < minDate.getDate(); i++) {
+      expect(getCell(i)).toHaveClass("disabled-cell");
+    }
+  });
+
+  it("disables the left arrow button if the min date is in the current month", async () => {
+    renderWithMinDate(15);
+    await clickFirstInput();
+
+    expect(screen.getByTestId("prev-month-button")).toBeDisabled();
+  });
+
+  it("doesn't select date that is lesser that the min date", async () => {
+    renderWithMinDate(15);
+    await clickFirstInput();
+
+    const cell = getCell(14);
+    await userEvent.click(cell);
+    expect(cell).not.toHaveClass("selected-cell");
+
+    const firstContainer = screen.getByTestId("first-date-time-container");
+    expect(
+      within(firstContainer).getByDisplayValue(getDateTimePlaceholder(true))
+    ).toBeDefined();
+  });
+
+  it(`doesn't visually indicate that date that is lesser that the min date 
+  is hovered`, async () => {
+    renderWithMinDate(15);
+    await clickFirstInput();
+
+    const cell = getCell(14);
+    await userEvent.hover(getCell(14));
+    expect(cell).not.toHaveClass("hovered-cell");
+  });
+
+  it(`doesn't show dashed border when date that is lesser than the min date 
+  is hovered`, async () => {
+    renderWithMinDate(15);
+    await clickSecondInput();
+    await selectCell("16");
+
+    await clickFirstInput();
+    await userEvent.hover(getCell(13));
+    expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
   });
 });

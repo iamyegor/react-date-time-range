@@ -12,9 +12,11 @@ interface DateTimeRangeProps {
   bannedDates?: Date[];
   useAMPM?: boolean;
   inputText: { start: string; end: string };
+  minDate?: Date;
 }
 
 export default function DateTimeRange({
+  minDate,
   bannedDates = [],
   useAMPM = false,
   inputText,
@@ -106,6 +108,7 @@ export default function DateTimeRange({
       onSecondSelectedTimeChange={handleSecondTimeChange}
       bannedDates={bannedDates}
       useAMPM={useAMPM}
+      minDate={minDate}
     >
       <div ref={containerRef} style={{ userSelect: "none" }}>
         <div className="flex items-center justify-center mb-2">
