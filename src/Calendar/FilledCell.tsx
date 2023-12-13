@@ -25,8 +25,11 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     onIsDraggingChange,
     bannedDates,
     minDate,
+    maxDate,
   } = useDateTimeRange();
-  const isDateDisabled = minDate && day < minDate;
+  function isDateDisabled() {
+    return (minDate && day < minDate) || (maxDate && day > maxDate);
+  }
 
   const isDateSelected = (date: Date) =>
     (firstDate && isSameDay(date, firstDate)) ||
@@ -74,7 +77,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   }
 
   function handleClick() {
-    if (!isDateDisabled) {
+    if (!isDateDisabled()) {
       handleCellClick(day);
     }
   }

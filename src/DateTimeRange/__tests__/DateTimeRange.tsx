@@ -42,23 +42,40 @@ describe("DateTimeRange", () => {
     renderDateTimeRange({ useAMPM: true });
   });
 
+  function expectDashedBorderToBeHidden() {
+    expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
+  }
+
   function expectSecondInputToHaveValue(value: string) {
     const secondContainer = screen.getByTestId("second-date-time-container");
     expect(within(secondContainer).getByDisplayValue(value)).toBeDefined();
   }
 
-  function expectFirtInputToHaveValue(value: string) {
+  function expectFirstInputToHaveValue(value: string) {
     const firstContainer = screen.getByTestId("first-date-time-container");
     expect(within(firstContainer).getByDisplayValue(value)).toBeDefined();
   }
 
   function renderWithMinDate(day: number) {
-    const year = new Date().getFullYear();
-    const month = new Date().getMonth();
-    const minDate = new Date(year, month, day);
-
+    const minDate = changeDayInCurrentMonth(day);
     renderDateTimeRange({ minDate: minDate, useAMPM: true });
     return minDate;
+  }
+
+  function renderWithMaxDate(day: number) {
+    const maxDate = changeDayInCurrentMonth(day);
+    renderDateTimeRange({ maxDate: maxDate, useAMPM: true });
+    return maxDate;
+  }
+
+  function changeDayInCurrentMonth(day: number) {
+    const currentMonth = new Date();
+    const newDate = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
+    return newDate;
   }
 
   function expectSelected(first: number, second: number) {
@@ -93,13 +110,15 @@ describe("DateTimeRange", () => {
   function renderDateTimeRange({
     useAMPM = false,
     minDate,
-  }: { useAMPM?: boolean; minDate?: Date } = {}) {
+    maxDate,
+  }: { useAMPM?: boolean; minDate?: Date; maxDate?: Date } = {}) {
     cleanup();
     return render(
       <DateTimeRange
         inputText={{ start: "Start Date", end: "End Date" }}
         useAMPM={useAMPM}
         minDate={minDate}
+        maxDate={maxDate}
       />
     );
   }
@@ -343,7 +362,7 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
     await selectCell("15");
 
-    expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
+    expectDashedBorderToBeHidden();
 
     await clickSecondInput();
     await hoverCell("18");
@@ -356,7 +375,7 @@ describe("DateTimeRange", () => {
     await clickSecondInput();
     await selectCell("15");
 
-    expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
+    expectDashedBorderToBeHidden();
 
     await clickFirstInput();
     await hoverCell("12");
@@ -489,28 +508,26 @@ describe("DateTimeRange", () => {
     expect(screen.getByTestId("prev-month-button")).toBeDisabled();
   });
 
-  it("doesn't select date that is lesser that the min date", async () => {
+  it(`doesn't select date that is lesser that the min date when first input
+  is active`, async () => {
     renderWithMinDate(15);
     await clickFirstInput();
 
-    const cell = getCell(14);
-    await userEvent.click(cell);
-    expect(cell).not.toHaveClass("selected-cell");
+    await userEvent.click(getCell(14));
 
-    const firstContainer = screen.getByTestId("first-date-time-container");
-    expect(
-      within(firstContainer).getByDisplayValue(getDateTimePlaceholder(true))
-    ).toBeDefined();
+    expect(getCell(14)).not.toHaveClass("selected-cell");
+    expectFirstInputToHaveValue(getDateTimePlaceholder(true));
   });
 
-  it(`doesn't visually indicate that date that is lesser that the min date 
-  is hovered`, async () => {
+  it(`doesn't select date that is lesser that the min date when second input
+  is active`, async () => {
     renderWithMinDate(15);
-    await clickFirstInput();
+    await clickSecondInput();
 
-    const cell = getCell(14);
-    await userEvent.hover(getCell(14));
-    expect(cell).not.toHaveClass("hovered-cell");
+    await userEvent.click(getCell(14));
+
+    expect(getCell(14)).not.toHaveClass("selected-cell");
+    expectSecondInputToHaveValue(getDateTimePlaceholder(true));
   });
 
   it(`doesn't show dashed border when date that is lesser than the min date 
@@ -521,11 +538,11 @@ describe("DateTimeRange", () => {
 
     await clickFirstInput();
     await userEvent.hover(getCell(13));
-    expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
+    expectDashedBorderToBeHidden();
   });
 
   it(`doesn't allow drag and drop on dates that are lesser than the min date
-  for the first date`, async () => {
+  when the first input is active`, async () => {
     renderWithMinDate(15);
     await clickFirstInput();
     await selectCell("16");
@@ -538,23 +555,81 @@ describe("DateTimeRange", () => {
 
     expect(disabledCell).not.toHaveClass("selected-cell");
     expect(selectedCell).toHaveClass("selected-cell");
-    expectFirtInputToHaveValue(getInputValue(16));
+    expectFirstInputToHaveValue(getInputValue(16));
   });
 
   it(`doesn't allow drag and drop on dates that are lesser than the min date 
-  for the second date`, async () => {
+  when the second input is active`, async () => {
     renderWithMinDate(15);
     await clickSecondInput();
     await selectCell("16");
 
-    const selectedCell = getCell(16);
-    fireEvent.mouseDown(selectedCell);
+    fireEvent.mouseDown(getCell(16));
+    fireEvent.mouseEnter(getCell(14));
 
-    const disabledCell = getCell(14);
-    fireEvent.mouseEnter(disabledCell);
-
-    expect(disabledCell).not.toHaveClass("selected-cell");
-    expect(selectedCell).toHaveClass("selected-cell");
+    expect(getCell(14)).not.toHaveClass("selected-cell");
+    expect(getCell(16)).toHaveClass("selected-cell");
     expectSecondInputToHaveValue(getInputValue(16));
+  });
+
+  it(`doesn't select date that is greater than the max date when the first input
+  is active`, async () => {
+    renderWithMaxDate(15);
+    await clickFirstInput();
+
+    await userEvent.click(getCell(16));
+
+    expect(getCell(16)).not.toHaveClass("selected-cell");
+    expectFirstInputToHaveValue(getDateTimePlaceholder(true));
+  });
+
+  it(`doesn't select date that is greater than the max date when the second input
+  is active`, async () => {
+    renderWithMaxDate(15);
+    await clickSecondInput();
+
+    await userEvent.click(getCell(16));
+
+    expect(getCell(16)).not.toHaveClass("selected-cell");
+    expectSecondInputToHaveValue(getDateTimePlaceholder(true));
+  });
+
+  it(`doesn't show dashed border when date that is greater than the max date
+  is hovered`, async () => {
+    renderWithMaxDate(15);
+    await clickFirstInput();
+    await selectCell("14");
+
+    await clickSecondInput();
+    await userEvent.hover(getCell(16));
+    expectDashedBorderToBeHidden();
+  });
+
+  it(`doesn't allow drag and drop on dates that are greater than the max date
+  when the first input is active`, async () => {
+    renderWithMaxDate(15);
+    await clickFirstInput();
+    await selectCell("15");
+
+    fireEvent.mouseDown(getCell(15));
+    fireEvent.mouseEnter(getCell(16));
+
+    expect(getCell(16)).not.toHaveClass("selected-cell");
+    expect(getCell(15)).toHaveClass("selected-cell");
+    expectFirstInputToHaveValue(getInputValue(15));
+  });
+
+  it(`doesn't allow drag and drop on dates that are greater than the max date
+  when the second input is active`, async () => {
+    renderWithMaxDate(15);
+    await clickSecondInput();
+    await selectCell("15");
+
+    fireEvent.mouseDown(getCell(15));
+    fireEvent.mouseEnter(getCell(16));
+
+    expect(getCell(16)).not.toHaveClass("selected-cell");
+    expect(getCell(15)).toHaveClass("selected-cell");
+    expectSecondInputToHaveValue(getInputValue(15));
   });
 });

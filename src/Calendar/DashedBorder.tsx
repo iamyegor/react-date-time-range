@@ -27,17 +27,18 @@ export default function DashedBorder({ day }: { day: Date }) {
     edgeSelectedDate,
     dashedBorderDirection,
     minDate,
+    maxDate,
   } = useDateTimeRange();
-  const hoveredDateIsLesserThanMinDate =
-    hoveredDate && minDate && hoveredDate < minDate;
+  function isDisabled() {
+    if (hoveredDate) {
+      return (
+        (minDate && hoveredDate < minDate) || (maxDate && hoveredDate > maxDate)
+      );
+    }
+  }
 
   function shouldApplyDashedBorder() {
-    if (
-      !hoveredDate ||
-      isDragging ||
-      !edgeSelectedDate ||
-      hoveredDateIsLesserThanMinDate
-    ) {
+    if (!hoveredDate || isDragging || !edgeSelectedDate || isDisabled()) {
       return false;
     }
 

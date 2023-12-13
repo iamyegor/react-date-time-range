@@ -45,9 +45,11 @@ type DateTimeRangeContextProps = {
   bannedDates: Date[];
   useAMPM: boolean;
   minDate?: Date;
+  maxDate?: Date;
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
+  maxDate: undefined,
   minDate: undefined,
   draggedDate: DraggedDate.First,
   onDraggedDateChange: () => {},
@@ -97,9 +99,11 @@ interface DateTimeRangeProviderProps {
   bannedDates: Date[];
   useAMPM: boolean;
   minDate?: Date;
+  maxDate?: Date;
 }
 
 export default function DateTimeRangeProvider({
+  maxDate,
   minDate,
   useAMPM,
   bannedDates,
@@ -245,6 +249,7 @@ export default function DateTimeRangeProvider({
         bannedDates,
         useAMPM,
         minDate,
+        maxDate,
       }}
     >
       {children}

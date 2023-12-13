@@ -31,6 +31,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     onIsDraggingChange,
     onDateChangedWhileDraggingChange,
     minDate,
+    maxDate,
   } = useDateTimeRange();
   const [firstDateBeforeDrag, setFirstDateBeforeDrag] = useState<Date | null>(
     null
@@ -54,7 +55,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
       return;
     }
 
-    if (minDate && hoveredDate < minDate) {
+    if (dateExceedLimits(hoveredDate)) {
       onIsDraggingChange(false);
       return;
     }
@@ -64,6 +65,12 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     } else {
       onFirstDateChange(hoveredDate);
     }
+  }
+
+  function dateExceedLimits(hoveredDate: Date) {
+    return (
+      (minDate && hoveredDate < minDate) || (maxDate && hoveredDate > maxDate)
+    );
   }
 
   function changeDragToSecondDate() {
@@ -77,7 +84,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
       return;
     }
 
-    if (minDate && hoveredDate < minDate) {
+    if (dateExceedLimits(hoveredDate)) {
       onIsDraggingChange(false);
       return;
     }
