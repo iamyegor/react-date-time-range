@@ -1,10 +1,8 @@
 import { format, isSameMonth } from "date-fns";
-import leftArrowSvg from "../assets/icons/left-arrow.svg";
-import rightArrowSvg from "../assets/icons/right-arrow.svg";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 import { useEffect, useState } from "react";
-import { ReactSVG } from "react-svg";
+import { useDateTimeRange } from "./DateTimeRangeProvider";
 import LeftArrow from "./LeftArrow";
+import RightArrow from "./RightArrow";
 
 interface HeaderProps {
   currentMonth: Date;
@@ -18,7 +16,8 @@ export default function Header({
   onNextMonthClick,
 }: HeaderProps) {
   const [leftArrowDisabled, setLeftArrowDisabled] = useState<boolean>(false);
-  const { minDate } = useDateTimeRange();
+  const [rightArrowDisabled, setRightArrowDisabled] = useState<boolean>(false);
+  const { minDate, maxDate } = useDateTimeRange();
 
   useEffect(() => {
     if (minDate && isSameMonth(currentMonth, minDate)) {
@@ -28,6 +27,14 @@ export default function Header({
     }
   }, [currentMonth, minDate]);
 
+  useEffect(() => {
+    if (maxDate && isSameMonth(currentMonth, maxDate)) {
+      setRightArrowDisabled(true);
+    } else {
+      setRightArrowDisabled(false);
+    }
+  }, [currentMonth, maxDate]);
+
   const dateFormat = "MMMM yyyy";
   return (
     <div className="flex justify-between items-center py-2 px-4">
@@ -36,24 +43,20 @@ export default function Header({
         onClick={onPrevMonthClick}
         data-testid="prev-month-button"
         disabled={leftArrowDisabled}
-        style={{
-          filter: leftArrowDisabled ? "grayscale(100%)" : "grayscale(0%)",
-        }}
       >
         <LeftArrow isDisabled={leftArrowDisabled} />
-        {/* <img src={leftArrowSvg} alt="left-arrow" className="w-5 h-5 text-gray-10" /> */}
-        {/* <ReactSVG src={leftArrowSvg} width={20} height={20} color="gray" /> */}
       </button>
       <div>
         <span>{format(currentMonth, dateFormat)}</span>
       </div>
-      <div
+      <button
         className="cursor-pointer"
         onClick={onNextMonthClick}
         data-testid="next-month-button"
+        disabled={rightArrowDisabled}
       >
-        <img src={rightArrowSvg} alt="right-arrow" className="w-5 h-5" />
-      </div>
+        <RightArrow isDisabled={rightArrowDisabled} />
+      </button>
     </div>
   );
 }

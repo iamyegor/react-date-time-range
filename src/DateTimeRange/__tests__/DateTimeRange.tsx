@@ -641,4 +641,11 @@ describe("DateTimeRange", () => {
       expect(getCell(i)).toHaveClass("disabled-cell");
     }
   });
+
+  it(`disables the right arrow button if the max date is in the current month`, async () => {
+    renderWithMaxDate(15);
+    await clickFirstInput();
+
+    expect(screen.getByTestId("next-month-button")).toBeDisabled();
+  });
 });
