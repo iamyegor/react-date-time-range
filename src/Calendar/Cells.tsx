@@ -4,7 +4,7 @@ import {
   endOfWeek,
   isEqual,
   startOfMonth,
-  startOfWeek
+  startOfWeek,
 } from "date-fns";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { DraggedDate } from "../types";
@@ -28,7 +28,9 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     onDraggedDateChange,
     onShadowSelectedDateChange,
     isDragging,
+    onIsDraggingChange,
     onDateChangedWhileDraggingChange,
+    minDate,
   } = useDateTimeRange();
   const [firstDateBeforeDrag, setFirstDateBeforeDrag] = useState<Date | null>(
     null
@@ -40,24 +42,58 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
   useEffect(() => {
     if (hoveredDate && isDragging) {
       if (draggedDate === DraggedDate.First) {
-        if (secondDate && hoveredDate > secondDate) {
-          onFirstDateChange(secondDate);
-          onSecondDateChange(hoveredDate);
-          onDraggedDateChange(DraggedDate.Second);
-        } else {
-          onFirstDateChange(hoveredDate);
-        }
+        handleFirtDateDrag();
       } else if (draggedDate === DraggedDate.Second) {
-        if (firstDate && hoveredDate < firstDate) {
-          onSecondDateChange(firstDate);
-          onFirstDateChange(hoveredDate);
-          onDraggedDateChange(DraggedDate.First);
-        } else {
-          onSecondDateChange(hoveredDate);
-        }
+        handleSecondDateDrag();
       }
     }
   }, [hoveredDate, draggedDate]);
+
+  function handleFirtDateDrag() {
+    if (!hoveredDate) {
+      return;
+    }
+
+    if (minDate && hoveredDate < minDate) {
+      onIsDraggingChange(false);
+      return;
+    }
+
+    if (secondDate && hoveredDate > secondDate) {
+      changeDragToSecondDate();
+    } else {
+      onFirstDateChange(hoveredDate);
+    }
+  }
+
+  function changeDragToSecondDate() {
+    onFirstDateChange(secondDate);
+    onSecondDateChange(hoveredDate);
+    onDraggedDateChange(DraggedDate.Second);
+  }
+
+  function handleSecondDateDrag() {
+    if (!hoveredDate) {
+      return;
+    }
+
+    if (minDate && hoveredDate < minDate) {
+      onIsDraggingChange(false);
+      return;
+    }
+
+    if (firstDate && hoveredDate < firstDate) {
+      changeDragToFirstDate();
+    } else {
+      onSecondDateChange(hoveredDate);
+    }
+  }
+
+  function changeDragToFirstDate() {
+    onSecondDateChange(firstDate);
+    onFirstDateChange(hoveredDate);
+    onDraggedDateChange(DraggedDate.First);
+  }
 
   useEffect(() => {
     if (hoveredDate && isDragging) {
@@ -119,7 +155,11 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     return weeks;
   }, [currentMonth, firstDate, secondDate, hoveredDate]);
 
-  return <div data-testid="cells" className={`flex-shrink-0 w-full`}>{rows}</div>;
+  return (
+    <div data-testid="cells" className={`flex-shrink-0 w-full`}>
+      {rows}
+    </div>
+  );
 }
 
 export default Cells;

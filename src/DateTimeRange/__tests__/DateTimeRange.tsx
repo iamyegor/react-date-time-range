@@ -1,5 +1,6 @@
 import {
   cleanup,
+  fireEvent,
   render,
   screen,
   waitFor,
@@ -40,6 +41,16 @@ describe("DateTimeRange", () => {
   beforeEach(() => {
     renderDateTimeRange({ useAMPM: true });
   });
+
+  function expectSecondInputToHaveValue(value: string) {
+    const secondContainer = screen.getByTestId("second-date-time-container");
+    expect(within(secondContainer).getByDisplayValue(value)).toBeDefined();
+  }
+
+  function expectFirtInputToHaveValue(value: string) {
+    const firstContainer = screen.getByTestId("first-date-time-container");
+    expect(within(firstContainer).getByDisplayValue(value)).toBeDefined();
+  }
 
   function renderWithMinDate(day: number) {
     const year = new Date().getFullYear();
@@ -511,5 +522,39 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
     await userEvent.hover(getCell(13));
     expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
+  });
+
+  it(`doesn't allow drag and drop on dates that are lesser than the min date
+  for the first date`, async () => {
+    renderWithMinDate(15);
+    await clickFirstInput();
+    await selectCell("16");
+
+    const selectedCell = getCell(16);
+    fireEvent.mouseDown(selectedCell);
+
+    const disabledCell = getCell(14);
+    fireEvent.mouseEnter(disabledCell);
+
+    expect(disabledCell).not.toHaveClass("selected-cell");
+    expect(selectedCell).toHaveClass("selected-cell");
+    expectFirtInputToHaveValue(getInputValue(16));
+  });
+
+  it(`doesn't allow drag and drop on dates that are lesser than the min date 
+  for the second date`, async () => {
+    renderWithMinDate(15);
+    await clickSecondInput();
+    await selectCell("16");
+
+    const selectedCell = getCell(16);
+    fireEvent.mouseDown(selectedCell);
+
+    const disabledCell = getCell(14);
+    fireEvent.mouseEnter(disabledCell);
+
+    expect(disabledCell).not.toHaveClass("selected-cell");
+    expect(selectedCell).toHaveClass("selected-cell");
+    expectSecondInputToHaveValue(getInputValue(16));
   });
 });
