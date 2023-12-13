@@ -632,4 +632,13 @@ describe("DateTimeRange", () => {
     expect(getCell(15)).toHaveClass("selected-cell");
     expectSecondInputToHaveValue(getInputValue(15));
   });
+
+  it(`disables the date if it's greater than the max date`, async () => {
+    const maxDate = renderWithMaxDate(15);
+    await clickFirstInput();
+
+    for (let i = maxDate.getDate() + 1; i <= 31; i++) {
+      expect(getCell(i)).toHaveClass("disabled-cell");
+    }
+  });
 });

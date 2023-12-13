@@ -55,7 +55,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
       return;
     }
 
-    if (dateExceedLimits(hoveredDate)) {
+    if (isDateOutsideRange(hoveredDate)) {
       onIsDraggingChange(false);
       return;
     }
@@ -67,7 +67,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     }
   }
 
-  function dateExceedLimits(hoveredDate: Date) {
+  function isDateOutsideRange(hoveredDate: Date) {
     return (
       (minDate && hoveredDate < minDate) || (maxDate && hoveredDate > maxDate)
     );
@@ -84,7 +84,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
       return;
     }
 
-    if (dateExceedLimits(hoveredDate)) {
+    if (isDateOutsideRange(hoveredDate)) {
       onIsDraggingChange(false);
       return;
     }

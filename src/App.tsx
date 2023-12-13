@@ -15,6 +15,7 @@ export default function App() {
         inputText={{ start: "Start date", end: "End date" }}
         useAMPM={true}
         minDate={new Date(2023, 11, 12)}
+        maxDate={new Date(2023, 11, 20)}
       />
     </div>
   );

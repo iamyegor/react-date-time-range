@@ -27,7 +27,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     minDate,
     maxDate,
   } = useDateTimeRange();
-  function isDateDisabled() {
+  function isDateOutsideRange() {
     return (minDate && day < minDate) || (maxDate && day > maxDate);
   }
 
@@ -52,13 +52,13 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   function getDayCellClasses(): string {
     return classNames(getClassesForDay(), {
       "selected-cell": isDateSelected(day),
-      "hovered-cell": !isDateSelected(day) && !isDateDisabled,
+      "hovered-cell": !isDateSelected(day) && !isDateOutsideRange,
       "group-hover:border-none group-hover:bg-transparent":
         firstDate && secondDate && day > firstDate && day < secondDate,
       "line-through text-gray-500 group-hover:cursor-default": bannedDates.some(
         (date) => isSameDay(date, day)
       ),
-      "disabled-cell": minDate && day < minDate,
+      "disabled-cell": isDateOutsideRange(),
     });
   }
 
@@ -77,7 +77,7 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   }
 
   function handleClick() {
-    if (!isDateDisabled()) {
+    if (!isDateOutsideRange()) {
       handleCellClick(day);
     }
   }
