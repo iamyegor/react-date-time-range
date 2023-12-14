@@ -15,8 +15,8 @@ export default function useDisabledMinutes(
     }
 
     if (!selectedTime) {
-      if (minTime.hours > 12) {
-        setDisabledMinutes(minutes.slice(0, minTime.minutes));
+      if (minTime.hours >= 12) {
+        setDisabledMinutes(minutes.slice(0, 60));
       }
       return;
     }

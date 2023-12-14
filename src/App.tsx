@@ -10,7 +10,7 @@ export default function App() {
         useAMPM={true}
         minDate={new Date(2023, 11, 12)}
         maxDate={new Date(2023, 11, 20)}
-        minTime={new Date(2023, 11, 12, 7, 23)}
+        minTime={new Date(2023, 11, 12, 12, 23)}
       />
     </div>
   );
