@@ -13,6 +13,7 @@ import {
   DashedBorderDirection,
   DraggedDate,
   Time,
+  TimeIn24HourFormat,
 } from "../types";
 import { getDefaultSelectedTime } from "../utils";
 
@@ -46,9 +47,11 @@ type DateTimeRangeContextProps = {
   useAMPM: boolean;
   minDate?: Date;
   maxDate?: Date;
+  minTimeIn24Hours?: TimeIn24HourFormat;
 };
 
 const DateTimeRangeContext = createContext<DateTimeRangeContextProps>({
+  minTimeIn24Hours: undefined,
   maxDate: undefined,
   minDate: undefined,
   draggedDate: DraggedDate.First,
@@ -100,9 +103,11 @@ interface DateTimeRangeProviderProps {
   useAMPM: boolean;
   minDate?: Date;
   maxDate?: Date;
+  minTimeIn24Hours?: TimeIn24HourFormat;
 }
 
 export default function DateTimeRangeProvider({
+  minTimeIn24Hours,
   maxDate,
   minDate,
   useAMPM,
@@ -250,6 +255,7 @@ export default function DateTimeRangeProvider({
         useAMPM,
         minDate,
         maxDate,
+        minTimeIn24Hours,
       }}
     >
       {children}

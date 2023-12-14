@@ -1,5 +1,6 @@
 import { isValid } from "date-fns";
 import { KeyboardEvent, useEffect, useRef } from "react";
+import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
 import {
   DATE_PLACEHOLDER,
   TIME_PLACEHOLDER_24,
@@ -8,26 +9,29 @@ import {
   sections,
 } from "../globals";
 import { Section, Time } from "../types";
-import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
 
 interface DateTimeInputProps {
   date: Date | null;
   onDateChange: (date: Date | null) => void;
   time: Time | null;
   onTimeChange: (time: Time | null) => void;
-  isInputValid: boolean;
-  onIsInputValidChange: (isValid: boolean) => void;
   value: string;
   onValueChange: (value: string) => void;
+  isDateInvalid: boolean;
+  onIsDateInvalidChange: (isInvalid: boolean) => void;
+  isTimeInvalid: boolean;
+  onIsTimeInvalidChange: (isInvalid: boolean) => void;
 }
 
 function DateTimeInput({
+  isTimeInvalid,
+  onIsTimeInvalidChange,
+  isDateInvalid,
+  onIsDateInvalidChange,
   date,
   time,
   onDateChange,
   onTimeChange,
-  isInputValid,
-  onIsInputValidChange,
   value,
   onValueChange,
 }: DateTimeInputProps) {
@@ -40,23 +44,18 @@ function DateTimeInput({
 
     if (validateDate(dateFromValue)) {
       onDateChange(dateFromValue);
+      onIsDateInvalidChange(false);
     } else {
       onDateChange(null);
+      onIsDateInvalidChange(!isValuePlaceholder());
     }
 
     if (timeFromValue) {
       onTimeChange(timeFromValue);
+      onIsTimeInvalidChange(false);
     } else {
       onTimeChange(null);
-    }
-
-    if (
-      isValuePlaceholder() ||
-      (timeFromValue && validateDate(dateFromValue))
-    ) {
-      onIsInputValidChange(true);
-    } else {
-      onIsInputValidChange(false);
+      onIsTimeInvalidChange(!isValuePlaceholder());
     }
   }, [value]);
 
@@ -137,7 +136,7 @@ function DateTimeInput({
       return formatDate(date);
     } else {
       const dateValue = getSectionValue(section);
-      if (dateValue && !isInputValid) {
+      if (dateValue && isDateInvalid) {
         return dateValue;
       } else {
         return DATE_PLACEHOLDER;
@@ -188,7 +187,7 @@ function DateTimeInput({
     placeholder: string
   ) {
     const timeValue = getSectionValue({ start, end });
-    return timeValue && !isInputValid ? timeValue : placeholder;
+    return timeValue && isTimeInvalid ? timeValue : placeholder;
   }
 
   function updateValueWithTime(start: number, end: number, timeValue: string) {

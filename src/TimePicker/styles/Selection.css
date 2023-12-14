@@ -9,3 +9,15 @@
 .selection-scroll::-webkit-scrollbar-thumb {
   @apply bg-gray-200 rounded-full;
 }
+
+.disabled-item {
+  @apply text-gray-300 hover:cursor-default;
+}
+
+.disabled-selected-item {
+  @apply bg-blue-300 text-white;
+}
+
+.selected-item {
+  @apply bg-blue-500 text-white;
+}

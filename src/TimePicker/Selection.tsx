@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./styles/Selection.css";
+import classNames from "classnames";
 
 interface SelectionProps {
   items: string[];
@@ -7,9 +8,11 @@ interface SelectionProps {
   onSelect: (item: string) => void;
   testid?: string;
   hasBorder?: boolean;
+  disabledItems?: string[];
 }
 
 function Selection({
+  disabledItems,
   items,
   selectedItem,
   onSelect,
@@ -17,7 +20,7 @@ function Selection({
   hasBorder = false,
 }: SelectionProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const itemRef = useRef<HTMLDivElement | null>(null);
+  const itemRef = useRef<HTMLButtonElement | null>(null);
   const [containerHeight, setContainerHeight] = useState<number>(0);
   const [itemHeight, setItemHeight] = useState<number>(0);
   const [isItemFirstRender, setIsItemFirstRender] = useState<boolean>(true);
@@ -45,10 +48,22 @@ function Selection({
   }, [selectedItem]);
 
   function getClassNames(item: string) {
-    return `cursor-pointer py-2 flex justify-center items-center rounded 
-    flex-shrink-0 w-10 h-9 text-sm transition-all  ${
-      selectedItem === item ? "bg-blue-500 text-white" : ""
-    }`;
+    return classNames({
+      "py-2 flex justify-center items-center rounded flex-shrink-0 w-10 h-9 text-sm transition-all":
+        true,
+      "selected-item": isSelected(item) && !isDisabled(item),
+      "disabled-item": isDisabled(item),
+      "disabled-selected-item": isDisabled(item) && isSelected(item),
+      "cursor-pointer": !isDisabled(item),
+    });
+  }
+
+  function isDisabled(item: string) {
+    return disabledItems?.includes(item);
+  }
+
+  function isSelected(item: string) {
+    return selectedItem === item;
   }
 
   function handleClick(item: string, index: number) {
@@ -76,15 +91,16 @@ function Selection({
       style={{ paddingBottom: `${bottomSpace}px` }}
     >
       {items.map((item, index) => (
-        <div
+        <button
           ref={index === 0 ? itemRef : null}
           key={item}
           className={getClassNames(item)}
           onClick={() => handleClick(item, index)}
           data-testid={`${testid}`}
+          disabled={disabledItems?.includes(item)}
         >
           {item}
-        </div>
+        </button>
       ))}
     </div>
   );

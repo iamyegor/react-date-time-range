@@ -1,22 +1,16 @@
 import { startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
 import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
+import { hours12, hours24, minutes } from "../constants";
+import useDisabledHours from "../hooks/useDisabledHours";
+import useDisabledMinutes from "../hooks/useDisabledMinutes";
 import { ActiveInput, Time } from "../types";
-import { getDefaultSelectedTime, isTimeEqual } from "../utils";
+import convertTo2DigitString, {
+  getDefaultSelectedTime,
+  isTimeEqual,
+} from "../utils";
 import Selection from "./Selection";
 
-const hours12 = Array.from({ length: 11 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
-);
-hours12.unshift("12");
-
-const hours24 = Array.from({ length: 23 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
-);
-
-const minutes = Array.from({ length: 60 }, (_, i) =>
-  String(i).padStart(2, "0")
-);
 const periods = ["AM", "PM"];
 
 function TimePicker() {
@@ -31,8 +25,15 @@ function TimePicker() {
     onSecondSelectedTimeChange,
     activeInput,
     useAMPM,
+    minTimeIn24Hours,
   } = useDateTimeRange();
   const [selectedTime, setSelectedTime] = useState<Time | null>(null);
+  const disabledHours = useDisabledHours(
+    minTimeIn24Hours,
+    selectedTime,
+    useAMPM
+  );
+  const disabledMinutes = useDisabledMinutes(minTimeIn24Hours, selectedTime);
 
   useEffect(() => {
     if (activeInput === ActiveInput.First) {
@@ -52,23 +53,28 @@ function TimePicker() {
       !isTimeEqual(selectedTime, firstSelectedTime)
     ) {
       onFirstSelectedTimeChange(selectedTime);
+      setFirstDateIfNotSet();
     } else if (
       activeInput === ActiveInput.Second &&
       !isTimeEqual(selectedTime, secondSelectedTime)
     ) {
       onSecondSelectedTimeChange(selectedTime);
+      setSecondDateIfNotSet();
     }
   }, [selectedTime]);
 
   function handleTimeChange(key: string, value: number | string) {
     updateSelectedTime(key, value);
-    setDateIfNotSet();
   }
 
-  function setDateIfNotSet() {
-    if (activeInput === ActiveInput.First && !firstDate) {
+  function setFirstDateIfNotSet() {
+    if (!firstDate) {
       onFirstDateChange(startOfDay(new Date()));
-    } else if (activeInput === ActiveInput.Second && !secondDate) {
+    }
+  }
+
+  function setSecondDateIfNotSet() {
+    if (!secondDate) {
       onSecondDateChange(startOfDay(new Date()));
     }
   }
@@ -83,14 +89,11 @@ function TimePicker() {
     });
   }
 
-  function convertTo2DigitString(num: number) {
-    return num.toString().padStart(2, "0");
-  }
-
   return (
     <div className="flex flex-col">
       <div className="flex overflow-hidden">
         <Selection
+          disabledItems={disabledHours}
           items={useAMPM ? hours12 : hours24}
           selectedItem={
             selectedTime ? convertTo2DigitString(selectedTime.hours) : ""
@@ -100,6 +103,7 @@ function TimePicker() {
           testid="hour-option"
         />
         <Selection
+          disabledItems={disabledMinutes}
           items={minutes}
           selectedItem={
             selectedTime ? convertTo2DigitString(selectedTime.minutes) : ""

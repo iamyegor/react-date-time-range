@@ -20,6 +20,7 @@ import {
 import { ReactNode } from "react";
 import { DATE_PLACEHOLDER, getDateTimePlaceholder } from "../../globals";
 import DateTimeRange from "../DateTimeRange";
+import convertTo2DigitString from "../../utils";
 
 Element.prototype.scrollTo = () => {};
 vi.mock("react-transition-group", () => {
@@ -41,6 +42,53 @@ describe("DateTimeRange", () => {
   beforeEach(() => {
     renderDateTimeRange({ useAMPM: true });
   });
+
+  async function clickHour(hour: number) {
+    const hourOptions = screen.getAllByTestId("hour-option");
+
+    const hourElement = hourOptions.filter((option) => {
+      return option.textContent === convertTo2DigitString(hour);
+    })[0];
+
+    await userEvent.click(hourElement);
+  }
+
+  async function clickAMPMOption(option: string) {
+    const periodOptions = screen.getAllByTestId("period-option");
+    const AMPMOption = periodOptions.find(
+      (o) => o.textContent === option
+    ) as HTMLElement;
+    await userEvent.click(AMPMOption);
+  }
+
+  function expectFirstInputToBeInvalid() {
+    const firstInput = screen.getAllByTestId("date-time-input")[0];
+    expect(firstInput).toHaveClass("invalid-input");
+  }
+
+  function expectMinutesToBeDisabled(minutes: number) {
+    const minuteOptions = screen.getAllByTestId("minute-option");
+    for (let i = 0; i < minutes; i++) {
+      expect(minuteOptions[i]).toHaveClass("disabled-item");
+      expect(minuteOptions[i]).toBeDisabled();
+    }
+  }
+
+  function expectHoursToBeDisabled(hours: number) {
+    const hourOptions = screen.getAllByTestId("hour-option");
+    for (let i = 0; i < hours; i++) {
+      expect(hourOptions[i]).toHaveClass("disabled-item");
+      expect(hourOptions[i]).toBeDisabled();
+    }
+  }
+
+  function expectMinutesToBeEnabled(minutes: number) {
+    const minutesOptions = screen.getAllByTestId("minute-option");
+    for (let i = 0; i < minutes; i++) {
+      expect(minutesOptions[i]).not.toHaveClass("disabled-item");
+      expect(minutesOptions[i]).not.toBeDisabled();
+    }
+  }
 
   function expectDashedBorderToBeHidden() {
     expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
@@ -78,7 +126,7 @@ describe("DateTimeRange", () => {
     return newDate;
   }
 
-  function expectSelected(first: number, second: number) {
+  function expectCellsToBeSelected(first: number, second: number) {
     const cells = screen.getByTestId("cells");
     const firstSelectedCell = within(cells).getByText(first.toString());
     const secondSelectedCell = within(cells).getByText(second.toString());
@@ -111,7 +159,13 @@ describe("DateTimeRange", () => {
     useAMPM = false,
     minDate,
     maxDate,
-  }: { useAMPM?: boolean; minDate?: Date; maxDate?: Date } = {}) {
+    minTime,
+  }: {
+    useAMPM?: boolean;
+    minDate?: Date;
+    maxDate?: Date;
+    minTime?: Date;
+  } = {}) {
     cleanup();
     return render(
       <DateTimeRange
@@ -119,6 +173,7 @@ describe("DateTimeRange", () => {
         useAMPM={useAMPM}
         minDate={minDate}
         maxDate={maxDate}
+        minTime={minTime}
       />
     );
   }
@@ -159,10 +214,20 @@ describe("DateTimeRange", () => {
     const hourOptions = screen.getAllByTestId("hour-option");
 
     const hourElement = hourOptions.filter((option) => {
-      return option.textContent === hour.toString().padStart(2, "0");
+      return option.textContent === convertTo2DigitString(hour);
     })[0];
 
     await userEvent.click(hourElement);
+  }
+
+  async function selectMinute(minute: number) {
+    const minuteOptions = screen.getAllByTestId("minute-option");
+
+    const minuteElement = minuteOptions.filter((option) => {
+      return option.textContent === convertTo2DigitString(minute);
+    })[0];
+
+    await userEvent.click(minuteElement);
   }
 
   function expectOnlyCellIsSelected(cell: HTMLElement) {
@@ -489,7 +554,7 @@ describe("DateTimeRange", () => {
     await clickSecondInput();
     await selectCell("19");
 
-    expectSelected(15, 19);
+    expectCellsToBeSelected(15, 19);
   });
 
   it("disables the date if it's lesser than the min date", async () => {
@@ -647,5 +712,167 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
 
     expect(screen.getByTestId("next-month-button")).toBeDisabled();
+  });
+
+  it(`disables the time if it's less than the minTime for 24 hours system`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: false,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+
+    expectHoursToBeDisabled(hours - 1);
+    expectMinutesToBeEnabled(minutes);
+
+    await selectHour(hours);
+
+    expectMinutesToBeDisabled(minutes);
+  });
+
+  it(`enables the minutes if the current hour is greater than the min time hour
+  for 24 hours system`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: false,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    await selectHour(hours);
+    await selectHour(hours + 1);
+
+    expectMinutesToBeEnabled(minutes);
+  });
+
+  it(`disables selected minute if it's less than the min time minute for
+  24 hours system`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: false,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    await selectMinute(minutes - 1);
+    await selectHour(hours);
+
+    const minutesOptions = screen.getAllByTestId("minute-option");
+    const selectedMinute = minutesOptions.find((option) => {
+      return option.textContent === convertTo2DigitString(minutes - 1);
+    });
+
+    expect(selectedMinute).toHaveClass("disabled-selected-item");
+    expect(selectedMinute).not.toHaveClass("selected-item");
+  });
+
+  it(`invalidates the input when the time is less than the min time 
+  for 24 hours system`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: false,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    await selectMinute(minutes - 1);
+    await selectHour(hours);
+
+    expectFirstInputToBeInvalid();
+  });
+
+  it(`disables the time if it's less than the min time for AM/PM system when
+  minTime hour is AM and user has no (AM/PM) selected`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    // we don't do hours - 1 because there is 12 at the beginning of the list
+    expectHoursToBeDisabled(hours);
+  });
+
+  it(`disables the time if it's less than the min time for AM/PM system when
+  minTime hour is PM and user has no (AM/PM) selected`, async () => {
+    const minutes = 23;
+    const hours = 19;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+
+    expectHoursToBeDisabled(12);
+  });
+
+  it(`disables the time if it's less than the min time for AM/PM system when
+  minTime hour is PM and user has AM selected`, async () => {
+    const minutes = 23;
+    const hours = 19;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    await clickAMPMOption("AM");
+
+    expectHoursToBeDisabled(12);
+  });
+
+  it(`disables the time if it's less than the min time for AM/PM system when
+  minTime hour is AM and user has AM selected`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    await clickAMPMOption("AM");
+
+    expectHoursToBeDisabled(hours);
+  });
+
+  it(`disables the time if it's less than the min time for AM/PM system when
+  minTime hour is PM and user has PM selected`, async () => {
+    const minutes = 23;
+    const hours = 19;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    await clickAMPMOption("PM");
+
+    expectHoursToBeDisabled(hours - 12);
+  });
+
+  it(`disables minutes if the minTime hour is PM and user has no (AM/PM) selected`, async () => {
+    const minutes = 23;
+    const hours = 19;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+
+    expectMinutesToBeDisabled(minutes);
+  });
+
+  it(`disables minutes if the current hour is less than the minTime hour for
+  AM/PM system when minTime hour is AM`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    await clickHour(hours);
+
+    expectMinutesToBeDisabled(minutes);
   });
 });

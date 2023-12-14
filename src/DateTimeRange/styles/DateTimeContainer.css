@@ -1,0 +1,7 @@
+.invalid-input {
+  @apply border-red-600;
+}
+
+.invalid-label {
+  @apply text-red-600;
+}

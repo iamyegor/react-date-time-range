@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import DateTimeRangeProvider from "../Calendar/DateTimeRangeProvider";
 import arrowBetweenDates from "../assets/icons/arrow-between-dates.svg";
+import useIsDateLessThanMinDate from "../hooks/useIsDateLessThanMinDate";
+import useIsTimeLessThanMinTime from "../hooks/useIsTimeLessThanMinTime";
 import useOutsideClick from "../hooks/useOutsideClick";
 import { ActiveInput, Time } from "../types";
-import DateTimeContainer from "./DateTimeContainer";
+import { convertTo24HourFormat, formatToTime } from "../utils";
 import DateTime from "./DateTime";
+import DateTimeContainer from "./DateTimeContainer";
 import "./styles/DateTimeRange.css";
 
 interface DateTimeRangeProps {
@@ -14,9 +17,11 @@ interface DateTimeRangeProps {
   inputText: { start: string; end: string };
   minDate?: Date;
   maxDate?: Date;
+  minTime?: Date;
 }
 
 export default function DateTimeRange({
+  minTime,
   maxDate,
   minDate,
   bannedDates = [],
@@ -33,8 +38,20 @@ export default function DateTimeRange({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { isVisible: showDateTime, setIsVisible: setShowDateTime } =
     useOutsideClick(containerRef.current);
-  const [isFirstInputValid, setIsFirstInputValid] = useState<boolean>(true);
-  const [isSecondInputValid, setIsSecondInputValid] = useState<boolean>(true);
+  const [isFirtsDateInvalid, setIsFirstDateInvalid] = useState<boolean>(false);
+  const [isSecondDateInvalid, setIsSecondDateInvalid] =
+    useState<boolean>(false);
+  const { isFirstDateLessThanMinDate, isSecondDateLessThanMinDate } =
+    useIsDateLessThanMinDate(firstDate, secondDate, minDate || null);
+  const [isFirstTimeInvalid, setIsFirstTimeInvalid] = useState<boolean>(false);
+  const [isSecondTimeInvalid, setIsSecondTimeInvalid] =
+    useState<boolean>(false);
+  const { isFirstTimeLessThanMinTime, isSecondTimeLessThanMinTime } =
+    useIsTimeLessThanMinTime(
+      firstSelectedTime,
+      secondSelectedTime,
+      minTime ? formatToTime(minTime, useAMPM) : null
+    );
 
   useEffect(() => {
     if (!showDateTime) {
@@ -88,12 +105,20 @@ export default function DateTimeRange({
     setActiveInput(input);
   }
 
-  function handleIsFirstInputValidChange(isValid: boolean) {
-    setIsFirstInputValid(isValid);
+  function handleIsFirstDateInvalidChange(isInvalid: boolean) {
+    setIsFirstDateInvalid(isInvalid);
   }
 
-  function handleIsSecondInputValidChange(isValid: boolean) {
-    setIsSecondInputValid(isValid);
+  function handleIsSecondDateInvalidChange(isInvalid: boolean) {
+    setIsSecondDateInvalid(isInvalid);
+  }
+
+  function handleIsFirstTimeInvalidChange(isInvalid: boolean) {
+    setIsFirstTimeInvalid(isInvalid);
+  }
+
+  function handleIsSecondTimeInvalidChange(isInvalid: boolean) {
+    setIsSecondTimeInvalid(isInvalid);
   }
 
   return (
@@ -112,6 +137,11 @@ export default function DateTimeRange({
       useAMPM={useAMPM}
       minDate={minDate}
       maxDate={maxDate}
+      minTimeIn24Hours={
+        minTime
+          ? convertTo24HourFormat(formatToTime(minTime, false))
+          : undefined
+      }
     >
       <div ref={containerRef} style={{ userSelect: "none" }}>
         <div className="flex items-center justify-center mb-2">
@@ -123,9 +153,13 @@ export default function DateTimeRange({
             time={firstSelectedTime}
             onTimeChange={handleFirstTimeChange}
             onFocus={() => handleInputFocus(ActiveInput.First)}
-            isInputValid={isFirstInputValid}
-            onIsInputValidChange={handleIsFirstInputValidChange}
             testid="first-date-time-container"
+            isTimeLessThanMinTime={isFirstTimeLessThanMinTime}
+            isDateInvalid={isFirtsDateInvalid}
+            onIsDateInvalidChange={handleIsFirstDateInvalidChange}
+            isTimeInvalid={isFirstTimeInvalid}
+            onIsTimeInvalidChange={handleIsFirstTimeInvalidChange}
+            isDateLessThanMinDate={isFirstDateLessThanMinDate}
           />
           <img src={arrowBetweenDates} alt="dash" className="mx-2 w-5 h-5" />
           <DateTimeContainer
@@ -136,9 +170,13 @@ export default function DateTimeRange({
             time={secondSelectedTime}
             onTimeChange={handleSecondTimeChange}
             onFocus={() => handleInputFocus(ActiveInput.Second)}
-            isInputValid={isSecondInputValid}
-            onIsInputValidChange={handleIsSecondInputValidChange}
             testid="second-date-time-container"
+            isTimeLessThanMinTime={isSecondTimeLessThanMinTime}
+            isDateInvalid={isSecondDateInvalid}
+            onIsDateInvalidChange={handleIsSecondDateInvalidChange}
+            isTimeInvalid={isSecondTimeInvalid}
+            onIsTimeInvalidChange={handleIsSecondTimeInvalidChange}
+            isDateLessThanMinDate={isSecondDateLessThanMinDate}
           />
         </div>
         <CSSTransition

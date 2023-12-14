@@ -15,6 +15,10 @@ export interface Time {
   ampm: "AM" | "PM" | "24";
 }
 
+export interface TimeIn24HourFormat extends Omit<Time, "ampm"> {
+  ampm: "24";
+}
+
 export enum DashedBorderDirection {
   Left = "left",
   Right = "right",

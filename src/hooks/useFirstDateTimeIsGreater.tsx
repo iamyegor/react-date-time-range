@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Time } from "../types";
+import { convertTo24HourFormat } from "../utils";
 
 export default function useFirstDateTimeIsGreater(
   firstDate: Date | null,
   secondDate: Date | null,
   firstSelectedTime: Time | null,
-  secondSelectedTime: Time | null,
+  secondSelectedTime: Time | null
 ) {
   const [firstDateTimeIsGreater, setFirstDateTimeIsGreater] =
     useState<boolean>(false);
@@ -15,7 +16,7 @@ export default function useFirstDateTimeIsGreater(
     const datesAreEqual = isDateEqual(firstDate, secondDate);
     const firstTimeIsGreaterOrEqual = isTimeGreaterOrEqual(
       firstSelectedTime,
-      secondSelectedTime,
+      secondSelectedTime
     );
 
     if (firstDateIsGreater || (datesAreEqual && firstTimeIsGreaterOrEqual)) {
@@ -35,24 +36,20 @@ export default function useFirstDateTimeIsGreater(
 
   function isTimeGreaterOrEqual(
     firstTime: Time | null,
-    secondTime: Time | null,
+    secondTime: Time | null
   ) {
     if (!firstTime || !secondTime) {
       return false;
     }
 
-    const firstTimeHours = hoursIn24HourFormat(firstTime);
-    const secondTimeHours = hoursIn24HourFormat(secondTime);
+    const firstTimeHours = convertTo24HourFormat(firstTime).hours;
+    const secondTimeHours = convertTo24HourFormat(secondTime).hours;
 
     return (
       firstTimeHours > secondTimeHours ||
       (firstTimeHours === secondTimeHours &&
         firstTime.minutes >= secondTime.minutes)
     );
-  }
-
-  function hoursIn24HourFormat(time: Time) {
-    return time.ampm == "PM" ? time.hours + 12 : time.hours;
   }
 
   return firstDateTimeIsGreater;
