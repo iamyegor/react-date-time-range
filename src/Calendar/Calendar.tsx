@@ -1,9 +1,18 @@
 import { addMonths, isSameMonth, subMonths } from "date-fns";
 import { useEffect, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  selectActiveInput,
+  selectCurrentMonth,
+  selectFirstDate,
+  selectIsDragging,
+  selectSecondDate,
+  setCurrentMonth,
+  setIsDragging,
+} from "../features/dateTimeRangeSlice";
 import { ActiveInput } from "../types";
 import Cells from "./Cells";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 import Days from "./Days";
 import Header from "./Header";
 import "./styles/Calendar.css";
@@ -11,15 +20,13 @@ import "./styles/Calendar.css";
 const duration = 250;
 
 function Calendar() {
-  const {
-    currentMonth,
-    onCurrentMonthChange,
-    isDragging,
-    onIsDraggingChange,
-    activeInput,
-    firstDate,
-    secondDate,
-  } = useDateTimeRange();
+  const dispatch = useAppDispatch();
+  const currentMonth = useAppSelector(selectCurrentMonth);
+  const isDragging = useAppSelector(selectIsDragging);
+  const activeInput = useAppSelector(selectActiveInput);
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+
   const [isNext, setIsNext] = useState(true);
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element }[]
@@ -35,7 +42,8 @@ function Calendar() {
     }
 
     setIsNext(newCurrentMonth > currentMonth);
-    onCurrentMonthChange(newCurrentMonth);
+
+    dispatch(setCurrentMonth(newCurrentMonth));
   }, [activeInput]);
 
   useEffect(() => {
@@ -71,12 +79,12 @@ function Calendar() {
   }
 
   function onPrevMonthClick() {
-    onCurrentMonthChange(subMonths(currentMonth, 1));
+    dispatch(setCurrentMonth(subMonths(currentMonth, 1)));
     setIsNext(false);
   }
 
   function onNextMonthClick() {
-    onCurrentMonthChange(addMonths(currentMonth, 1));
+    dispatch(setCurrentMonth(addMonths(currentMonth, 1)));
     setIsNext(true);
   }
 
@@ -84,8 +92,8 @@ function Calendar() {
     <div
       className={`font-sans w-[360px] h-full p-4 border-r 
     overflow-hidden ${isDragging ? "cursor-grabbing" : ""}`}
-      onMouseUp={() => onIsDraggingChange(false)}
-      onMouseLeave={() => onIsDraggingChange(false)}
+      onMouseUp={() => dispatch(setIsDragging(false))}
+      onMouseLeave={() => dispatch(setIsDragging(false))}
     >
       <Header
         currentMonth={currentMonth}
