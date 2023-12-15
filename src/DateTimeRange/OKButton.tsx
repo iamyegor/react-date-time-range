@@ -7,7 +7,7 @@ import {
   selectSecondDate,
   selectSecondSelectedTime,
   setActiveInput,
-  setShowDateTime,
+  setIsDateTimeShown,
 } from "../features/dateTimeRangeSlice";
 import { ActiveInput } from "../types";
 import "./styles/OKButton.css";
@@ -48,7 +48,7 @@ export default function OKButton({ children }: OKButtonProps) {
     const areSecondDateAndTimeSelected = secondDate && secondSelectedTime;
 
     if (!areFirstDateAndTimeSelected && !areSecondDateAndTimeSelected) {
-      dispatch(setShowDateTime(false));
+      dispatch(setIsDateTimeShown(false));
     } else if (
       activeInput === ActiveInput.First &&
       !areSecondDateAndTimeSelected
@@ -60,7 +60,7 @@ export default function OKButton({ children }: OKButtonProps) {
     ) {
       dispatch(setActiveInput(ActiveInput.First));
     } else {
-      dispatch(setShowDateTime(false));
+      dispatch(setIsDateTimeShown(false));
     }
   }
 

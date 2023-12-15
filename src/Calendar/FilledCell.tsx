@@ -4,20 +4,27 @@ import { ReactElement } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../app/hooks";
 import {
+  selectActiveInput,
   selectBannedDates,
   selectFirstDate,
+  selectFirstSelectedTime,
   selectIsDragging,
   selectMaxDate,
   selectMinDate,
   selectSecondDate,
+  selectSecondSelectedTime,
   selectShadowSelectedDate,
-  setDateBasedOnActiveInput,
-  setDefaultTimeIfNotSet,
+  selectUseAMPM,
   setDraggedDate,
+  setFirstDate,
+  setFirstSelectedTime,
   setHoveredDate,
   setIsDragging,
+  setSecondDate,
+  setSecondSelectedTime
 } from "../features/dateTimeRangeSlice";
-import { DraggedDate } from "../types";
+import { ActiveInput, DraggedDate } from "../types";
+import { getDefaultSelectedTime } from "../utils";
 import DashedBorder from "./DashedBorder";
 import Highlight from "./Highlight";
 import HoverHighlight from "./HoverHighlight";
@@ -30,6 +37,7 @@ interface FilledCellProps {
 
 function FilledCell({ day }: FilledCellProps): ReactElement {
   const dispatch = useAppDispatch();
+  const activeInput = useSelector(selectActiveInput);
   const minDate = useSelector(selectMinDate);
   const maxDate = useSelector(selectMaxDate);
   const firstDate = useSelector(selectFirstDate);
@@ -37,6 +45,9 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
   const isDragging = useSelector(selectIsDragging);
   const shadowSelectedDate = useSelector(selectShadowSelectedDate);
   const bannedDates = useSelector(selectBannedDates);
+  const firstSelectedTime = useSelector(selectFirstSelectedTime);
+  const secondSelectedTime = useSelector(selectSecondSelectedTime);
+  const useAMPM = useSelector(selectUseAMPM);
 
   function isDateOutsideRange() {
     return (minDate && day < minDate) || (maxDate && day > maxDate);
@@ -89,8 +100,24 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function handleCellClick() {
     if (!isDateOutsideRange()) {
-      dispatch(setDateBasedOnActiveInput(day));
-      dispatch(setDefaultTimeIfNotSet());
+      setDateBasedOnActiveInput(day);
+      setDefaultTimeIfNotSet();
+    }
+  }
+
+  function setDateBasedOnActiveInput(day: Date) {
+    if (activeInput === ActiveInput.First) {
+      dispatch(setFirstDate(day));
+    } else if (activeInput === ActiveInput.Second) {
+      dispatch(setSecondDate(day));
+    }
+  }
+
+  function setDefaultTimeIfNotSet() {
+    if (activeInput === ActiveInput.First && !firstSelectedTime) {
+      dispatch(setFirstSelectedTime(getDefaultSelectedTime(useAMPM)));
+    } else if (activeInput === ActiveInput.Second && !secondSelectedTime) {
+      dispatch(setSecondSelectedTime(getDefaultSelectedTime(useAMPM)));
     }
   }
 

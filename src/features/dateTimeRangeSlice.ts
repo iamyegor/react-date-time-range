@@ -12,35 +12,35 @@ import { getDefaultSelectedTime } from "../utils";
 
 interface DateTimeRangeState {
   draggedDate: DraggedDate;
-  firstDate: Date | null;
-  secondDate: Date | null;
-  currentMonth: Date;
-  hoveredDate: Date | null;
-  shadowSelectedDate: Date | null;
+  firstDate: string | null;
+  secondDate: string | null;
+  currentMonth: string;
+  hoveredDate: string | null;
+  shadowSelectedDate: string | null;
   isDragging: boolean;
   activeInput: ActiveInput;
   firstSelectedTime: Time | null;
   secondSelectedTime: Time | null;
   firstDateTimeIsGreater: boolean;
-  edgeSelectedDate: Date | null;
+  edgeSelectedDate: string | null;
   dashedBorderDirection: DashedBorderDirection;
-  bannedDates: Date[];
+  bannedDates: string[];
   useAMPM: boolean;
-  minDate?: Date;
-  maxDate?: Date;
+  minDate: string | null;
+  maxDate: string | null;
   minTimeIn24Hours?: TimeIn24HourFormat;
   dateChangedWhileDragging: boolean;
-  showDateTime: boolean;
+  isDateTimeShown: boolean;
 }
 
 const initialState: DateTimeRangeState = {
   minTimeIn24Hours: undefined,
-  maxDate: undefined,
-  minDate: undefined,
+  maxDate: null,
+  minDate: null,
   draggedDate: DraggedDate.First,
   firstDate: null,
   secondDate: null,
-  currentMonth: new Date(),
+  currentMonth: new Date().toDateString(),
   hoveredDate: null,
   shadowSelectedDate: null,
   isDragging: false,
@@ -53,18 +53,18 @@ const initialState: DateTimeRangeState = {
   bannedDates: [],
   useAMPM: false,
   dateChangedWhileDragging: false,
-  showDateTime: false,
+  isDateTimeShown: false,
 };
 
 const slice = createSlice({
   name: "dateTimeRange",
   initialState,
   reducers: {
-    setShowDateTime: (
+    setIsDateTimeShown: (
       state: DateTimeRangeState,
       action: PayloadAction<boolean>
     ) => {
-      state.showDateTime = action.payload;
+      state.isDateTimeShown = action.payload;
     },
     setDraggedDate: (
       state: DateTimeRangeState,
@@ -72,35 +72,49 @@ const slice = createSlice({
     ) => {
       state.draggedDate = action.payload;
     },
-    setFirstDate: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date | null>
-    ) => {
-      state.firstDate = action.payload;
+    setFirstDate: {
+      reducer: (
+        state: DateTimeRangeState,
+        action: PayloadAction<string | null>
+      ) => {
+        state.firstDate = action.payload;
+      },
+      prepare: (date: Date | null) => getPayloadAsStringOrNull(date),
     },
-    setSecondDate: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date | null>
-    ) => {
-      state.secondDate = action.payload;
+    setSecondDate: {
+      reducer: (
+        state: DateTimeRangeState,
+        action: PayloadAction<string | null>
+      ) => {
+        state.secondDate = action.payload;
+      },
+      prepare: (date: Date | null) => getPayloadAsStringOrNull(date),
     },
-    setCurrentMonth: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date>
-    ) => {
-      state.currentMonth = action.payload;
+    setCurrentMonth: {
+      reducer: (state: DateTimeRangeState, action: PayloadAction<string>) => {
+        state.currentMonth = action.payload;
+      },
+      prepare: (date: Date) => ({
+        payload: date?.toDateString(),
+      }),
     },
-    setHoveredDate: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date | null>
-    ) => {
-      state.hoveredDate = action.payload;
+    setHoveredDate: {
+      reducer: (
+        state: DateTimeRangeState,
+        action: PayloadAction<string | null>
+      ) => {
+        state.hoveredDate = action.payload;
+      },
+      prepare: (date: Date | null) => getPayloadAsStringOrNull(date),
     },
-    setShadowSelectedDate: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date | null>
-    ) => {
-      state.shadowSelectedDate = action.payload;
+    setShadowSelectedDate: {
+      reducer: (
+        state: DateTimeRangeState,
+        action: PayloadAction<string | null>
+      ) => {
+        state.shadowSelectedDate = action.payload;
+      },
+      prepare: (date: Date | null) => getPayloadAsStringOrNull(date),
     },
     setIsDragging: (
       state: DateTimeRangeState,
@@ -138,11 +152,14 @@ const slice = createSlice({
     ) => {
       state.firstDateTimeIsGreater = action.payload;
     },
-    setEdgeSelectedDate: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date | null>
-    ) => {
-      state.edgeSelectedDate = action.payload;
+    setEdgeSelectedDate: {
+      reducer: (
+        state: DateTimeRangeState,
+        action: PayloadAction<string | null>
+      ) => {
+        state.edgeSelectedDate = action.payload;
+      },
+      prepare: (date: Date | null) => getPayloadAsStringOrNull(date),
     },
     setDashedBorderDirection: (
       state: DateTimeRangeState,
@@ -150,26 +167,34 @@ const slice = createSlice({
     ) => {
       state.dashedBorderDirection = action.payload;
     },
-    setBannedDates: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date[]>
-    ) => {
-      state.bannedDates = action.payload;
+    setBannedDates: {
+      reducer: (state: DateTimeRangeState, action: PayloadAction<string[]>) => {
+        state.bannedDates = action.payload;
+      },
+      prepare: (dates: Date[]) => ({
+        payload: dates.map((date) => date.toDateString()),
+      }),
     },
     setUseAMPM: (state: DateTimeRangeState, action: PayloadAction<boolean>) => {
       state.useAMPM = action.payload;
     },
-    setMinDate: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date | undefined>
-    ) => {
-      state.minDate = action.payload;
+    setMinDate: {
+      reducer: (
+        state: DateTimeRangeState,
+        action: PayloadAction<string | null>
+      ) => {
+        state.minDate = action.payload;
+      },
+      prepare: (date: Date | null) => getPayloadAsStringOrNull(date),
     },
-    setMaxDate: (
-      state: DateTimeRangeState,
-      action: PayloadAction<Date | undefined>
-    ) => {
-      state.maxDate = action.payload;
+    setMaxDate: {
+      reducer: (
+        state: DateTimeRangeState,
+        action: PayloadAction<string | null>
+      ) => {
+        state.maxDate = action.payload;
+      },
+      prepare: (date: Date | null) => getPayloadAsStringOrNull(date),
     },
     setMinTimeIn24Hours: (
       state: DateTimeRangeState,
@@ -179,7 +204,7 @@ const slice = createSlice({
     },
     setDateBasedOnActiveInput: (
       state: DateTimeRangeState,
-      action: PayloadAction<Date>
+      action: PayloadAction<string>
     ) => {
       if (state.activeInput === ActiveInput.First) {
         state.firstDate = action.payload;
@@ -199,6 +224,10 @@ const slice = createSlice({
     },
   },
 });
+
+function getPayloadAsStringOrNull(date: Date | null) {
+  return { payload: date?.toDateString() || null };
+}
 
 export default slice.reducer;
 export const {
@@ -223,47 +252,63 @@ export const {
   setMinTimeIn24Hours,
   setDateBasedOnActiveInput,
   setDefaultTimeIfNotSet,
-  setShowDateTime,
+  setIsDateTimeShown,
 } = slice.actions;
 
-const selectDateTimeRangeState = (state: RootState) => state;
-export const selectShowDateTime = (state: RootState) =>
-  selectDateTimeRangeState(state).showDateTime;
+const getDateTimeRangeState = (state: RootState) => state;
+export const selectIsDateTimeShown = (state: RootState) =>
+  getDateTimeRangeState(state).isDateTimeShown;
 export const selectMinTimeIn24Hours = (state: RootState) =>
-  selectDateTimeRangeState(state).minTimeIn24Hours;
-export const selectMaxDate = (state: RootState) =>
-  selectDateTimeRangeState(state).maxDate;
-export const selectMinDate = (state: RootState) =>
-  selectDateTimeRangeState(state).minDate;
+  getDateTimeRangeState(state).minTimeIn24Hours;
+export const selectMaxDate = (state: RootState) => {
+  const maxDate = getDateTimeRangeState(state).maxDate;
+  return maxDate ? new Date(maxDate) : null;
+};
+export const selectMinDate = (state: RootState) => {
+  const minDate = getDateTimeRangeState(state).minDate;
+  return minDate ? new Date(minDate) : null;
+};
 export const selectDraggedDate = (state: RootState) =>
-  selectDateTimeRangeState(state).draggedDate;
-export const selectFirstDate = (state: RootState) =>
-  selectDateTimeRangeState(state).firstDate;
-export const selectSecondDate = (state: RootState) =>
-  selectDateTimeRangeState(state).secondDate;
+  getDateTimeRangeState(state).draggedDate;
+export const selectFirstDate = (state: RootState) => {
+  const firstDate = getDateTimeRangeState(state).firstDate;
+  return firstDate ? new Date(firstDate) : null;
+};
+export const selectSecondDate = (state: RootState) => {
+  const secondDate = getDateTimeRangeState(state).secondDate;
+  return secondDate ? new Date(secondDate) : null;
+};
 export const selectCurrentMonth = (state: RootState) =>
-  selectDateTimeRangeState(state).currentMonth;
-export const selectHoveredDate = (state: RootState) =>
-  selectDateTimeRangeState(state).hoveredDate;
-export const selectShadowSelectedDate = (state: RootState) =>
-  selectDateTimeRangeState(state).shadowSelectedDate;
+  new Date(getDateTimeRangeState(state).currentMonth);
+export const selectHoveredDate = (state: RootState) => {
+  const hoveredDate = getDateTimeRangeState(state).hoveredDate;
+  return hoveredDate ? new Date(hoveredDate) : null;
+};
+export const selectShadowSelectedDate = (state: RootState) => {
+  const shadowSelectedDate = getDateTimeRangeState(state).shadowSelectedDate;
+  return shadowSelectedDate ? new Date(shadowSelectedDate) : null;
+};
 export const selectIsDragging = (state: RootState) =>
-  selectDateTimeRangeState(state).isDragging;
+  getDateTimeRangeState(state).isDragging;
 export const selectActiveInput = (state: RootState) =>
-  selectDateTimeRangeState(state).activeInput;
+  getDateTimeRangeState(state).activeInput;
 export const selectFirstSelectedTime = (state: RootState) =>
-  selectDateTimeRangeState(state).firstSelectedTime;
+  getDateTimeRangeState(state).firstSelectedTime;
 export const selectSecondSelectedTime = (state: RootState) =>
-  selectDateTimeRangeState(state).secondSelectedTime;
+  getDateTimeRangeState(state).secondSelectedTime;
 export const selectFirstDateTimeIsGreater = (state: RootState) =>
-  selectDateTimeRangeState(state).firstDateTimeIsGreater;
-export const selectEdgeSelectedDate = (state: RootState) =>
-  selectDateTimeRangeState(state).edgeSelectedDate;
+  getDateTimeRangeState(state).firstDateTimeIsGreater;
+export const selectEdgeSelectedDate = (state: RootState) => {
+  const edgeSelectedDate = getDateTimeRangeState(state).edgeSelectedDate;
+  return edgeSelectedDate ? new Date(edgeSelectedDate) : null;
+};
 export const selectDashedBorderDirection = (state: RootState) =>
-  selectDateTimeRangeState(state).dashedBorderDirection;
-export const selectBannedDates = (state: RootState) =>
-  selectDateTimeRangeState(state).bannedDates;
+  getDateTimeRangeState(state).dashedBorderDirection;
+export const selectBannedDates = (state: RootState) => {
+  const bannedDates = getDateTimeRangeState(state).bannedDates;
+  return bannedDates.map((date) => new Date(date));
+};
 export const selectUseAMPM = (state: RootState) =>
-  selectDateTimeRangeState(state).useAMPM;
+  getDateTimeRangeState(state).useAMPM;
 export const selectDateChangedWhileDragging = (state: RootState) =>
-  selectDateTimeRangeState(state).dateChangedWhileDragging;
+  getDateTimeRangeState(state).dateChangedWhileDragging;

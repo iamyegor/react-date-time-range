@@ -32,15 +32,15 @@ interface DateTimeRangeProps {
   bannedDates?: Date[];
   useAMPM?: boolean;
   inputText: { start: string; end: string };
-  minDate?: Date;
-  maxDate?: Date;
-  minTime?: Date;
+  minDate: Date | null;
+  maxDate: Date | null;
+  minTime: Date | null;
 }
 
 export default function DateTimeRange({
-  minTime,
-  maxDate,
-  minDate,
+  minTime = null,
+  maxDate = null,
+  minDate = null,
   bannedDates = [],
   useAMPM = false,
   inputText,
@@ -48,7 +48,7 @@ export default function DateTimeRange({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setMinDate(minDate?.toISOString()));
+    dispatch(setMinDate(minDate));
     dispatch(setMaxDate(maxDate));
     dispatch(setBannedDates(bannedDates));
     dispatch(setUseAMPM(useAMPM));
@@ -61,7 +61,7 @@ export default function DateTimeRange({
   }, []);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { isVisible: showDateTime, setIsVisible: setShowDateTime } =
+  const { isVisible: isDateTimeShown, setIsVisible: setIsDateTimeShown } =
     useOutsideClick(containerRef.current);
   const [isFirstDateInvalid, setIsFirstDateInvalid] = useState<boolean>(false);
   const [isSecondDateInvalid, setIsSecondDateInvalid] =
@@ -75,14 +75,14 @@ export default function DateTimeRange({
     useIsTimeLessThanMinTime();
 
   useEffect(() => {
-    if (!showDateTime) {
+    if (!isDateTimeShown) {
       dispatch(setActiveInput(ActiveInput.None));
     }
-  }, [showDateTime]);
+  }, [isDateTimeShown]);
 
   function handleInputFocus(input: ActiveInput) {
     dispatch(setActiveInput(input));
-    setShowDateTime(true);
+    setIsDateTimeShown(true);
   }
 
   const activeInput = useAppSelector(selectActiveInput);
@@ -138,7 +138,7 @@ export default function DateTimeRange({
           />
         </div>
         <CSSTransition
-          in={showDateTime}
+          in={isDateTimeShown}
           timeout={200}
           classNames="date-time"
           unmountOnExit
