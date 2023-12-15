@@ -1,7 +1,11 @@
 import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
-import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider.tsx";
+import { useAppSelector } from "../app/hooks.ts";
 import calendarIcon from "../assets/icons/calendar.svg";
+import {
+  selectFirstDateTimeIsGreater,
+  selectUseAMPM,
+} from "../features/dateTimeRangeSlice.ts";
 import { getDateTimePlaceholder } from "../globals.ts";
 import { Time } from "../types.tsx";
 import DateTimeInput from "./DateTimeInput.tsx";
@@ -40,14 +44,15 @@ function DateTimeContainer({
   onFocus,
   isActive,
 }: DateTimeConatinerProps) {
+  const [inputValue, setInputValue] = useState<string>("");
+  const firstDateTimeIsGreater = useAppSelector(selectFirstDateTimeIsGreater);
+
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
     useState<boolean>(false);
   const hiddenTextRef = useRef<HTMLLabelElement>(null);
-  const [inputValue, setInputValue] = useState<string>("");
-  const { firstDateTimeIsGreater } = useDateTimeRange();
-  const { useAMPM } = useDateTimeRange();
+  const useAMPM = useAppSelector(selectUseAMPM);
 
   useEffect(() => {
     if (hiddenTextRef.current) {

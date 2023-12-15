@@ -1,6 +1,7 @@
 import { isValid } from "date-fns";
 import { KeyboardEvent, useEffect, useRef } from "react";
-import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
+import { useAppSelector } from "../app/hooks";
+import { selectUseAMPM } from "../features/dateTimeRangeSlice";
 import {
   DATE_PLACEHOLDER,
   TIME_PLACEHOLDER_24,
@@ -35,7 +36,8 @@ function DateTimeInput({
   value,
   onValueChange,
 }: DateTimeInputProps) {
-  const { useAMPM } = useDateTimeRange();
+  const useAMPM = useAppSelector(selectUseAMPM);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {

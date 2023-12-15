@@ -1,6 +1,7 @@
 import { format, isSameMonth } from "date-fns";
 import { useEffect, useState } from "react";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
+import { useAppSelector } from "../app/hooks";
+import { selectMaxDate, selectMinDate } from "../features/dateTimeRangeSlice";
 import LeftArrow from "./LeftArrow";
 import RightArrow from "./RightArrow";
 
@@ -17,7 +18,8 @@ export default function Header({
 }: HeaderProps) {
   const [leftArrowDisabled, setLeftArrowDisabled] = useState<boolean>(false);
   const [rightArrowDisabled, setRightArrowDisabled] = useState<boolean>(false);
-  const { minDate, maxDate } = useDateTimeRange();
+  const minDate = useAppSelector(selectMinDate);
+  const maxDate = useAppSelector(selectMaxDate);
 
   useEffect(() => {
     if (minDate && isSameMonth(currentMonth, minDate)) {

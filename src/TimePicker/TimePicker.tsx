@@ -1,7 +1,20 @@
 import { startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
-import { useDateTimeRange } from "../Calendar/DateTimeRangeProvider";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { hours12, hours24, minutes } from "../constants";
+import {
+  selectActiveInput,
+  selectFirstDate,
+  selectFirstSelectedTime,
+  selectMinTimeIn24Hours,
+  selectSecondDate,
+  selectSecondSelectedTime,
+  selectUseAMPM,
+  setFirstDate,
+  setFirstSelectedTime,
+  setSecondDate,
+  setSecondSelectedTime,
+} from "../features/dateTimeRangeSlice";
 import useDisabledHours from "../hooks/useDisabledHours";
 import useDisabledMinutes from "../hooks/useDisabledMinutes";
 import { ActiveInput, Time } from "../types";
@@ -14,19 +27,15 @@ import Selection from "./Selection";
 const periods = ["AM", "PM"];
 
 function TimePicker() {
-  const {
-    firstDate,
-    onFirstDateChange,
-    secondDate,
-    onSecondDateChange,
-    firstSelectedTime,
-    secondSelectedTime,
-    onFirstSelectedTimeChange,
-    onSecondSelectedTimeChange,
-    activeInput,
-    useAMPM,
-    minTimeIn24Hours,
-  } = useDateTimeRange();
+  const dispatch = useAppDispatch();
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+  const activeInput = useAppSelector(selectActiveInput);
+  const firstSelectedTime = useAppSelector(selectFirstSelectedTime);
+  const secondSelectedTime = useAppSelector(selectSecondSelectedTime);
+  const useAMPM = useAppSelector(selectUseAMPM);
+  const minTimeIn24Hours = useAppSelector(selectMinTimeIn24Hours);
+
   const [selectedTime, setSelectedTime] = useState<Time | null>(null);
   const disabledHours = useDisabledHours(
     minTimeIn24Hours,
@@ -52,13 +61,13 @@ function TimePicker() {
       activeInput === ActiveInput.First &&
       !isTimeEqual(selectedTime, firstSelectedTime)
     ) {
-      onFirstSelectedTimeChange(selectedTime);
+      dispatch(setFirstSelectedTime(selectedTime));
       setFirstDateIfNotSet();
     } else if (
       activeInput === ActiveInput.Second &&
       !isTimeEqual(selectedTime, secondSelectedTime)
     ) {
-      onSecondSelectedTimeChange(selectedTime);
+      dispatch(setSecondSelectedTime(selectedTime));
       setSecondDateIfNotSet();
     }
   }, [selectedTime]);
@@ -69,13 +78,13 @@ function TimePicker() {
 
   function setFirstDateIfNotSet() {
     if (!firstDate) {
-      onFirstDateChange(startOfDay(new Date()));
+      dispatch(setFirstDate(startOfDay(new Date())));
     }
   }
 
   function setSecondDateIfNotSet() {
     if (!secondDate) {
-      onSecondDateChange(startOfDay(new Date()));
+      dispatch(setSecondDate(startOfDay(new Date())));
     }
   }
 

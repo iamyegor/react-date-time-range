@@ -1,8 +1,10 @@
-import { useDateTimeRange } from "./DateTimeRangeProvider";
+import { useAppSelector } from "../app/hooks";
+import { selectFirstDate, selectSecondDate } from "../features/dateTimeRangeSlice";
 import HighlightBase from "./HighlightBase";
 
 export default function Highlight({ day }: { day: Date }) {
-  const { firstDate, secondDate } = useDateTimeRange();
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
 
   return (
     firstDate &&

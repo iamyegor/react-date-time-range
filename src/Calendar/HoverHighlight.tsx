@@ -1,10 +1,19 @@
+import { useAppSelector } from "../app/hooks";
+import {
+  selectActiveInput,
+  selectFirstDate,
+  selectHoveredDate,
+  selectSecondDate
+} from "../features/dateTimeRangeSlice";
 import { ActiveInput } from "../types";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 import HighlightBase from "./HighlightBase";
 
 export default function HoverHighlight({ day }: { day: Date }) {
-  const { firstDate, secondDate, hoveredDate, activeInput } =
-    useDateTimeRange();
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+  const hoveredDate = useAppSelector(selectHoveredDate);
+  const activeInput = useAppSelector(selectActiveInput);
+
   let startDate = null;
   let endDate = null;
 

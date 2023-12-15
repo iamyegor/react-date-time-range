@@ -8,8 +8,6 @@ import {
   startOfMonth,
   subDays,
 } from "date-fns";
-import { ActiveInput, DashedBorderDirection } from "../types";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 import { useAppSelector } from "../app/hooks";
 import {
   selectActiveInput,
@@ -22,6 +20,7 @@ import {
   selectMinDate,
   selectSecondDate,
 } from "../features/dateTimeRangeSlice";
+import { ActiveInput, DashedBorderDirection } from "../types";
 
 const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
 const BORDER_LEFT = "border-l-2 rounded-l-full left-[6px]";
