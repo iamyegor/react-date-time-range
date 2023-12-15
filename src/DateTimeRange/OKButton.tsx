@@ -1,12 +1,29 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  selectActiveInput,
+  selectFirstDate,
+  selectFirstSelectedTime,
+  selectSecondDate,
+  selectSecondSelectedTime,
+  setActiveInput,
+  setShowDateTime,
+} from "../features/dateTimeRangeSlice";
+import { ActiveInput } from "../types";
 import "./styles/OKButton.css";
 
 interface OKButtonProps {
   children: ReactNode;
-  onClick: () => void;
 }
 
-export default function OKButton({ children, onClick }: OKButtonProps) {
+export default function OKButton({ children }: OKButtonProps) {
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+  const firstSelectedTime = useAppSelector(selectFirstSelectedTime);
+  const secondSelectedTime = useAppSelector(selectSecondSelectedTime);
+  const activeInput = useAppSelector(selectActiveInput);
+  const dispatch = useAppDispatch();
+
   const timer = useRef<NodeJS.Timeout | null>(null);
   const [isClicked, setIsClicked] = useState(false);
 
@@ -24,15 +41,33 @@ export default function OKButton({ children, onClick }: OKButtonProps) {
     }
   }, [isClicked]);
 
-  function handleButtonClick() {
+  function handleClick() {
     setIsClicked(true);
-    onClick();
+
+    const areFirstDateAndTimeSelected = firstDate && firstSelectedTime;
+    const areSecondDateAndTimeSelected = secondDate && secondSelectedTime;
+
+    if (!areFirstDateAndTimeSelected && !areSecondDateAndTimeSelected) {
+      dispatch(setShowDateTime(false));
+    } else if (
+      activeInput === ActiveInput.First &&
+      !areSecondDateAndTimeSelected
+    ) {
+      dispatch(setActiveInput(ActiveInput.Second));
+    } else if (
+      activeInput === ActiveInput.Second &&
+      !areFirstDateAndTimeSelected
+    ) {
+      dispatch(setActiveInput(ActiveInput.First));
+    } else {
+      dispatch(setShowDateTime(false));
+    }
   }
 
   return (
     <button
       className="flex flex-1 items-center justify-end pr-5 py-2"
-      onClick={() => handleButtonClick()}
+      onClick={() => handleClick()}
     >
       <p
         className={`p-0.5 px-3 flex justify-center items-center transition-all

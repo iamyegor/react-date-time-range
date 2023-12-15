@@ -2,11 +2,7 @@ import Calendar from "../Calendar/Calendar";
 import TimePicker from "../TimePicker/TimePicker";
 import OKButton from "./OKButton";
 
-interface DateTimeProps {
-  onOkButtonClick: () => void;
-}
-
-export default function DateTime({ onOkButtonClick }: DateTimeProps) {
+export default function DateTime() {
   return (
     <div
       className="border border-gray-400 rounded-md shadow-md bg-white 
@@ -19,7 +15,7 @@ export default function DateTime({ onOkButtonClick }: DateTimeProps) {
         <TimePicker />
       </div>
       <hr />
-      <OKButton onClick={() => onOkButtonClick()}>OK</OKButton>
+      <OKButton>OK</OKButton>
     </div>
   );
 }

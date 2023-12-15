@@ -14,33 +14,33 @@ import "./styles/DateTimeContainer.css";
 interface DateTimeConatinerProps {
   text: string;
   date: Date | null;
-  onDateChange: (date: Date | null) => void;
+  updateDate: (date: Date | null) => void;
   time: Time | null;
-  onTimeChange: (time: Time | null) => void;
+  updateTime: (time: Time | null) => void;
   onFocus: () => void;
   isActive: boolean;
   testid?: string;
   isTimeLessThanMinTime: boolean;
   isDateInvalid: boolean;
-  onIsDateInvalidChange: (date: boolean) => void;
+  updateIsDateInvalid: (date: boolean) => void;
   isTimeInvalid: boolean;
-  onIsTimeInvalidChange: (date: boolean) => void;
+  updateIsTimeInvalid: (date: boolean) => void;
   isDateLessThanMinDate: boolean;
 }
 
 function DateTimeContainer({
   isDateLessThanMinDate,
   isTimeInvalid,
-  onIsTimeInvalidChange,
+  updateIsTimeInvalid,
   isDateInvalid,
-  onIsDateInvalidChange,
+  updateIsDateInvalid,
   isTimeLessThanMinTime,
   testid = "date-time-container",
   text,
   date,
-  onDateChange,
+  updateDate,
   time,
-  onTimeChange,
+  updateTime,
   onFocus,
   isActive,
 }: DateTimeConatinerProps) {
@@ -146,14 +146,14 @@ function DateTimeContainer({
           <DateTimeInput
             date={date}
             time={time}
-            onDateChange={onDateChange}
-            onTimeChange={onTimeChange}
+            onDateChange={updateDate}
+            onTimeChange={updateTime}
             value={inputValue}
             onValueChange={handleValueChange}
             isDateInvalid={isDateInvalid}
-            onIsDateInvalidChange={onIsDateInvalidChange}
+            onIsDateInvalidChange={updateIsDateInvalid}
             isTimeInvalid={isTimeInvalid}
-            onIsTimeInvalidChange={onIsTimeInvalidChange}
+            onIsTimeInvalidChange={updateIsTimeInvalid}
           />
         )}
         <img src={calendarIcon} className=" absolute right-2 w-5 h-5" />

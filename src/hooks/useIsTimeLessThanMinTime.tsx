@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
+import { useAppSelector } from "../app/hooks";
+import {
+  selectFirstSelectedTime,
+  selectMinTimeIn24Hours,
+  selectSecondSelectedTime,
+} from "../features/dateTimeRangeSlice";
 import { isTimeLesser } from "../utils";
-import { Time } from "../types";
 
-export default function useIsTimeLessThanMinTime(
-  firstSelectedTime: Time | null,
-  secondSelectedTime: Time | null,
-  minTimeIn24Hours: Time | null
-) {
+export default function useIsTimeLessThanMinTime() {
+  const firstSelectedTime = useAppSelector(selectFirstSelectedTime);
+  const secondSelectedTime = useAppSelector(selectSecondSelectedTime);
+  const minTimeIn24Hours = useAppSelector(selectMinTimeIn24Hours);
+
   const [isFirstTimeLessThanMinTime, setIsFirstTimeLessThanMinTime] =
     useState<boolean>(false);
   const [isSecondTimeLessThanMinTime, setIsSecondTimeLessThanMinTime] =
