@@ -1,9 +1,24 @@
 import classNames from "classnames";
 import { format, isEqual, isSameDay } from "date-fns";
 import { ReactElement } from "react";
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "../app/hooks";
+import {
+  selectBannedDates,
+  selectFirstDate,
+  selectIsDragging,
+  selectMaxDate,
+  selectMinDate,
+  selectSecondDate,
+  selectShadowSelectedDate,
+  setDateBasedOnActiveInput,
+  setDefaultTimeIfNotSet,
+  setDraggedDate,
+  setHoveredDate,
+  setIsDragging,
+} from "../features/dateTimeRangeSlice";
 import { DraggedDate } from "../types";
 import DashedBorder from "./DashedBorder";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 import Highlight from "./Highlight";
 import HoverHighlight from "./HoverHighlight";
 import "./styles/DayCell.css";
@@ -14,19 +29,15 @@ interface FilledCellProps {
 }
 
 function FilledCell({ day }: FilledCellProps): ReactElement {
-  const {
-    firstDate,
-    secondDate,
-    onDraggedDateChange,
-    handleCellClick,
-    onHoveredDateChange,
-    shadowSelectedDate,
-    isDragging,
-    onIsDraggingChange,
-    bannedDates,
-    minDate,
-    maxDate,
-  } = useDateTimeRange();
+  const dispatch = useAppDispatch();
+  const minDate = useSelector(selectMinDate);
+  const maxDate = useSelector(selectMaxDate);
+  const firstDate = useSelector(selectFirstDate);
+  const secondDate = useSelector(selectSecondDate);
+  const isDragging = useSelector(selectIsDragging);
+  const shadowSelectedDate = useSelector(selectShadowSelectedDate);
+  const bannedDates = useSelector(selectBannedDates);
+
   function isDateOutsideRange() {
     return (minDate && day < minDate) || (maxDate && day > maxDate);
   }
@@ -64,11 +75,11 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function handleMouseDown() {
     if (firstDate && isEqual(firstDate, day)) {
-      onIsDraggingChange(true);
-      onDraggedDateChange(DraggedDate.First);
+      dispatch(setIsDragging(true));
+      dispatch(setDraggedDate(DraggedDate.First));
     } else if (secondDate && isEqual(secondDate, day)) {
-      onIsDraggingChange(true);
-      onDraggedDateChange(DraggedDate.Second);
+      dispatch(setIsDragging(true));
+      dispatch(setDraggedDate(DraggedDate.Second));
     }
   }
 
@@ -76,9 +87,10 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     return isDragging ? "cursor-grabbing" : "";
   }
 
-  function handleClick() {
+  function handleCellClick() {
     if (!isDateOutsideRange()) {
-      handleCellClick(day);
+      dispatch(setDateBasedOnActiveInput(day));
+      dispatch(setDefaultTimeIfNotSet());
     }
   }
 
@@ -86,9 +98,9 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
     <div
       className={`flex-1 py-1 flex justify-center items-center group relative
       ${getCursorWhenDragging()}`}
-      onClick={() => handleClick()}
-      onMouseEnter={() => onHoveredDateChange(day)}
-      onMouseLeave={() => onHoveredDateChange(null)}
+      onClick={() => handleCellClick()}
+      onMouseEnter={() => dispatch(setHoveredDate(day))}
+      onMouseLeave={() => dispatch(setHoveredDate(null))}
       onMouseDown={handleMouseDown}
       data-testid="filled-cell"
     >
