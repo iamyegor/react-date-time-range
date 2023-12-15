@@ -139,7 +139,7 @@ export default function DateTimeRange({
       maxDate={maxDate}
       minTimeIn24Hours={
         minTime
-          ? convertTo24HourFormat(formatToTime(minTime, false))
+          ? convertTo24HourFormat(formatToTime(minTime, useAMPM))
           : undefined
       }
     >

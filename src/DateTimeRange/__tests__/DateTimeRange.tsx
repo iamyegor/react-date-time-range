@@ -850,7 +850,8 @@ describe("DateTimeRange", () => {
     expectHoursToBeDisabled(hours - 12);
   });
 
-  it(`disables minutes if the minTime hour is PM and user has no (AM/PM) selected`, async () => {
+  it(`disables all minutes if the minTime hour is PM and user has no (AM/PM) 
+  selected`, async () => {
     const minutes = 23;
     const hours = 12;
     renderDateTimeRange({
@@ -862,7 +863,7 @@ describe("DateTimeRange", () => {
     expectMinutesToBeDisabled(60);
   });
 
-  it(`disables minutes if the current hour is less than the minTime hour for
+  it(`disables minutes if the current hour is equal to the minTime hour for
   AM/PM system when minTime hour is AM`, async () => {
     const minutes = 23;
     const hours = 7;
@@ -871,6 +872,22 @@ describe("DateTimeRange", () => {
       minTime: new Date(0, 0, 0, hours, minutes),
     });
     await clickFirstInput();
+    await clickHour(hours);
+
+    expectMinutesToBeDisabled(minutes);
+  });
+
+  it(`disables minutes if the current hour is equal to the minTime hour for AM/PM
+  system and minTime hour is 12 PM`, async () => {
+    const minutes = 23;
+    const hours = 12;
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+
+    await clickAMPMOption("PM");
     await clickHour(hours);
 
     expectMinutesToBeDisabled(minutes);

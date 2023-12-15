@@ -21,7 +21,15 @@ export function isTimeEqual(time1: Time | null, time2: Time | null) {
 }
 
 export function convertTo24HourFormat(time: Time): TimeIn24HourFormat {
-  const hours = time.ampm == "PM" ? time.hours + 12 : time.hours;
+  let hours = time.hours;
+
+  if (time.ampm === "PM") {
+    hours = hours === 12 ? 12 : hours + 12;
+  } else if (time.ampm === "AM") {
+    hours = hours === 12 ? 0 : hours;
+  } else {
+    hours = hours;
+  }
 
   return {
     hours,
@@ -63,10 +71,22 @@ export default function convertTo2DigitString(num: number) {
 
 export function formatToTime(date: Date, isAMPM: boolean): Time {
   if (isAMPM) {
+    let hours = date.getHours();
+    let ampm: "AM" | "PM" = "AM";
+
+    if (hours >= 12) {
+      ampm = "PM";
+      if (hours > 12) {
+        hours = hours - 12;
+      }
+    } else if (hours === 0) {
+      hours = 12;
+    }
+
     return {
-      hours: date.getHours() > 12 ? date.getHours() - 12 : date.getHours(),
+      hours: hours,
       minutes: date.getMinutes(),
-      ampm: date.getHours() < 12 ? "AM" : "PM",
+      ampm,
     };
   } else {
     return {
