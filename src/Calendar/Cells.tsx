@@ -7,8 +7,23 @@ import {
   startOfWeek,
 } from "date-fns";
 import { ReactElement, useEffect, useMemo, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  selectDraggedDate,
+  selectFirstDate,
+  selectHoveredDate,
+  selectIsDragging,
+  selectMaxDate,
+  selectMinDate,
+  selectSecondDate,
+  setDateChangedWhileDragging,
+  setDraggedDate,
+  setFirstDate,
+  setIsDragging,
+  setSecondDate,
+  setShadowSelectedDate,
+} from "../features/dateTimeRangeSlice";
 import { DraggedDate } from "../types";
-import { useDateTimeRange } from "./DateTimeRangeProvider";
 import WeekRow from "./WeekRow";
 
 interface CellsProps {
@@ -18,21 +33,15 @@ interface CellsProps {
 const DAYS_IN_A_WEEK = 7;
 
 function Cells({ currentMonth }: CellsProps): ReactElement {
-  const {
-    firstDate,
-    secondDate,
-    onFirstDateChange,
-    onSecondDateChange,
-    hoveredDate,
-    draggedDate,
-    onDraggedDateChange,
-    onShadowSelectedDateChange,
-    isDragging,
-    onIsDraggingChange,
-    onDateChangedWhileDraggingChange,
-    minDate,
-    maxDate,
-  } = useDateTimeRange();
+  const dispatch = useAppDispatch();
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+  const hoveredDate = useAppSelector(selectHoveredDate);
+  const draggedDate = useAppSelector(selectDraggedDate);
+  const isDragging = useAppSelector(selectIsDragging);
+  const minDate = useAppSelector(selectMinDate);
+  const maxDate = useAppSelector(selectMaxDate);
+
   const [firstDateBeforeDrag, setFirstDateBeforeDrag] = useState<Date | null>(
     null
   );
@@ -56,14 +65,14 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     }
 
     if (isDateOutsideRange(hoveredDate)) {
-      onIsDraggingChange(false);
+      dispatch(setIsDragging(false));
       return;
     }
 
     if (secondDate && hoveredDate > secondDate) {
       changeDragToSecondDate();
     } else {
-      onFirstDateChange(hoveredDate);
+      dispatch(setFirstDate(hoveredDate));
     }
   }
 
@@ -74,9 +83,9 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
   }
 
   function changeDragToSecondDate() {
-    onFirstDateChange(secondDate);
-    onSecondDateChange(hoveredDate);
-    onDraggedDateChange(DraggedDate.Second);
+    dispatch(setFirstDate(secondDate));
+    dispatch(setSecondDate(hoveredDate));
+    dispatch(setDraggedDate(DraggedDate.Second));
   }
 
   function handleSecondDateDrag() {
@@ -85,32 +94,32 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
     }
 
     if (isDateOutsideRange(hoveredDate)) {
-      onIsDraggingChange(false);
+      dispatch(setIsDragging(false));
       return;
     }
 
     if (firstDate && hoveredDate < firstDate) {
       changeDragToFirstDate();
     } else {
-      onSecondDateChange(hoveredDate);
+      dispatch(setSecondDate(hoveredDate));
     }
   }
 
   function changeDragToFirstDate() {
-    onSecondDateChange(firstDate);
-    onFirstDateChange(hoveredDate);
-    onDraggedDateChange(DraggedDate.First);
+    dispatch(setSecondDate(firstDate));
+    dispatch(setFirstDate(hoveredDate));
+    dispatch(setDraggedDate(DraggedDate.First));
   }
 
   useEffect(() => {
     if (hoveredDate && isDragging) {
       if (firstDateBeforeDrag) {
         if (!isEqual(firstDateBeforeDrag, hoveredDate)) {
-          onDateChangedWhileDraggingChange(true);
+          dispatch(setDateChangedWhileDragging(true));
         }
       } else if (secondDateBeforeDrag) {
         if (!isEqual(secondDateBeforeDrag, hoveredDate)) {
-          onDateChangedWhileDraggingChange(true);
+          dispatch(setDateChangedWhileDragging(true));
         }
       }
     }
@@ -119,13 +128,13 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
   useEffect(() => {
     if (isDragging) {
       if (draggedDate === DraggedDate.First) {
-        onShadowSelectedDateChange(firstDate);
+        dispatch(setShadowSelectedDate(firstDate));
       }
       if (draggedDate === DraggedDate.Second) {
-        onShadowSelectedDateChange(secondDate);
+        dispatch(setShadowSelectedDate(secondDate));
       }
     } else {
-      onShadowSelectedDateChange(null);
+      dispatch(setShadowSelectedDate(null));
     }
   }, [isDragging]);
 
@@ -137,7 +146,7 @@ function Cells({ currentMonth }: CellsProps): ReactElement {
       setFirstDateBeforeDrag(null);
       setSecondDateBeforeDrag(null);
 
-      onDateChangedWhileDraggingChange(false);
+      dispatch(setDateChangedWhileDragging(false));
     }
   }, [isDragging]);
 

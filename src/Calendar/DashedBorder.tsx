@@ -10,6 +10,18 @@ import {
 } from "date-fns";
 import { ActiveInput, DashedBorderDirection } from "../types";
 import { useDateTimeRange } from "./DateTimeRangeProvider";
+import { useAppSelector } from "../app/hooks";
+import {
+  selectActiveInput,
+  selectDashedBorderDirection,
+  selectEdgeSelectedDate,
+  selectFirstDate,
+  selectHoveredDate,
+  selectIsDragging,
+  selectMaxDate,
+  selectMinDate,
+  selectSecondDate,
+} from "../features/dateTimeRangeSlice";
 
 const BORDER_DASHED = "border-dashed border-t-2 border-b-2 border-gray-300";
 const BORDER_LEFT = "border-l-2 rounded-l-full left-[6px]";
@@ -18,17 +30,16 @@ const BORDER_LENGTHENED_LEFT = "-left-6";
 const BORDER_LENGTHENED_RIGHT = "-right-6";
 
 export default function DashedBorder({ day }: { day: Date }) {
-  const {
-    firstDate,
-    secondDate,
-    hoveredDate,
-    activeInput,
-    isDragging,
-    edgeSelectedDate,
-    dashedBorderDirection,
-    minDate,
-    maxDate,
-  } = useDateTimeRange();
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+  const hoveredDate = useAppSelector(selectHoveredDate);
+  const activeInput = useAppSelector(selectActiveInput);
+  const isDragging = useAppSelector(selectIsDragging);
+  const edgeSelectedDate = useAppSelector(selectEdgeSelectedDate);
+  const dashedBorderDirection = useAppSelector(selectDashedBorderDirection);
+  const minDate = useAppSelector(selectMinDate);
+  const maxDate = useAppSelector(selectMaxDate);
+
   function isDisabled() {
     if (hoveredDate) {
       return (
