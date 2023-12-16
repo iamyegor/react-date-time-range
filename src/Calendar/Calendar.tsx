@@ -1,5 +1,5 @@
 import { addMonths, isSameMonth, subMonths } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
@@ -18,8 +18,10 @@ import Header from "./Header";
 import "./styles/Calendar.css";
 
 const duration = 250;
+let rerenderCount = 0;
 
 function Calendar() {
+  rerenderCount++;
   const dispatch = useAppDispatch();
   const currentMonth = useAppSelector(selectCurrentMonth);
   const isDragging = useAppSelector(selectIsDragging);
@@ -27,7 +29,11 @@ function Calendar() {
   const firstDate = useAppSelector(selectFirstDate);
   const secondDate = useAppSelector(selectSecondDate);
 
-  const [isNext, setIsNext] = useState(true);
+  const prevMonthRef = useRef(currentMonth);
+  const isNext = useMemo(
+    () => currentMonth > prevMonthRef.current,
+    [currentMonth, prevMonthRef.current]
+  );
   const [cellsComponents, setCellsComponents] = useState<
     { id: string; element: JSX.Element }[]
   >([]);
@@ -41,9 +47,7 @@ function Calendar() {
       newCurrentMonth = secondDate;
     }
 
-    setIsNext(newCurrentMonth > currentMonth);
-
-    dispatch(setCurrentMonth(newCurrentMonth));
+    updateMonths(newCurrentMonth);
   }, [activeInput]);
 
   useEffect(() => {
@@ -67,6 +71,11 @@ function Calendar() {
     }
   }, [currentMonth]);
 
+  function updateMonths(newCurrentMonth: Date) {
+    prevMonthRef.current = currentMonth;
+    dispatch(setCurrentMonth(newCurrentMonth));
+  }
+
   function shouldUpdateCells() {
     if (isCellsFirstRender) {
       if (activeInput === ActiveInput.First && firstDate) {
@@ -79,13 +88,11 @@ function Calendar() {
   }
 
   function onPrevMonthClick() {
-    dispatch(setCurrentMonth(subMonths(currentMonth, 1)));
-    setIsNext(false);
+    updateMonths(subMonths(currentMonth, 1));
   }
 
   function onNextMonthClick() {
-    dispatch(setCurrentMonth(addMonths(currentMonth, 1)));
-    setIsNext(true);
+    updateMonths(addMonths(currentMonth, 1));
   }
 
   return (
