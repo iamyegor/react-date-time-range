@@ -1,3 +1,4 @@
+import { configureStore } from "@reduxjs/toolkit";
 import {
   cleanup,
   fireEvent,
@@ -18,9 +19,11 @@ import {
   subMonths,
 } from "date-fns";
 import { ReactNode } from "react";
+import { Provider } from "react-redux";
+import dateTimeRangeSlice from "../../features/dateTimeRangeSlice";
 import { DATE_PLACEHOLDER, getDateTimePlaceholder } from "../../globals";
-import DateTimeRange from "../DateTimeRange";
 import convertTo2DigitString from "../../utils";
+import DateTimeRange from "../DateTimeRange";
 
 Element.prototype.scrollTo = () => {};
 vi.mock("react-transition-group", () => {
@@ -39,9 +42,43 @@ vi.mock("react-transition-group", () => {
 });
 
 describe("DateTimeRange", () => {
+  let store: any;
+
   beforeEach(() => {
+    store = configureStore({
+      reducer: dateTimeRangeSlice,
+    });
     renderDateTimeRange({ useAMPM: true });
   });
+
+  afterEach(() => {
+    store.dispatch({ type: "RESET" });
+  });
+
+  function renderDateTimeRange({
+    useAMPM = false,
+    minDate,
+    maxDate,
+    minTime,
+  }: {
+    useAMPM?: boolean;
+    minDate?: Date;
+    maxDate?: Date;
+    minTime?: Date;
+  } = {}) {
+    cleanup();
+    return render(
+      <Provider store={store}>
+        <DateTimeRange
+          inputText={{ start: "Start Date", end: "End Date" }}
+          useAMPM={useAMPM}
+          minDate={minDate}
+          maxDate={maxDate}
+          minTime={minTime}
+        />
+      </Provider>
+    );
+  }
 
   async function clickHour(hour: number) {
     const hourOptions = screen.getAllByTestId("hour-option");
@@ -155,30 +192,7 @@ describe("DateTimeRange", () => {
     );
   }
 
-  function renderDateTimeRange({
-    useAMPM = false,
-    minDate,
-    maxDate,
-    minTime,
-  }: {
-    useAMPM?: boolean;
-    minDate?: Date;
-    maxDate?: Date;
-    minTime?: Date;
-  } = {}) {
-    cleanup();
-    return render(
-      <DateTimeRange
-        inputText={{ start: "Start Date", end: "End Date" }}
-        useAMPM={useAMPM}
-        minDate={minDate}
-        maxDate={maxDate}
-        minTime={minTime}
-      />
-    );
-  }
-
-  async function selectCell(cell: string) {
+  async function clickCell(cell: string) {
     const cells = screen.getByTestId("cells");
     const selectedDate = within(cells).getByText(cell);
     await userEvent.click(selectedDate);
@@ -387,7 +401,7 @@ describe("DateTimeRange", () => {
 
   it("updates input with selected date and default time when a date is chosen from the calendar", async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     const expectedInputValue = getInputValue(15);
 
@@ -417,7 +431,7 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
     expect(screen.queryByTestId("selected-cell")).toBeNull();
 
-    const selectedCell = await selectCell("15");
+    const selectedCell = await clickCell("15");
 
     expectOnlyCellIsSelected(selectedCell);
   });
@@ -425,7 +439,7 @@ describe("DateTimeRange", () => {
   it(`displays appropriate dashed border dates when first date is selected 
   and second input is active`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     expectDashedBorderToBeHidden();
 
@@ -438,7 +452,7 @@ describe("DateTimeRange", () => {
   it(`displays appropriate dashed border dates when second date is selected 
   and first input is active`, async () => {
     await clickSecondInput();
-    await selectCell("15");
+    await clickCell("15");
 
     expectDashedBorderToBeHidden();
 
@@ -451,10 +465,10 @@ describe("DateTimeRange", () => {
   it(`displays appropriate dashed border dates when both dates are selected 
   and second input is active`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("17");
+    await clickCell("17");
 
     await hoverCell("20");
 
@@ -464,10 +478,10 @@ describe("DateTimeRange", () => {
   it(`displays appropriate dashed border dates when both dates are selected 
   and first input is active`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("17");
+    await clickCell("17");
 
     await clickFirstInput();
     await hoverCell("12");
@@ -478,30 +492,28 @@ describe("DateTimeRange", () => {
   it(`removes the date from the second input and keeps the time when 
   user selects the first date that is greater than the second date`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("17");
+    await clickCell("17");
     await selectHour(7);
 
     await clickFirstInput();
-    await selectCell("20");
+    await clickCell("20");
 
-    within(screen.getByTestId("second-date-time-container")).getByDisplayValue(
-      DATE_PLACEHOLDER + " " + "07:00 AM"
-    );
+    expectSecondInputToHaveValue(DATE_PLACEHOLDER + " 07:00 AM");
   });
 
   it(`removes the second date highlight when user selects the first date 
   that is greater than the second date`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("17");
+    await clickCell("17");
 
     await clickFirstInput();
-    const selectedCell = await selectCell("20");
+    const selectedCell = await clickCell("20");
 
     expectOnlyCellIsSelected(selectedCell);
   });
@@ -509,50 +521,48 @@ describe("DateTimeRange", () => {
   it(`removes the date from the second input and keeps the time when user 
   selects the second date that is lesser than the first date`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("17");
+    await clickCell("17");
     await selectHour(7);
 
     await clickSecondInput();
-    await selectCell("10");
+    await clickCell("10");
 
-    within(screen.getByTestId("second-date-time-container")).getByDisplayValue(
-      DATE_PLACEHOLDER + " " + "07:00 AM"
-    );
+    expectSecondInputToHaveValue(DATE_PLACEHOLDER + " 07:00 AM");
   });
 
   it(`removes the second date highlight when user selects the second date that 
   is lesser than the first date`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("17");
+    await clickCell("17");
 
     await clickSecondInput();
-    const selectedCell = await selectCell("10");
+    const selectedCell = await clickCell("10");
 
     expectOnlyCellIsSelected(selectedCell);
   });
 
   it(`displays highlight for dates between selected dates`, async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("19");
+    await clickCell("19");
 
     expectDatesHighlighted(["15", "16", "17", "18", "19"]);
   });
 
   it("highlight first and second date when user selects both", async () => {
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     await clickSecondInput();
-    await selectCell("19");
+    await clickCell("19");
 
     expectCellsToBeSelected(15, 19);
   });
@@ -573,7 +583,7 @@ describe("DateTimeRange", () => {
     expect(screen.getByTestId("prev-month-button")).toBeDisabled();
   });
 
-  it(`doesn't select date that is lesser that the min date when first input
+  it(`doesn't select date that is less that the min date when first input
   is active`, async () => {
     renderWithMinDate(15);
     await clickFirstInput();
@@ -584,12 +594,13 @@ describe("DateTimeRange", () => {
     expectFirstInputToHaveValue(getDateTimePlaceholder(true));
   });
 
-  it(`doesn't select date that is lesser that the min date when second input
+  it(`doesn't select date that is less that the min date when second input
   is active`, async () => {
     renderWithMinDate(15);
+    await clickFirstInput();
     await clickSecondInput();
 
-    await userEvent.click(getCell(14));
+    await clickCell("14");
 
     expect(getCell(14)).not.toHaveClass("selected-cell");
     expectSecondInputToHaveValue(getDateTimePlaceholder(true));
@@ -599,7 +610,7 @@ describe("DateTimeRange", () => {
   is hovered`, async () => {
     renderWithMinDate(15);
     await clickSecondInput();
-    await selectCell("16");
+    await clickCell("16");
 
     await clickFirstInput();
     await userEvent.hover(getCell(13));
@@ -610,7 +621,7 @@ describe("DateTimeRange", () => {
   when the first input is active`, async () => {
     renderWithMinDate(15);
     await clickFirstInput();
-    await selectCell("16");
+    await clickCell("16");
 
     const selectedCell = getCell(16);
     fireEvent.mouseDown(selectedCell);
@@ -627,7 +638,7 @@ describe("DateTimeRange", () => {
   when the second input is active`, async () => {
     renderWithMinDate(15);
     await clickSecondInput();
-    await selectCell("16");
+    await clickCell("16");
 
     fireEvent.mouseDown(getCell(16));
     fireEvent.mouseEnter(getCell(14));
@@ -663,7 +674,7 @@ describe("DateTimeRange", () => {
   is hovered`, async () => {
     renderWithMaxDate(15);
     await clickFirstInput();
-    await selectCell("14");
+    await clickCell("14");
 
     await clickSecondInput();
     await userEvent.hover(getCell(16));
@@ -674,7 +685,7 @@ describe("DateTimeRange", () => {
   when the first input is active`, async () => {
     renderWithMaxDate(15);
     await clickFirstInput();
-    await selectCell("15");
+    await clickCell("15");
 
     fireEvent.mouseDown(getCell(15));
     fireEvent.mouseEnter(getCell(16));
@@ -688,7 +699,7 @@ describe("DateTimeRange", () => {
   when the second input is active`, async () => {
     renderWithMaxDate(15);
     await clickSecondInput();
-    await selectCell("15");
+    await clickCell("15");
 
     fireEvent.mouseDown(getCell(15));
     fireEvent.mouseEnter(getCell(16));

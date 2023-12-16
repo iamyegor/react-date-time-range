@@ -1,15 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  selectFirstDate,
+  selectFirstSelectedTime,
+  selectSecondDate,
+  selectSecondSelectedTime,
+  setFirstDateTimeIsGreater,
+} from "../features/dateTimeRangeSlice";
 import { Time } from "../types";
 import { convertTo24HourFormat } from "../utils";
 
-export default function useFirstDateTimeIsGreater(
-  firstDate: Date | null,
-  secondDate: Date | null,
-  firstSelectedTime: Time | null,
-  secondSelectedTime: Time | null
-) {
-  const [firstDateTimeIsGreater, setFirstDateTimeIsGreater] =
-    useState<boolean>(false);
+export default function useFirstDateTimeIsGreater() {
+  const dispatch = useAppDispatch();
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+  const firstSelectedTime = useAppSelector(selectFirstSelectedTime);
+  const secondSelectedTime = useAppSelector(selectSecondSelectedTime);
 
   useEffect(() => {
     const firstDateIsGreater = isDateGreater(firstDate, secondDate);
@@ -20,9 +26,9 @@ export default function useFirstDateTimeIsGreater(
     );
 
     if (firstDateIsGreater || (datesAreEqual && firstTimeIsGreaterOrEqual)) {
-      setFirstDateTimeIsGreater(true);
+      dispatch(setFirstDateTimeIsGreater(true));
     } else {
-      setFirstDateTimeIsGreater(false);
+      dispatch(setFirstDateTimeIsGreater(false));
     }
   }, [firstDate, secondDate, firstSelectedTime, secondSelectedTime]);
 
@@ -51,6 +57,4 @@ export default function useFirstDateTimeIsGreater(
         firstTime.minutes >= secondTime.minutes)
     );
   }
-
-  return firstDateTimeIsGreater;
 }

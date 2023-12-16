@@ -4,10 +4,13 @@ import { useAppSelector } from "../app/hooks.ts";
 import calendarIcon from "../assets/icons/calendar.svg";
 import {
   selectFirstDateTimeIsGreater,
+  selectMinDate,
+  selectMinTimeIn24Hours,
   selectUseAMPM,
 } from "../features/dateTimeRangeSlice.ts";
 import { getDateTimePlaceholder } from "../globals.ts";
 import { Time } from "../types.tsx";
+import { isTimeLess } from "../utils.ts";
 import DateTimeInput from "./DateTimeInput.tsx";
 import "./styles/DateTimeContainer.css";
 
@@ -20,21 +23,17 @@ interface DateTimeConatinerProps {
   onFocus: () => void;
   isActive: boolean;
   testid?: string;
-  isTimeLessThanMinTime: boolean;
   isDateInvalid: boolean;
   updateIsDateInvalid: (date: boolean) => void;
   isTimeInvalid: boolean;
   updateIsTimeInvalid: (date: boolean) => void;
-  isDateLessThanMinDate: boolean;
 }
 
 function DateTimeContainer({
-  isDateLessThanMinDate,
   isTimeInvalid,
   updateIsTimeInvalid,
   isDateInvalid,
   updateIsDateInvalid,
-  isTimeLessThanMinTime,
   testid = "date-time-container",
   text,
   date,
@@ -45,14 +44,16 @@ function DateTimeContainer({
   isActive,
 }: DateTimeConatinerProps) {
   const [inputValue, setInputValue] = useState<string>("");
-  const firstDateTimeIsGreater = useAppSelector(selectFirstDateTimeIsGreater);
-
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textWidth, setTextWidth] = useState<number>(0);
   const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
     useState<boolean>(false);
   const hiddenTextRef = useRef<HTMLLabelElement>(null);
+
+  const firstDateTimeIsGreater = useAppSelector(selectFirstDateTimeIsGreater);
   const useAMPM = useAppSelector(selectUseAMPM);
+  const minTime = useAppSelector(selectMinTimeIn24Hours);
+  const minDate = useAppSelector(selectMinDate);
 
   useEffect(() => {
     if (hiddenTextRef.current) {
@@ -72,13 +73,16 @@ function DateTimeContainer({
   }
 
   function shouldTextBeOnTop() {
-    return (
+    if (
       isFocused ||
       date ||
       time ||
       isActive ||
       (inputValue && inputValue !== getDateTimePlaceholder(useAMPM))
-    );
+    ) {
+      return true;
+    }
+    return false;
   }
 
   function shouldHaveOutline() {
@@ -86,13 +90,24 @@ function DateTimeContainer({
   }
 
   function shouldInvalidateInput() {
-    return (
+    if (
       firstDateTimeIsGreater ||
-      isTimeLessThanMinTime ||
+      isTimeLess(time, minTime) ||
       isDateInvalid ||
       isTimeInvalid ||
-      isDateLessThanMinDate
-    );
+      isDateLess(date, minDate)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  function isDateLess(firstDate: Date | null, secondDate: Date | null) {
+    if (!firstDate || !secondDate) {
+      return false;
+    }
+
+    return firstDate < secondDate;
   }
 
   function handleValueChange(value: string) {

@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks.ts";
+import {
+  selectActiveInput,
+  setDashedBorderDirection,
+} from "../features/dateTimeRangeSlice.ts";
 import { ActiveInput, DashedBorderDirection } from "../types.tsx";
 
-export default function useCurrentDirection(
-  activeInput: ActiveInput,
-) {
-  const [currentDirection, setCurrentDirection] = useState<DashedBorderDirection>(
-    DashedBorderDirection.Left,
-  );
+export default function useCurrentDirection() {
+  const dispatch = useAppDispatch();
+  const activeInput = useAppSelector(selectActiveInput);
 
   useEffect(() => {
     if (activeInput === ActiveInput.First) {
-      setCurrentDirection(DashedBorderDirection.Left);
+      dispatch(setDashedBorderDirection(DashedBorderDirection.Left));
     } else {
-      setCurrentDirection(DashedBorderDirection.Right);
+      dispatch(setDashedBorderDirection(DashedBorderDirection.Right));
     }
   }, [activeInput]);
-
-  return currentDirection;
 }

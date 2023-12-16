@@ -21,7 +21,7 @@ import {
   setHoveredDate,
   setIsDragging,
   setSecondDate,
-  setSecondSelectedTime
+  setSecondSelectedTime,
 } from "../features/dateTimeRangeSlice";
 import { ActiveInput, DraggedDate } from "../types";
 import { getDefaultSelectedTime } from "../utils";
@@ -100,15 +100,31 @@ function FilledCell({ day }: FilledCellProps): ReactElement {
 
   function handleCellClick() {
     if (!isDateOutsideRange()) {
-      setDateBasedOnActiveInput(day);
+      setDatesBasedOnActiveInput(day);
       setDefaultTimeIfNotSet();
     }
   }
 
-  function setDateBasedOnActiveInput(day: Date) {
+  function setDatesBasedOnActiveInput(day: Date) {
     if (activeInput === ActiveInput.First) {
-      dispatch(setFirstDate(day));
+      setDatesBasedOnFirstInput(day);
     } else if (activeInput === ActiveInput.Second) {
+      setDatesBasedOnSecondInput(day);
+    }
+  }
+
+  function setDatesBasedOnFirstInput(day: Date) {
+    dispatch(setFirstDate(day));
+    if (secondDate && day > secondDate) {
+      dispatch(setSecondDate(null));
+    }
+  }
+
+  function setDatesBasedOnSecondInput(day: Date) {
+    if (firstDate && day < firstDate) {
+      dispatch(setFirstDate(day));
+      dispatch(setSecondDate(null));
+    } else {
       dispatch(setSecondDate(day));
     }
   }

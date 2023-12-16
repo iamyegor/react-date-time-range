@@ -11,7 +11,7 @@ const hours24 = Array.from({ length: 23 }, (_, i) =>
 );
 
 export default function useDisabledHours(
-  minTime: TimeIn24HourFormat | undefined,
+  minTime: TimeIn24HourFormat | null,
   selectedTime: Time | null,
   isAMPM: boolean
 ) {
@@ -39,17 +39,7 @@ export default function useDisabledHours(
     } else {
       setDisabledHours(hours24.slice(0, minTime.hours - 1));
     }
-    // const tempDisabledHours: string[] = [];
-    // for (let i = 1; i < minTime?.hours; i++) {
-    //   tempDisabledHours.push(convertTo2DigitString(i));
-    // }
-
-    // if (isAMPM && !tempDisabledHours.includes("12")) {
-    //   tempDisabledHours.push(convertTo2DigitString(12));
-    // }
-
-    // setDisabledHours(tempDisabledHours);
-  }, [minTime]);
+  }, [minTime, selectedTime]);
 
   return disabledHours;
 }

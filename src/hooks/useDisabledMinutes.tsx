@@ -4,7 +4,7 @@ import { Time, TimeIn24HourFormat } from "../types";
 import { convertTo24HourFormat } from "../utils";
 
 export default function useDisabledMinutes(
-  minTime: TimeIn24HourFormat | undefined,
+  minTime: TimeIn24HourFormat | null,
   selectedTime: Time | null
 ) {
   const [disabledMinutes, setDisabledMinutes] = useState<string[]>([]);

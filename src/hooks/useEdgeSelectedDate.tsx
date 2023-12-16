@@ -1,38 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks.ts";
+import {
+  selectDashedBorderDirection,
+  selectFirstDate,
+  selectSecondDate,
+  setEdgeSelectedDate,
+} from "../features/dateTimeRangeSlice.ts";
 import { DashedBorderDirection } from "../types.tsx";
 
-export default function useEdgeSelectedDate(
-  firstDate: Date | null,
-  secondDate: Date | null,
-  currentDirection: DashedBorderDirection,
-) {
-  const [edgeSelectedDate, setEdgeSelectedDate] = useState<Date | null>(null);
+export default function useEdgeSelectedDate() {
+  const dispatch = useAppDispatch();
+
+  const firstDate = useAppSelector(selectFirstDate);
+  const secondDate = useAppSelector(selectSecondDate);
+  const dashedBorderDirection = useAppSelector(selectDashedBorderDirection);
 
   useEffect(() => {
     if (firstDate && !secondDate) {
-      setEdgeSelectedDate(firstDate);
+      dispatch(setEdgeSelectedDate(firstDate));
     } else if (!firstDate && secondDate) {
-      setEdgeSelectedDate(secondDate);
+      dispatch(setEdgeSelectedDate(secondDate));
     }
 
-    if (currentDirection === DashedBorderDirection.Left) {
+    if (dashedBorderDirection === DashedBorderDirection.Left) {
       if (firstDate && secondDate) {
         if (firstDate < secondDate) {
-          setEdgeSelectedDate(firstDate);
+          dispatch(setEdgeSelectedDate(firstDate));
         } else if (firstDate > secondDate) {
-          setEdgeSelectedDate(secondDate);
+          dispatch(setEdgeSelectedDate(secondDate));
         }
       }
-    } else if (currentDirection === DashedBorderDirection.Right) {
+    } else if (dashedBorderDirection === DashedBorderDirection.Right) {
       if (firstDate && secondDate) {
         if (firstDate < secondDate) {
-          setEdgeSelectedDate(secondDate);
+          dispatch(setEdgeSelectedDate(secondDate));
         } else if (firstDate > secondDate) {
-          setEdgeSelectedDate(firstDate);
+          dispatch(setEdgeSelectedDate(firstDate));
         }
       }
     }
-  }, [firstDate, secondDate, currentDirection]);
-
-  return edgeSelectedDate;
+  }, [firstDate, secondDate, dashedBorderDirection]);
 }

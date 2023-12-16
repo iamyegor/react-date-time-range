@@ -48,7 +48,7 @@ export function convertToAMPMFormat(time: TimeIn24HourFormat): Time {
   };
 }
 
-export function isTimeLesser(time1: Time | null, time2: Time | null): boolean {
+export function isTimeLess(time1: Time | null, time2: Time | null): boolean {
   if (!time1 || !time2) {
     return false;
   }
