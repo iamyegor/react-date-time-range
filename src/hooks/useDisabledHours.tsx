@@ -1,45 +1,58 @@
 import { useEffect, useState } from "react";
-import { Time, TimeIn24HourFormat } from "../types";
-
-const hours12 = Array.from({ length: 11 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
-);
-hours12.unshift("12");
-
-const hours24 = Array.from({ length: 23 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
-);
+import { useAppSelector } from "../app/hooks";
+import { hours12, hours24 } from "../constants";
+import {
+  selectMaxTimeIn24Hours,
+  selectMinTimeIn24Hours,
+} from "../features/dateTimeRangeSlice";
+import { Time } from "../types";
 
 export default function useDisabledHours(
-  minTime: TimeIn24HourFormat | null,
   selectedTime: Time | null,
   isAMPM: boolean
 ) {
+  const minTime = useAppSelector(selectMinTimeIn24Hours);
+  const maxTime = useAppSelector(selectMaxTimeIn24Hours);
   const [disabledHours, setDisabledHours] = useState<string[]>([]);
 
   useEffect(() => {
+    setDisabledHours([
+      ...getDisabledHoursForMinTime(),
+      ...getDisabledHourForMaxTime(),
+    ]);
+  }, [minTime, maxTime, selectedTime]);
+
+  function getDisabledHoursForMinTime() {
     if (!minTime) {
-      return;
+      return [];
     }
 
     if (isAMPM) {
       if (selectedTime?.ampm === "PM") {
-        if (minTime.hours > 12) {
-          setDisabledHours(hours12.slice(0, minTime.hours - 12));
-        } else {
-          setDisabledHours([]);
-        }
+        return minTime.hours > 12 ? hours12.slice(0, minTime.hours - 12) : [];
       } else {
-        if (minTime.hours < 12) {
-          setDisabledHours(hours12.slice(0, minTime.hours));
-        } else {
-          setDisabledHours(hours12);
-        }
+        return minTime.hours > 12 ? hours12 : hours12.slice(0, minTime.hours);
       }
     } else {
-      setDisabledHours(hours24.slice(0, minTime.hours - 1));
+      return hours24.slice(0, minTime.hours - 1);
     }
-  }, [minTime, selectedTime]);
+  }
+
+  function getDisabledHourForMaxTime() {
+    if (!maxTime) {
+      return [];
+    }
+
+    if (isAMPM) {
+      if (selectedTime?.ampm === "PM") {
+        return maxTime.hours > 12 ? hours12.slice(maxTime.hours - 12 + 1) : hours12;
+      } else {
+        return maxTime.hours > 12 ? [] : hours12.slice(maxTime.hours + 1);
+      }
+    } else {
+      return hours24.slice(maxTime.hours);
+    }
+  }
 
   return disabledHours;
 }

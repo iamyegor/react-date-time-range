@@ -6,10 +6,11 @@ export default function App() {
     <div className="flex h-full pt-10 justify-center bg-sky-200">
       <DateTimeRange
         inputText={{ start: "Start date", end: "End date" }}
-        useAMPM={false}
+        useAMPM={true}
         minDate={new Date(2023, 11, 15)}
         // maxDate={new Date(2023, 11, 20)}
-        minTime={new Date(2023, 11, 12, 7, 23)}
+        // minTime={new Date(2023, 11, 12, 12, 23)}
+        maxTime={new Date(2023, 11, 12, 7, 23)}
       />
     </div>
   );

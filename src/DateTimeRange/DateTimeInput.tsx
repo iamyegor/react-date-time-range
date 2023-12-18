@@ -457,6 +457,7 @@ function DateTimeInput({
       onChange={() => {}}
       onSelect={highlightSection}
       onKeyDown={handleKeyDown}
+      data-testid="date-time-input"
     />
   );
 }

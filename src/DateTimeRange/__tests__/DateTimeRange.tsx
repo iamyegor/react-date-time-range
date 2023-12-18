@@ -1,29 +1,41 @@
-import { configureStore } from "@reduxjs/toolkit";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import {
-  addMonths,
-  differenceInCalendarDays,
-  endOfMonth,
-  endOfWeek,
-  format,
-  startOfMonth,
-  startOfWeek,
-  subMonths,
-} from "date-fns";
+import { addMonths, format, subMonths } from "date-fns";
 import { ReactNode } from "react";
-import { Provider } from "react-redux";
-import dateTimeRangeSlice from "../../features/dateTimeRangeSlice";
 import { DATE_PLACEHOLDER, getDateTimePlaceholder } from "../../globals";
 import convertTo2DigitString from "../../utils";
-import DateTimeRange from "../DateTimeRange";
+import {
+  clickAMPMOption,
+  clickCell,
+  clickFirstInput,
+  clickHour,
+  clickMinute,
+  clickSecondInput,
+  expectCellsToBeSelected,
+  expectDashedBorderAroundDates,
+  expectDashedBorderToBeHidden,
+  expectDatesHighlighted,
+  expectFirstInputToBeInvalid,
+  expectFirstInputToHaveValue,
+  expectHourToBeDisabled,
+  expectHourToBeEnabled,
+  expectHoursToBeDisabledInRange,
+  expectHoursToBeDisabledUpTo,
+  expectHoursToBeEnabledUpTo,
+  expectMinutesToBeDisabledInRange,
+  expectMinutesToBeDisabledUpTo,
+  expectMinutesToBeEnabled,
+  expectOnlyCellIsSelected,
+  expectSecondInputToBeInvalid,
+  expectSecondInputToHaveValue,
+  getCell,
+  getEmptyCellsFor,
+  getInputValue,
+  hoverCell,
+  renderDateTimeRange,
+  renderWithMaxDate,
+  renderWithMinDate,
+} from "../../test/helpers.tsx";
 
 Element.prototype.scrollTo = () => {};
 vi.mock("react-transition-group", () => {
@@ -42,230 +54,9 @@ vi.mock("react-transition-group", () => {
 });
 
 describe("DateTimeRange", () => {
-  let store: any;
-
   beforeEach(() => {
-    store = configureStore({
-      reducer: dateTimeRangeSlice,
-    });
     renderDateTimeRange({ useAMPM: true });
   });
-
-  afterEach(() => {
-    store.dispatch({ type: "RESET" });
-  });
-
-  function renderDateTimeRange({
-    useAMPM = false,
-    minDate,
-    maxDate,
-    minTime,
-  }: {
-    useAMPM?: boolean;
-    minDate?: Date;
-    maxDate?: Date;
-    minTime?: Date;
-  } = {}) {
-    cleanup();
-    return render(
-      <Provider store={store}>
-        <DateTimeRange
-          inputText={{ start: "Start Date", end: "End Date" }}
-          useAMPM={useAMPM}
-          minDate={minDate}
-          maxDate={maxDate}
-          minTime={minTime}
-        />
-      </Provider>
-    );
-  }
-
-  async function clickHour(hour: number) {
-    const hourOptions = screen.getAllByTestId("hour-option");
-
-    const hourElement = hourOptions.filter((option) => {
-      return option.textContent === convertTo2DigitString(hour);
-    })[0];
-
-    await userEvent.click(hourElement);
-  }
-
-  async function clickAMPMOption(option: string) {
-    const periodOptions = screen.getAllByTestId("period-option");
-    const AMPMOption = periodOptions.find(
-      (o) => o.textContent === option
-    ) as HTMLElement;
-    await userEvent.click(AMPMOption);
-  }
-
-  function expectFirstInputToBeInvalid() {
-    const firstInput = screen.getAllByTestId("date-time-input")[0];
-    expect(firstInput).toHaveClass("invalid-input");
-  }
-
-  function expectMinutesToBeDisabled(minutes: number) {
-    const minuteOptions = screen.getAllByTestId("minute-option");
-    for (let i = 0; i < minutes; i++) {
-      expect(minuteOptions[i]).toHaveClass("disabled-item");
-      expect(minuteOptions[i]).toBeDisabled();
-    }
-  }
-
-  function expectHoursToBeDisabled(hours: number) {
-    const hourOptions = screen.getAllByTestId("hour-option");
-    for (let i = 0; i < hours; i++) {
-      expect(hourOptions[i]).toHaveClass("disabled-item");
-      expect(hourOptions[i]).toBeDisabled();
-    }
-  }
-
-  function expectMinutesToBeEnabled(minutes: number) {
-    const minutesOptions = screen.getAllByTestId("minute-option");
-    for (let i = 0; i < minutes; i++) {
-      expect(minutesOptions[i]).not.toHaveClass("disabled-item");
-      expect(minutesOptions[i]).not.toBeDisabled();
-    }
-  }
-
-  function expectDashedBorderToBeHidden() {
-    expect(screen.queryAllByTestId("dashed-border")).toHaveLength(0);
-  }
-
-  function expectSecondInputToHaveValue(value: string) {
-    const secondContainer = screen.getByTestId("second-date-time-container");
-    expect(within(secondContainer).getByDisplayValue(value)).toBeDefined();
-  }
-
-  function expectFirstInputToHaveValue(value: string) {
-    const firstContainer = screen.getByTestId("first-date-time-container");
-    expect(within(firstContainer).getByDisplayValue(value)).toBeDefined();
-  }
-
-  function renderWithMinDate(day: number) {
-    const minDate = changeDayInCurrentMonth(day);
-    renderDateTimeRange({ minDate: minDate, useAMPM: true });
-    return minDate;
-  }
-
-  function renderWithMaxDate(day: number) {
-    const maxDate = changeDayInCurrentMonth(day);
-    renderDateTimeRange({ maxDate: maxDate, useAMPM: true });
-    return maxDate;
-  }
-
-  function changeDayInCurrentMonth(day: number) {
-    const currentMonth = new Date();
-    const newDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      day
-    );
-    return newDate;
-  }
-
-  function expectCellsToBeSelected(first: number, second: number) {
-    const cells = screen.getByTestId("cells");
-    const firstSelectedCell = within(cells).getByText(first.toString());
-    const secondSelectedCell = within(cells).getByText(second.toString());
-
-    expect(firstSelectedCell).toEqual(
-      screen.getAllByTestId("selected-cell")[0]
-    );
-    expect(secondSelectedCell).toEqual(
-      screen.getAllByTestId("selected-cell")[1]
-    );
-  }
-
-  function getCell(day: number) {
-    const cells = screen.getByTestId("cells");
-    return within(cells).getByText(day.toString());
-  }
-
-  function getEmptyCellsFor(month: Date): number {
-    const monthStart = startOfMonth(month);
-    const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
-    return (
-      differenceInCalendarDays(monthStart, startDate) +
-      differenceInCalendarDays(endDate, monthEnd)
-    );
-  }
-
-  async function clickCell(cell: string) {
-    const cells = screen.getByTestId("cells");
-    const selectedDate = within(cells).getByText(cell);
-    await userEvent.click(selectedDate);
-    return selectedDate;
-  }
-
-  async function clickFirstInput() {
-    return await userEvent.click(screen.getByText("Start Date"));
-  }
-
-  async function clickSecondInput() {
-    return await userEvent.click(screen.getByText("End Date"));
-  }
-
-  function expectDashedBorderAroundDates(datesToCheck: string[]) {
-    const cells = screen.getByTestId("cells");
-
-    datesToCheck.forEach((date, i) => {
-      const dashedBorder = screen.getAllByTestId("dashed-border")[i];
-      const selectedCell = within(cells).getByText(date);
-
-      expect(dashedBorder.parentElement).toEqual(selectedCell.parentElement);
-    });
-  }
-
-  async function hoverCell(cell: string) {
-    const cells = screen.getByTestId("cells");
-    const hoveredCell = within(cells).getByText(cell);
-    await userEvent.hover(hoveredCell);
-  }
-
-  async function selectHour(hour: number) {
-    const hourOptions = screen.getAllByTestId("hour-option");
-
-    const hourElement = hourOptions.filter((option) => {
-      return option.textContent === convertTo2DigitString(hour);
-    })[0];
-
-    await userEvent.click(hourElement);
-  }
-
-  async function selectMinute(minute: number) {
-    const minuteOptions = screen.getAllByTestId("minute-option");
-
-    const minuteElement = minuteOptions.filter((option) => {
-      return option.textContent === convertTo2DigitString(minute);
-    })[0];
-
-    await userEvent.click(minuteElement);
-  }
-
-  function expectOnlyCellIsSelected(cell: HTMLElement) {
-    expect(screen.getByTestId("selected-cell")).toEqual(cell);
-  }
-
-  function getInputValue(day: number, hour: number = 12) {
-    const date = new Date();
-
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const hourWithPads = hour.toString().padStart(2, "0");
-    return `${month}/${day}/${year} ${hourWithPads}:00 AM`;
-  }
-
-  function expectDatesHighlighted(dates: string[]) {
-    const cells = screen.getByTestId("cells");
-    dates.forEach((date, i) => {
-      const highlight = screen.getAllByTestId("highlight-between-dates")[i];
-      const selectedCell = within(cells).getByText(date);
-
-      expect(highlight.parentElement).toEqual(selectedCell.parentElement);
-    });
-  }
 
   it("displays input text", () => {
     expect(screen.getByText("Start Date")).toBeInTheDocument();
@@ -411,7 +202,7 @@ describe("DateTimeRange", () => {
   it(`updates input with today's date and selected time when a time is chosen 
   from the time picker`, async () => {
     await clickFirstInput();
-    await selectHour(7);
+    await clickHour(7);
 
     const expectedInputValue = getInputValue(new Date().getDate(), 7);
 
@@ -422,7 +213,7 @@ describe("DateTimeRange", () => {
   it(`highlights selected date in the calendar when a time is chosen from the
   time picker`, async () => {
     await clickFirstInput();
-    await selectHour(7);
+    await clickHour(7);
 
     expectOnlyCellIsSelected(getCell(new Date().getDate()));
   });
@@ -496,7 +287,7 @@ describe("DateTimeRange", () => {
 
     await clickSecondInput();
     await clickCell("17");
-    await selectHour(7);
+    await clickHour(7);
 
     await clickFirstInput();
     await clickCell("20");
@@ -525,7 +316,7 @@ describe("DateTimeRange", () => {
 
     await clickSecondInput();
     await clickCell("17");
-    await selectHour(7);
+    await clickHour(7);
 
     await clickSecondInput();
     await clickCell("10");
@@ -734,12 +525,12 @@ describe("DateTimeRange", () => {
     });
     await clickFirstInput();
 
-    expectHoursToBeDisabled(hours - 1);
-    expectMinutesToBeEnabled(minutes);
+    expectHoursToBeDisabledUpTo(hours - 1);
+    expectMinutesToBeEnabled(minutes - 1);
 
-    await selectHour(hours);
+    await clickHour(hours);
 
-    expectMinutesToBeDisabled(minutes);
+    expectMinutesToBeDisabledUpTo(minutes - 1);
   });
 
   it(`enables the minutes if the current hour is greater than the min time hour
@@ -751,8 +542,8 @@ describe("DateTimeRange", () => {
       minTime: new Date(0, 0, 0, hours, minutes),
     });
     await clickFirstInput();
-    await selectHour(hours);
-    await selectHour(hours + 1);
+    await clickHour(hours);
+    await clickHour(hours + 1);
 
     expectMinutesToBeEnabled(minutes);
   });
@@ -766,8 +557,8 @@ describe("DateTimeRange", () => {
       minTime: new Date(0, 0, 0, hours, minutes),
     });
     await clickFirstInput();
-    await selectMinute(minutes - 1);
-    await selectHour(hours);
+    await clickMinute(minutes - 1);
+    await clickHour(hours);
 
     const minutesOptions = screen.getAllByTestId("minute-option");
     const selectedMinute = minutesOptions.find((option) => {
@@ -787,8 +578,8 @@ describe("DateTimeRange", () => {
       minTime: new Date(0, 0, 0, hours, minutes),
     });
     await clickFirstInput();
-    await selectMinute(minutes - 1);
-    await selectHour(hours);
+    await clickMinute(minutes - 1);
+    await clickHour(hours);
 
     expectFirstInputToBeInvalid();
   });
@@ -802,8 +593,9 @@ describe("DateTimeRange", () => {
       minTime: new Date(0, 0, 0, hours, minutes),
     });
     await clickFirstInput();
-    // we don't do hours - 1 because there is 12 at the beginning of the list
-    expectHoursToBeDisabled(hours);
+
+    expectHoursToBeDisabledUpTo(hours - 1);
+    expectHourToBeDisabled(12);
   });
 
   it(`disables the time if it's less than the min time for AM/PM system when
@@ -816,7 +608,7 @@ describe("DateTimeRange", () => {
     });
     await clickFirstInput();
 
-    expectHoursToBeDisabled(12);
+    expectHoursToBeDisabledUpTo(12);
   });
 
   it(`disables the time if it's less than the min time for AM/PM system when
@@ -830,7 +622,7 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
     await clickAMPMOption("AM");
 
-    expectHoursToBeDisabled(12);
+    expectHoursToBeDisabledUpTo(12);
   });
 
   it(`disables the time if it's less than the min time for AM/PM system when
@@ -844,7 +636,7 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
     await clickAMPMOption("AM");
 
-    expectHoursToBeDisabled(hours);
+    expectHoursToBeDisabledUpTo(hours - 1);
   });
 
   it(`disables the time if it's less than the min time for AM/PM system when
@@ -858,7 +650,7 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
     await clickAMPMOption("PM");
 
-    expectHoursToBeDisabled(hours - 12);
+    expectHoursToBeDisabledUpTo(hours - 12 - 1);
   });
 
   it(`disables all minutes if the minTime hour is PM and user has no (AM/PM) 
@@ -871,7 +663,7 @@ describe("DateTimeRange", () => {
     });
     await clickFirstInput();
 
-    expectMinutesToBeDisabled(60);
+    expectMinutesToBeDisabledUpTo(59);
   });
 
   it(`disables minutes if the current hour is equal to the minTime hour for
@@ -885,7 +677,7 @@ describe("DateTimeRange", () => {
     await clickFirstInput();
     await clickHour(hours);
 
-    expectMinutesToBeDisabled(minutes);
+    expectMinutesToBeDisabledUpTo(minutes - 1);
   });
 
   it(`disables minutes if the current hour is equal to the minTime hour for AM/PM
@@ -901,6 +693,86 @@ describe("DateTimeRange", () => {
     await clickAMPMOption("PM");
     await clickHour(hours);
 
-    expectMinutesToBeDisabled(minutes);
+    expectMinutesToBeDisabledUpTo(minutes - 1);
+  });
+
+  it(`disables the time if it's more than the maxTime for AM/PM system when
+  maxTime hour is AM`, async () => {
+    const minutes = 23;
+    const hours = 7;
+    renderDateTimeRange({
+      useAMPM: true,
+      maxTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    expectHoursToBeDisabledInRange(hours + 1, 11);
+
+    await clickHour(hours);
+    expectMinutesToBeDisabledInRange(minutes + 1, 59);
+  });
+
+  it(`disables the time if it's more than the maxTime for AM/PM system when
+  maxTime hour is PM`, async () => {
+    const minutes = 23;
+    const hours = 19;
+    renderDateTimeRange({
+      useAMPM: true,
+      maxTime: new Date(0, 0, 0, hours, minutes),
+    });
+    await clickFirstInput();
+    expectHourToBeEnabled(12);
+    expectHoursToBeEnabledUpTo(11);
+
+    await clickAMPMOption("PM");
+    expectHoursToBeDisabledInRange(8, 11);
+
+    await clickHour(7);
+    expectMinutesToBeDisabledInRange(24, 59);
+  });
+
+  it(`disables the time when both minTime and maxTime are set for AM/PM`, async () => {
+    renderDateTimeRange({
+      useAMPM: true,
+      minTime: new Date(0, 0, 0, 7, 23),
+      maxTime: new Date(0, 0, 0, 19, 23),
+    });
+    await clickFirstInput();
+    expectHoursToBeDisabledInRange(1, 6);
+
+    await clickHour(7);
+    expectMinutesToBeDisabledInRange(0, 22);
+
+    await clickAMPMOption("PM");
+    expectHoursToBeDisabledInRange(8, 11);
+
+    await clickHour(7);
+    expectMinutesToBeDisabledInRange(24, 59);
+  });
+
+  it(`disables the time when both minTime and maxTime are set for 24 hours`, async () => {
+    renderDateTimeRange({
+      useAMPM: false,
+      minTime: new Date(0, 0, 0, 7, 23),
+      maxTime: new Date(0, 0, 0, 19, 23),
+    });
+    await clickFirstInput();
+    expectHoursToBeDisabledInRange(0, 6);
+
+    await clickHour(7);
+    expectMinutesToBeDisabledInRange(0, 22);
+
+    await clickHour(19);
+    expectMinutesToBeDisabledInRange(24, 59);
+  });
+
+  it(`invalidates input when the time is greater than the max time`, async () => {
+    renderDateTimeRange({
+      useAMPM: false,
+      maxTime: new Date(0, 0, 0, 7, 23),
+    });
+    await clickFirstInput();
+    await clickMinute(24);
+
+    expectFirstInputToBeInvalid();
   });
 });

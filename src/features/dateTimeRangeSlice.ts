@@ -28,15 +28,17 @@ interface DateTimeRangeState {
   useAMPM: boolean;
   minDate: string | null;
   maxDate: string | null;
-  minTimeIn24Hours: TimeIn24HourFormat | null;
   dateChangedWhileDragging: boolean;
   isDateTimeShown: boolean;
   isFirstDateInvalid: boolean;
   isSecondDateInvalid: boolean;
+  minTimeIn24Hours: TimeIn24HourFormat | null;
+  maxTimeIn24Hours: TimeIn24HourFormat | null;
 }
 
 const initialState: DateTimeRangeState = {
   minTimeIn24Hours: null,
+  maxTimeIn24Hours: null,
   maxDate: null,
   minDate: null,
   draggedDate: DraggedDate.First,
@@ -64,6 +66,12 @@ const slice = createSlice({
   name: "dateTimeRange",
   initialState,
   reducers: {
+    setMaxTimeIn24Hours: (
+      state: DateTimeRangeState,
+      action: PayloadAction<TimeIn24HourFormat | null>
+    ) => {
+      state.maxTimeIn24Hours = action.payload;
+    },
     setIsFirstDateInvalid: (
       state: DateTimeRangeState,
       action: PayloadAction<boolean>
@@ -263,9 +271,12 @@ export const {
   setDateBasedOnActiveInput,
   setDefaultTimeIfNotSet,
   setIsDateTimeShown,
+  setMaxTimeIn24Hours,
 } = slice.actions;
 
 const getDateTimeRangeState = (state: RootState) => state;
+export const selectMaxTimeIn24Hours = (state: RootState) =>
+  getDateTimeRangeState(state).maxTimeIn24Hours;
 export const selectIsDateTimeShown = (state: RootState) =>
   getDateTimeRangeState(state).isDateTimeShown;
 export const selectMinTimeIn24Hours = (state: RootState) =>

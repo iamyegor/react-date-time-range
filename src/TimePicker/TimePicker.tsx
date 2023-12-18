@@ -34,15 +34,10 @@ function TimePicker() {
   const firstSelectedTime = useAppSelector(selectFirstSelectedTime);
   const secondSelectedTime = useAppSelector(selectSecondSelectedTime);
   const useAMPM = useAppSelector(selectUseAMPM);
-  const minTimeIn24Hours = useAppSelector(selectMinTimeIn24Hours);
 
   const [selectedTime, setSelectedTime] = useState<Time | null>(null);
-  const disabledHours = useDisabledHours(
-    minTimeIn24Hours,
-    selectedTime,
-    useAMPM
-  );
-  const disabledMinutes = useDisabledMinutes(minTimeIn24Hours, selectedTime);
+  const disabledHours = useDisabledHours(selectedTime, useAMPM);
+  const disabledMinutes = useDisabledMinutes(selectedTime);
 
   useEffect(() => {
     if (activeInput === ActiveInput.First) {

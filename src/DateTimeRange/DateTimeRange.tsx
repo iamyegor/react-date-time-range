@@ -6,6 +6,7 @@ import {
   selectIsDateTimeShown,
   setBannedDates,
   setMaxDate,
+  setMaxTimeIn24Hours,
   setMinDate,
   setMinTimeIn24Hours,
   setUseAMPM,
@@ -29,9 +30,11 @@ interface DateTimeRangeProps {
   minDate?: Date | null;
   maxDate?: Date | null;
   minTime?: Date | null;
+  maxTime?: Date | null;
 }
 
 export default function DateTimeRange({
+  maxTime = null,
   minTime = null,
   maxDate = null,
   minDate = null,
@@ -53,11 +56,17 @@ export default function DateTimeRange({
     dispatch(setMaxDate(maxDate));
     dispatch(setBannedDates(bannedDates));
     dispatch(setUseAMPM(useAMPM));
+
     if (minTime) {
-      const minTimeIn24Hours = convertTo24HourFormat(
-        formatToTime(minTime, useAMPM)
-      );
+      const minTimeAsTime = formatToTime(minTime, useAMPM);
+      const minTimeIn24Hours = convertTo24HourFormat(minTimeAsTime);
       dispatch(setMinTimeIn24Hours(minTimeIn24Hours));
+    }
+
+    if (maxTime) {
+      const maxTimeAsTime = formatToTime(maxTime, useAMPM);
+      const maxTimeIn24Hours = convertTo24HourFormat(maxTimeAsTime);
+      dispatch(setMaxTimeIn24Hours(maxTimeIn24Hours));
     }
   }, []);
 

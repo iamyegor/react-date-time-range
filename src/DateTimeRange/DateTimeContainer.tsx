@@ -4,6 +4,7 @@ import { useAppSelector } from "../app/hooks.ts";
 import calendarIcon from "../assets/icons/calendar.svg";
 import {
   selectFirstDateTimeIsGreater,
+  selectMaxTimeIn24Hours,
   selectMinDate,
   selectMinTimeIn24Hours,
   selectUseAMPM,
@@ -54,6 +55,7 @@ function DateTimeContainer({
   const useAMPM = useAppSelector(selectUseAMPM);
   const minTime = useAppSelector(selectMinTimeIn24Hours);
   const minDate = useAppSelector(selectMinDate);
+  const maxTime = useAppSelector(selectMaxTimeIn24Hours);
 
   useEffect(() => {
     if (hiddenTextRef.current) {
@@ -95,7 +97,8 @@ function DateTimeContainer({
       isTimeLess(time, minTime) ||
       isDateInvalid ||
       isTimeInvalid ||
-      isDateLess(date, minDate)
+      isDateLess(date, minDate) ||
+      isTimeLess(maxTime, time)
     ) {
       return true;
     }
@@ -155,7 +158,7 @@ function DateTimeContainer({
         className={getInputClasses()}
         tabIndex={0}
         style={{ clipPath }}
-        data-testid="date-time-input"
+        data-testid="date-time-input-wrapper"
       >
         {shouldTextBeOnTop() && (
           <DateTimeInput
