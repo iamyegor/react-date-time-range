@@ -12,7 +12,7 @@ import {
 import ValueUpdater from "../utils/classes/ValueUpdater.tsx";
 import { Time } from "../../types.tsx";
 
-export default function useTime(
+export default function useOnTimeUpdated(
     time: Time | null,
     value: string,
     isTimeInvalid: boolean,

@@ -2,7 +2,7 @@ import { isValid } from "date-fns";
 import { KeyboardEvent, useEffect, useMemo, useRef } from "react";
 import { useAppSelector } from "../app/hooks";
 import { selectUseAMPM } from "../features/dateTimeRangeSlice";
-import { DATE_PLACEHOLDER, getDateTimePlaceholder, sections } from "../globals";
+import { getDateTimePlaceholder, sections } from "../globals";
 import { Section, Time } from "types.tsx";
 import SectionNavigation from "./utils/classes/SectionNavigation.tsx";
 import SectionValueAdjusterWithArrows from "./utils/classes/SectionValueAdjusterWithArrows.tsx";
@@ -10,12 +10,9 @@ import SectionValueAdjusterWithNumbers from "./utils/classes/SectionValueAdjuste
 import AmPmSwitcher from "./utils/classes/AmPmSwitcher.tsx";
 import SectionEraser from "./utils/classes/SectionEraser.tsx";
 import ValueUpdater from "./utils/classes/ValueUpdater.tsx";
-import {
-    extractPosition,
-    getSameHighlight,
-    getSectionValue,
-} from "DateTimeRange/utils/functions/sectionUtils.tsx";
-import useTime from "./hooks/useTime.tsx";
+import { getSectionValue } from "DateTimeRange/utils/functions/sectionUtils.tsx";
+import useOnTimeUpdated from "./hooks/useOnTimeUpdated.tsx";
+import useOnDateUpdated from "./hooks/useOnDateUpdated.tsx";
 
 interface DateTimeInputProps {
     date: Date | null;
@@ -154,39 +151,15 @@ function DateTimeInput({
         }
     }
 
-    useEffect(() => {
-        const dateSection: { start: number; end: number } = extractPosition(
-            sections[0],
-            sections[2],
-        );
+    useOnDateUpdated(
+        date,
+        value,
+        isDateInvalid,
+        valueUpdater,
+        inputRef.current,
+    );
 
-        let newDateValue: string;
-        if (date) {
-            const month: string = (date.getMonth() + 1)
-                .toString()
-                .padStart(2, "0");
-            const day: string = date.getDate().toString().padStart(2, "0");
-            const year: string = date.getFullYear().toString().padStart(4, "0");
-
-            newDateValue = `${month}/${day}/${year}`;
-        } else {
-            const dateValue: string = getSectionValue(value, dateSection);
-
-            if (dateValue && isDateInvalid) {
-                newDateValue = dateValue;
-            } else {
-                newDateValue = DATE_PLACEHOLDER;
-            }
-        }
-
-        valueUpdater.updateValue(
-            dateSection,
-            newDateValue,
-            getSameHighlight(inputRef.current),
-        );
-    }, [date]);
-
-    useTime(
+    useOnTimeUpdated(
         time,
         value,
         isTimeInvalid,
