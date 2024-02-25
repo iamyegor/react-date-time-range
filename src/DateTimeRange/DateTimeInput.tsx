@@ -2,19 +2,20 @@ import { isValid } from "date-fns";
 import { KeyboardEvent, useEffect, useMemo, useRef } from "react";
 import { useAppSelector } from "../app/hooks";
 import { selectUseAMPM } from "../features/dateTimeRangeSlice";
+import { DATE_PLACEHOLDER, getDateTimePlaceholder, sections } from "../globals";
+import { Section, Time } from "types.tsx";
+import SectionNavigation from "./utils/classes/SectionNavigation.tsx";
+import SectionValueAdjusterWithArrows from "./utils/classes/SectionValueAdjusterWithArrows.tsx";
+import SectionValueAdjusterWithNumbers from "./utils/classes/SectionValueAdjusterWithNumbers.tsx";
+import AmPmSwitcher from "./utils/classes/AmPmSwitcher.tsx";
+import SectionEraser from "./utils/classes/SectionEraser.tsx";
+import ValueUpdater from "./utils/classes/ValueUpdater.tsx";
 import {
-    DATE_PLACEHOLDER,
-    getDateTimePlaceholder,
-    sections,
-    TIME_PLACEHOLDER_24,
-    TIME_PLACEHOLDER_AMPM,
-} from "../globals";
-import { Section, Time } from "../types";
-import SectionNavigation from "./utility-classes/SectionNavigation.tsx";
-import SectionValueAdjusterWithArrows from "./utility-classes/SectionValueAdjusterWithArrows.tsx";
-import SectionValueAdjusterWithNumbers from "./utility-classes/SectionValueAdjusterWithNumbers.tsx";
-import AmPmSwitcher from "./utility-classes/AmPmSwitcher.tsx";
-import SectionEraser from "./utility-classes/SectionEraser.tsx";
+    extractPosition,
+    getSameHighlight,
+    getSectionValue,
+} from "DateTimeRange/utils/functions/sectionUtils.tsx";
+import useTime from "./hooks/useTime.tsx";
 
 interface DateTimeInputProps {
     date: Date | null;
@@ -45,35 +46,33 @@ function DateTimeInput({
 
     const inputRef = useRef<HTMLInputElement | null>(null);
 
+    const valueUpdater = useMemo(
+        () => new ValueUpdater(inputRef, onValueChange),
+        [inputRef, onValueChange],
+    );
+
     const sectionNavigation = useMemo(
         () => new SectionNavigation(inputRef, sections, useAMPM),
         [inputRef, sections, useAMPM],
     );
 
     const sectionAdjusterWithArrows = useMemo(
-        () =>
-            new SectionValueAdjusterWithArrows(
-                inputRef,
-                value,
-                onValueChange,
-                useAMPM,
-            ),
+        () => new SectionValueAdjusterWithArrows(value, valueUpdater, useAMPM),
         [inputRef, value, onValueChange, useAMPM],
     );
 
     const amPmSwitcher = useMemo(
-        () => new AmPmSwitcher(inputRef, onValueChange),
+        () => new AmPmSwitcher(valueUpdater),
         [inputRef, onValueChange],
     );
 
     const sectionAdjusterWithNumbers = useMemo(
-        () =>
-            new SectionValueAdjusterWithNumbers(value, inputRef, onValueChange),
+        () => new SectionValueAdjusterWithNumbers(value, valueUpdater),
         [value, inputRef, onValueChange],
     );
 
     const sectionEraser = useMemo(
-        () => new SectionEraser(inputRef, onValueChange),
+        () => new SectionEraser(valueUpdater),
         [inputRef, onValueChange],
     );
 
@@ -99,15 +98,19 @@ function DateTimeInput({
     }, [value]);
 
     function isValuePlaceholder() {
-        const section = { start: sections[0].start, end: sections[5].end };
-        const value = getSectionValue(section);
-        return value === getDateTimePlaceholder(useAMPM);
+        const section = {
+            start: sections[0].start,
+            end: sections[5].end,
+        };
+
+        const allSectionsValue: string = getSectionValue(value, section);
+        return allSectionsValue === getDateTimePlaceholder(useAMPM);
     }
 
     function queryDateFromValue() {
-        const month = parseInt(getSectionValue(sections[0]));
-        const day = parseInt(getSectionValue(sections[1]));
-        const year = parseInt(getSectionValue(sections[2]));
+        const month = parseInt(getSectionValue(value, sections[0]));
+        const day = parseInt(getSectionValue(value, sections[1]));
+        const year = parseInt(getSectionValue(value, sections[2]));
 
         if (year > 1899 && year < 2101) {
             return new Date(year, month - 1, day);
@@ -117,19 +120,15 @@ function DateTimeInput({
     }
 
     function queryTimeFromValue() {
-        const hours = parseInt(getSectionValue(sections[3]));
-        const minutes = parseInt(getSectionValue(sections[4]));
-        const ampm = useAMPM ? getSectionValue(sections[5]) : "24";
+        const hours = parseInt(getSectionValue(value, sections[3]));
+        const minutes = parseInt(getSectionValue(value, sections[4]));
+        const ampm = useAMPM ? getSectionValue(value, sections[5]) : "24";
 
         if (isTimeValid(hours, minutes, ampm)) {
             return { hours, minutes, ampm } as Time;
         }
 
         return null;
-    }
-
-    function getSectionValue({ start, end }: { start: number; end: number }) {
-        return value.slice(start, end);
     }
 
     function isTimeValid(hours: number, minutes: number, ampm: string) {
@@ -156,118 +155,50 @@ function DateTimeInput({
     }
 
     useEffect(() => {
-        changeDateInValue();
-    }, [date]);
+        const dateSection: { start: number; end: number } = extractPosition(
+            sections[0],
+            sections[2],
+        );
 
-    function changeDateInValue() {
-        const start = sections[0].start;
-        const end = sections[2].end;
-        const newDateValue = calculateNewDateValue({ start, end });
-        updateValue({ start, end }, newDateValue, getSameHighlight());
-    }
-
-    function calculateNewDateValue(section: { start: number; end: number }) {
+        let newDateValue: string;
         if (date) {
-            return formatDate(date);
+            const month: string = (date.getMonth() + 1)
+                .toString()
+                .padStart(2, "0");
+            const day: string = date.getDate().toString().padStart(2, "0");
+            const year: string = date.getFullYear().toString().padStart(4, "0");
+
+            newDateValue = `${month}/${day}/${year}`;
         } else {
-            const dateValue = getSectionValue(section);
+            const dateValue: string = getSectionValue(value, dateSection);
+
             if (dateValue && isDateInvalid) {
-                return dateValue;
+                newDateValue = dateValue;
             } else {
-                return DATE_PLACEHOLDER;
+                newDateValue = DATE_PLACEHOLDER;
             }
         }
-    }
 
-    function formatDate(date: Date) {
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        const year = date.getFullYear().toString().padStart(4, "0");
-        return `${month}/${day}/${year}`;
-    }
+        valueUpdater.updateValue(
+            dateSection,
+            newDateValue,
+            getSameHighlight(inputRef.current),
+        );
+    }, [date]);
 
-    useEffect(() => {
-        updateTimeInValue();
-    }, [time]);
-
-    function updateTimeInValue(): void {
-        const sectionStart = sections[3].start;
-        const sectionEnd = useAMPM ? sections[5].end : sections[4].end;
-        const formattedTime = getFormattedTime(sectionStart, sectionEnd);
-
-        updateValueWithTime(sectionStart, sectionEnd, formattedTime);
-    }
-
-    function getFormattedTime(start: number, end: number) {
-        return useAMPM
-            ? getFormattedTimeAMPM(start, end)
-            : getFormattedTime24(start, end);
-    }
-
-    function getFormattedTime24(start: number, end: number) {
-        return time
-            ? formatTime24(time)
-            : getTimeValueOrDefault(start, end, TIME_PLACEHOLDER_24);
-    }
-
-    function getFormattedTimeAMPM(start: number, end: number) {
-        return time
-            ? formatTimeAM(time)
-            : getTimeValueOrDefault(start, end, TIME_PLACEHOLDER_AMPM);
-    }
-
-    function getTimeValueOrDefault(
-        start: number,
-        end: number,
-        placeholder: string,
-    ) {
-        const timeValue = getSectionValue({ start, end });
-        return timeValue && isTimeInvalid ? timeValue : placeholder;
-    }
-
-    function updateValueWithTime(
-        start: number,
-        end: number,
-        timeValue: string,
-    ) {
-        const shouldAddSpace = value.slice(start - 1, start) !== " ";
-        const spaceOrEmpty = shouldAddSpace ? " " : "";
-        const newValue = `${spaceOrEmpty}${timeValue}`;
-
-        updateValue({ start, end }, newValue, getSameHighlight());
-    }
-
-    function formatTime24(time: Time) {
-        return formatTime(time, "");
-    }
-
-    function formatTimeAM(time: Time) {
-        return formatTime(time, ` ${time.ampm}`);
-    }
-
-    function formatTime(time: Time, suffix: string) {
-        const hours = time.hours.toString().padStart(2, "0");
-        const minutes = time.minutes.toString().padStart(2, "0");
-        return `${hours}:${minutes}${suffix}`;
-    }
-
-    function getSameHighlight() {
-        if (inputRef.current) {
-            return {
-                start: inputRef.current.selectionStart || 0,
-                end: inputRef.current.selectionEnd || 0,
-            };
-        }
-        return undefined;
-    }
+    useTime(
+        time,
+        value,
+        isTimeInvalid,
+        inputRef.current,
+        useAMPM,
+        valueUpdater,
+    );
 
     function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
         e.preventDefault();
-        const cursorPosition = inputRef.current?.selectionStart || 0;
-        const currentSection: Section | null = sections.find(
-            (sec) => cursorPosition >= sec.start && cursorPosition <= sec.end,
-        ) as Section | null;
 
+        const currentSection: Section | null = getSelectedSection();
         const pressedKey: string = e.key;
 
         if (sectionNavigation.canNavigate(currentSection, pressedKey)) {
@@ -287,47 +218,26 @@ function DateTimeInput({
         }
     }
 
-    function updateValue(
-        updatedSection: { start: number; end: number },
-        newSectionValue: string | number,
-        highlightSection?: { start: number; end: number },
-    ) {
-        const { start, end } = updatedSection;
-        if (!inputRef.current) {
-            return;
-        }
-
-        const { value } = inputRef.current;
-        const updatedValue =
-            value.slice(0, start) + newSectionValue + value.slice(end);
-
-        updateInputValue(updatedValue, highlightSection || updatedSection);
-        onValueChange(updatedValue);
-    }
-
-    function updateInputValue(
-        newValue: string,
-        highlight: { start: number; end: number },
-    ) {
-        if (inputRef.current) {
-            inputRef.current.value = newValue;
-            inputRef.current.setSelectionRange(highlight.start, highlight.end);
-        }
-    }
-
-    function highlightSection() {
-        if (!inputRef.current) return;
-        const cursorPosition = inputRef.current.selectionStart || 0;
-        const currentSection: Section | null = sections.find(
-            (sec) => cursorPosition >= sec.start && cursorPosition <= sec.end,
-        ) as Section | null;
-
+    function highlightSection(): void {
+        const currentSection: Section | null = getSelectedSection();
         if (currentSection) {
-            inputRef.current.setSelectionRange(
+            inputRef.current!.setSelectionRange(
                 currentSection.start,
                 currentSection.end,
             );
         }
+    }
+
+    function getSelectedSection(): Section | null {
+        if (!inputRef.current) {
+            return null;
+        }
+
+        const cursorPosition = inputRef.current.selectionStart || 0;
+
+        return sections.find(
+            (s) => cursorPosition >= s.start && cursorPosition <= s.end,
+        ) as Section | null;
     }
 
     return (

@@ -1,5 +1,5 @@
-import { Section } from "../../types";
-import { sections } from "../../globals";
+import { Section } from "types";
+import { sections } from "globals";
 import ValueUpdater from "./ValueUpdater.tsx";
 
 export default class SectionValueAdjusterWithArrows {

@@ -15,7 +15,7 @@ export default class ValueUpdater {
     public updateValue(
         updatedSection: { start: number; end: number },
         newSectionValue: string | number,
-        highlightSection: { start: number; end: number } | null,
+        highlightSection?: { start: number; end: number } | null,
     ) {
         const { start, end } = updatedSection;
         if (!this.inputRef.current) {

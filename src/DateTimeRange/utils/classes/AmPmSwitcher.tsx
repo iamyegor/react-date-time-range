@@ -1,5 +1,5 @@
-import { Section } from "../../types.tsx";
-import { sections } from "../../globals.ts";
+import { Section } from "types.tsx";
+import { sections } from "globals.ts";
 import ValueUpdater from "./ValueUpdater.tsx";
 
 export default class AmPmSwitcher {
