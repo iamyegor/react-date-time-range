@@ -80,7 +80,7 @@ function DateTimeInput({
         const dateFromValue = queryDateFromValue();
         const timeFromValue = queryTimeFromValue();
 
-        if (date && isValid(dateFromValue)) {
+        if (isValid(dateFromValue)) {
             onDateChange(dateFromValue);
             onIsDateInvalidChange(false);
         } else {
