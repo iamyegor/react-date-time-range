@@ -58,20 +58,14 @@ function DateTimeInput({
         [inputRef, value, onValueChange, useAMPM],
     );
 
-    const amPmSwitcher = useMemo(
-        () => new AmPmSwitcher(valueUpdater),
-        [inputRef, onValueChange],
-    );
+    const amPmSwitcher = useMemo(() => new AmPmSwitcher(valueUpdater), [inputRef, onValueChange]);
 
     const sectionAdjusterWithNumbers = useMemo(
         () => new SectionValueAdjusterWithNumbers(value, valueUpdater),
         [value, inputRef, onValueChange],
     );
 
-    const sectionEraser = useMemo(
-        () => new SectionEraser(valueUpdater),
-        [inputRef, onValueChange],
-    );
+    const sectionEraser = useMemo(() => new SectionEraser(valueUpdater), [inputRef, onValueChange]);
 
     useEffect(() => {
         const dateFromValue = queryDateFromValue();
@@ -151,22 +145,9 @@ function DateTimeInput({
         }
     }
 
-    useOnDateUpdated(
-        date,
-        value,
-        isDateInvalid,
-        valueUpdater,
-        inputRef.current,
-    );
+    useOnDateUpdated(date, value, isDateInvalid, valueUpdater, inputRef.current);
 
-    useOnTimeUpdated(
-        time,
-        value,
-        isTimeInvalid,
-        inputRef.current,
-        useAMPM,
-        valueUpdater,
-    );
+    useOnTimeUpdated(time, value, isTimeInvalid, inputRef.current, useAMPM, valueUpdater);
 
     function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
         e.preventDefault();
@@ -194,10 +175,7 @@ function DateTimeInput({
     function highlightSection(): void {
         const currentSection: Section | null = getSelectedSection();
         if (currentSection) {
-            inputRef.current!.setSelectionRange(
-                currentSection.start,
-                currentSection.end,
-            );
+            inputRef.current!.setSelectionRange(currentSection.start, currentSection.end);
         }
     }
 

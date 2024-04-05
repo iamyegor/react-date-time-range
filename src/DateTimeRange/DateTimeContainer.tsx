@@ -47,8 +47,7 @@ function DateTimeContainer({
     const [inputValue, setInputValue] = useState<string>("");
     const [isFocused, setIsFocused] = useState<boolean>(false);
     const [textWidth, setTextWidth] = useState<number>(0);
-    const [shouldRemoveHiddenText, setShouldRemoveHiddenText] =
-        useState<boolean>(false);
+    const [shouldRemoveHiddenText, setShouldRemoveHiddenText] = useState<boolean>(false);
     const hiddenTextRef = useRef<HTMLLabelElement>(null);
 
     const firstDateTimeIsGreater = useAppSelector(selectFirstDateTimeIsGreater);
@@ -120,10 +119,8 @@ function DateTimeContainer({
     function getInputClasses() {
         return classNames({
             "border-blue-500 border-2": shouldHaveOutline(),
-            "border-gray-700 group-hover:border-gray-400 border-1":
-                !shouldHaveOutline(),
-            "border-red-600 group-hover:border-red-600":
-                shouldInvalidateInput(),
+            "border-gray-700 group-hover:border-gray-400 border-1": !shouldHaveOutline(),
+            "border-red-600 group-hover:border-red-600": shouldInvalidateInput(),
             "rounded border flex justify-between items-center relative focus:outline-none h-full transition-colors":
                 true,
             "invalid-input": shouldInvalidateInput(),
@@ -134,8 +131,7 @@ function DateTimeContainer({
         return classNames({
             "transition-all absolute left-0 cursor-text": true,
             "left-3 -top-[0.725rem] text-xs": shouldTextBeOnTop(),
-            "transform -translate-y-1/2 top-1/2 left-2 text-base":
-                !shouldTextBeOnTop(),
+            "transform -translate-y-1/2 top-1/2 left-2 text-base": !shouldTextBeOnTop(),
             "text-blue-500": shouldHaveOutline() && !shouldInvalidateInput(),
             "text-gray-800": !shouldHaveOutline() && !shouldInvalidateInput(),
             "invalid-label": shouldInvalidateInput(),

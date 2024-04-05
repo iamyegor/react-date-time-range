@@ -16,16 +16,11 @@ export default class AmPmSwitcher {
         }
     }
 
-    public canSwitch(
-        currentSection: Section | null,
-        pressedKey: string,
-    ): boolean {
+    public canSwitch(currentSection: Section | null, pressedKey: string): boolean {
         if (currentSection != sections[5]) {
             return false;
         }
 
-        return (
-            pressedKey.toLowerCase() === "a" || pressedKey.toLowerCase() === "p"
-        );
+        return pressedKey.toLowerCase() === "a" || pressedKey.toLowerCase() === "p";
     }
 }

@@ -1,35 +1,35 @@
 .slide-next-enter {
-  transform: translateX(110%);
+    transform: translateX(110%);
 }
 
 .slide-next-enter-active {
-  transform: translateX(0);
-  transition: transform 0.25s ease-in-out;
+    transform: translateX(0);
+    transition: transform 0.25s ease-in-out;
 }
 
 .slide-next-exit {
-  transition: transform 0.15s ease-in-out;
+    transition: transform 0.15s ease-in-out;
 }
 
 .slide-next-exit-active {
-  transform: translateX(-110%);
-  transition: transform 0.25s ease-in-out;
+    transform: translateX(-110%);
+    transition: transform 0.25s ease-in-out;
 }
 
 .slide-prev-enter {
-  transform: translateX(-110%);
+    transform: translateX(-110%);
 }
 
 .slide-prev-exit {
-  transition: transform 0.15s ease-in-out;
+    transition: transform 0.15s ease-in-out;
 }
 
 .slide-prev-enter-active {
-  transform: translateX(0);
-  transition: transform 0.25s ease-in-out;
+    transform: translateX(0);
+    transition: transform 0.25s ease-in-out;
 }
 
 .slide-prev-exit-active {
-  transform: translateX(110%);
-  transition: transform 0.25s ease-in-out;
+    transform: translateX(110%);
+    transition: transform 0.25s ease-in-out;
 }

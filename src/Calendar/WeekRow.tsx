@@ -4,32 +4,32 @@ import EmptyCell from "./EmptyCell";
 import FilledCell from "./FilledCell";
 
 interface WeekRowProps {
-  startOfWeek: Date;
-  currentMonth: Date;
+    startOfWeek: Date;
+    currentMonth: Date;
 }
 
 const DAYS_IN_A_WEEK = 7;
 
 function WeekRow({ startOfWeek, currentMonth }: WeekRowProps): ReactElement {
-  let days: ReactElement[] = [];
-  let currentDay = startOfWeek;
+    let days: ReactElement[] = [];
+    let currentDay = startOfWeek;
 
-  for (let i = 0; i < DAYS_IN_A_WEEK; i++) {
-    days.push(
-      isSameMonth(currentDay, currentMonth) ? (
-        <FilledCell key={currentDay.toDateString()} day={currentDay} />
-      ) : (
-        <EmptyCell key={currentDay.toDateString()} />
-      )
+    for (let i = 0; i < DAYS_IN_A_WEEK; i++) {
+        days.push(
+            isSameMonth(currentDay, currentMonth) ? (
+                <FilledCell key={currentDay.toDateString()} day={currentDay} />
+            ) : (
+                <EmptyCell key={currentDay.toDateString()} />
+            ),
+        );
+        currentDay = addDays(currentDay, 1);
+    }
+
+    return (
+        <div className="flex" key={startOfWeek.toDateString()}>
+            {days}
+        </div>
     );
-    currentDay = addDays(currentDay, 1);
-  }
-
-  return (
-    <div className="flex" key={startOfWeek.toDateString()}>
-      {days}
-    </div>
-  );
 }
 
 export default WeekRow;

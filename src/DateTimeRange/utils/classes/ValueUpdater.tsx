@@ -23,23 +23,16 @@ export default class ValueUpdater {
         }
 
         const { value } = this.inputRef.current;
-        const updatedValue =
-            value.slice(0, start) + newSectionValue + value.slice(end);
+        const updatedValue = value.slice(0, start) + newSectionValue + value.slice(end);
 
         this.updateInputValue(updatedValue, highlightSection || updatedSection);
         this.onValueChange(updatedValue);
     }
 
-    private updateInputValue(
-        newValue: string,
-        highlight: { start: number; end: number },
-    ) {
+    private updateInputValue(newValue: string, highlight: { start: number; end: number }) {
         if (this.inputRef.current) {
             this.inputRef.current.value = newValue;
-            this.inputRef.current.setSelectionRange(
-                highlight.start,
-                highlight.end,
-            );
+            this.inputRef.current.setSelectionRange(highlight.start, highlight.end);
         }
     }
 }

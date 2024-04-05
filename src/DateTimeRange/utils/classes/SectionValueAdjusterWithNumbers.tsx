@@ -15,8 +15,7 @@ export default class SectionValueAdjusterWithNumbers {
             return;
         }
 
-        const { start, end, max }: { start: number; end: number; max: number } =
-            currentSection!;
+        const { start, end, max }: { start: number; end: number; max: number } = currentSection!;
 
         let currentSectionValue = this.value.slice(start, end);
         let newSectionValue: string;
@@ -24,13 +23,9 @@ export default class SectionValueAdjusterWithNumbers {
         const numKey: number = parseInt(pressedKey);
 
         if (currentSection === sections[2]) {
-            newSectionValue = this.calculateNewSectionValueForYear(
-                currentSectionValue,
-                numKey,
-            );
+            newSectionValue = this.calculateNewSectionValueForYear(currentSectionValue, numKey);
 
-            newHighlightedSection =
-                this.calculateNewHighlightedSectionForYear(newSectionValue);
+            newHighlightedSection = this.calculateNewHighlightedSectionForYear(newSectionValue);
         } else {
             newSectionValue = this.calculateNewSectionValue(
                 currentSectionValue,
@@ -46,17 +41,10 @@ export default class SectionValueAdjusterWithNumbers {
             );
         }
 
-        this.valueUpdater.updateValue(
-            currentSection!,
-            newSectionValue,
-            newHighlightedSection,
-        );
+        this.valueUpdater.updateValue(currentSection!, newSectionValue, newHighlightedSection);
     }
 
-    public canAdjust(
-        currentSection: Section | null,
-        pressedKey: string,
-    ): boolean {
+    public canAdjust(currentSection: Section | null, pressedKey: string): boolean {
         if (!currentSection) {
             return false;
         }
@@ -64,10 +52,7 @@ export default class SectionValueAdjusterWithNumbers {
         return !isNaN(parseInt(pressedKey));
     }
 
-    private calculateNewSectionValueForYear(
-        currentSectionValue: string,
-        numKey: number,
-    ) {
+    private calculateNewSectionValueForYear(currentSectionValue: string, numKey: number) {
         if (currentSectionValue[0] !== "0") {
             return "000" + numKey.toString();
         } else {

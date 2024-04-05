@@ -14,11 +14,7 @@ export default class SectionValueAdjusterWithArrows {
     }
 
     public adjust(currentSection: Section | null, pressedKey: string) {
-        const {
-            start,
-            end,
-            min,
-        }: { start: number; end: number; min?: number } = currentSection!;
+        const { start, end, min }: { start: number; end: number; min?: number } = currentSection!;
 
         if (!this.canAdjust(currentSection, pressedKey)) {
             return;
@@ -26,22 +22,16 @@ export default class SectionValueAdjusterWithArrows {
 
         if (start === 17 && end === 19) {
             const isCurrentlyPM = this.value.slice(start, end) === "PM";
-            this.valueUpdater.updateValue(
-                sections[5],
-                isCurrentlyPM ? "AM" : "PM",
-            );
+            this.valueUpdater.updateValue(sections[5], isCurrentlyPM ? "AM" : "PM");
 
             return;
         }
 
         let currentValue: number = parseInt(this.value.slice(start, end)) || 0;
-        currentValue =
-            pressedKey == "ArrowUp" ? currentValue + 1 : currentValue - 1;
+        currentValue = pressedKey == "ArrowUp" ? currentValue + 1 : currentValue - 1;
 
         const minThreshold: number = min ?? 1;
-        const maxThreshold: number = this.getMaxPossibleValueForSection(
-            currentSection!,
-        );
+        const maxThreshold: number = this.getMaxPossibleValueForSection(currentSection!);
 
         if (currentValue < minThreshold) {
             currentValue = maxThreshold;
@@ -51,16 +41,10 @@ export default class SectionValueAdjusterWithArrows {
         }
 
         const pads: number = end - start;
-        this.valueUpdater.updateValue(
-            currentSection!,
-            currentValue.toString().padStart(pads, "0"),
-        );
+        this.valueUpdater.updateValue(currentSection!, currentValue.toString().padStart(pads, "0"));
     }
 
-    public canAdjust(
-        currentSection: Section | null,
-        pressedKey: string,
-    ): boolean {
+    public canAdjust(currentSection: Section | null, pressedKey: string): boolean {
         if (!currentSection) {
             return false;
         }

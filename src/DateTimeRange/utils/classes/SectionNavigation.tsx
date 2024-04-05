@@ -16,47 +16,28 @@ export default class SectionNavigation {
         this.useAMPM = useAMPM;
     }
 
-    public navigate(
-        currentSection: Section | null,
-        pressedKey: string,
-    ): void {
+    public navigate(currentSection: Section | null, pressedKey: string): void {
         if (this.canNavigate(currentSection, pressedKey)) {
             const isNext = pressedKey === "ArrowRight";
-            this.moveToDifferentSection(
-                this.sections.indexOf(currentSection!),
-                isNext,
-            );
+            this.moveToDifferentSection(this.sections.indexOf(currentSection!), isNext);
         }
     }
 
-    public canNavigate(
-        section: Section | null,
-        pressedKey: string,
-    ): boolean {
+    public canNavigate(section: Section | null, pressedKey: string): boolean {
         if (!section) return false;
         return pressedKey === "ArrowLeft" || pressedKey === "ArrowRight";
     }
 
-    private moveToDifferentSection(
-        currentSectionIndex: number,
-        isNext: boolean,
-    ): void {
-        const nextSectionIndex = isNext
-            ? currentSectionIndex + 1
-            : currentSectionIndex - 1;
+    private moveToDifferentSection(currentSectionIndex: number, isNext: boolean): void {
+        const nextSectionIndex = isNext ? currentSectionIndex + 1 : currentSectionIndex - 1;
 
-        const sectionsLength = this.useAMPM
-            ? this.sections.length - 1
-            : this.sections.length - 2;
+        const sectionsLength = this.useAMPM ? this.sections.length - 1 : this.sections.length - 2;
 
         if (nextSectionIndex < 0 || nextSectionIndex > sectionsLength) {
             return;
         }
 
         const nextSection = this.sections[nextSectionIndex];
-        this.inputElement.current?.setSelectionRange(
-            nextSection.start,
-            nextSection.end,
-        );
+        this.inputElement.current?.setSelectionRange(nextSection.start, nextSection.end);
     }
 }

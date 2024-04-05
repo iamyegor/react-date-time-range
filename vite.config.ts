@@ -10,10 +10,7 @@ export default defineConfig({
     plugins: [react(), tsconfigPaths()],
     test: {
         globals: true,
-        include: [
-            "**/__tests__/**/*.{js,jsx,ts,tsx}",
-            "**/*.{test,spec}.?(c|m)[jt]s?(x)",
-        ],
+        include: ["**/__tests__/**/*.{js,jsx,ts,tsx}", "**/*.{test,spec}.?(c|m)[jt]s?(x)"],
         environment: "jsdom",
         setupFiles: "./src/test/setup.ts",
         css: false,

@@ -10,17 +10,11 @@ export default class SectionEraser {
 
     public erase(currentSection: Section | null, pressedKey: string): void {
         if (this.canErase(currentSection, pressedKey)) {
-            this.valueUpdater.updateValue(
-                currentSection!,
-                currentSection!.name,
-            );
+            this.valueUpdater.updateValue(currentSection!, currentSection!.name);
         }
     }
 
-    public canErase(
-        currentSection: Section | null,
-        pressedKey: string,
-    ): boolean {
+    public canErase(currentSection: Section | null, pressedKey: string): boolean {
         if (!currentSection) {
             return false;
         }

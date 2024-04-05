@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import dateTimeRangeReducer from "../features/dateTimeRangeSlice";
 
 const store = configureStore({
-  reducer: dateTimeRangeReducer,
+    reducer: dateTimeRangeReducer,
 });
 
 export default store;

@@ -22,9 +22,7 @@ export default function useOnDateUpdated(
 
         let newDateValue: string;
         if (date) {
-            const month: string = (date.getMonth() + 1)
-                .toString()
-                .padStart(2, "0");
+            const month: string = (date.getMonth() + 1).toString().padStart(2, "0");
             const day: string = date.getDate().toString().padStart(2, "0");
             const year: string = date.getFullYear().toString().padStart(4, "0");
 
@@ -39,10 +37,6 @@ export default function useOnDateUpdated(
             }
         }
 
-        valueUpdater.updateValue(
-            dateSection,
-            newDateValue,
-            getSameHighlight(inputElement),
-        );
+        valueUpdater.updateValue(dateSection, newDateValue, getSameHighlight(inputElement));
     }, [date]);
 }

@@ -1,25 +1,25 @@
 .date-time-enter {
-  opacity: 0;
-  scale: 0.6;
+    opacity: 0;
+    scale: 0.6;
 }
 
 .date-time-enter-active {
-  opacity: 1;
-  scale: 1;
-  transition: all 0.2s ease-in-out;
+    opacity: 1;
+    scale: 1;
+    transition: all 0.2s ease-in-out;
 }
 
 .date-time-exit {
-  opacity: 1;
-  scale: 1;
+    opacity: 1;
+    scale: 1;
 }
 
 .date-time-exit-active {
-  opacity: 0;
-  scale: 0.6;
-  transition: all 0.2s ease-in-out;
+    opacity: 0;
+    scale: 0.6;
+    transition: all 0.2s ease-in-out;
 }
 
 .date-time-exit-done {
-  opacity: 0;
+    opacity: 0;
 }

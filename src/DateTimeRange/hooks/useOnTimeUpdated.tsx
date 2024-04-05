@@ -4,11 +4,7 @@ import {
     getSameHighlight,
     getSectionValue,
 } from "../utils/functions/sectionUtils.tsx";
-import {
-    sections,
-    TIME_PLACEHOLDER_24,
-    TIME_PLACEHOLDER_AMPM,
-} from "../../globals.ts";
+import { sections, TIME_PLACEHOLDER_24, TIME_PLACEHOLDER_AMPM } from "../../globals.ts";
 import ValueUpdater from "../utils/classes/ValueUpdater.tsx";
 import { Time } from "../../types.tsx";
 
@@ -39,9 +35,7 @@ export default function useOnTimeUpdated(
             if (timeValue && isTimeInvalid) {
                 newTimeValue = timeValue;
             } else {
-                newTimeValue = useAMPM
-                    ? TIME_PLACEHOLDER_AMPM
-                    : TIME_PLACEHOLDER_24;
+                newTimeValue = useAMPM ? TIME_PLACEHOLDER_AMPM : TIME_PLACEHOLDER_24;
             }
         }
 
@@ -49,10 +43,6 @@ export default function useOnTimeUpdated(
         const spaceOrEmpty = hasSpaceBetweenDateAndTime ? "" : " ";
         newTimeValue = `${spaceOrEmpty}${newTimeValue}`;
 
-        valueUpdater.updateValue(
-            timeSection,
-            newTimeValue,
-            getSameHighlight(inputElement),
-        );
+        valueUpdater.updateValue(timeSection, newTimeValue, getSameHighlight(inputElement));
     }, [time]);
 }
