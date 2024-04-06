@@ -41,7 +41,7 @@ export default class SectionValueAdjusterWithNumbers {
             );
         }
 
-        this.valueUpdater.updateValue(currentSection!, newSectionValue, newHighlightedSection);
+        this.valueUpdater.update(currentSection!, newSectionValue, newHighlightedSection);
     }
 
     public canAdjust(currentSection: Section | null, pressedKey: string): boolean {

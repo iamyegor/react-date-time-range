@@ -10,9 +10,9 @@ import SectionValueAdjusterWithNumbers from "./utils/classes/SectionValueAdjuste
 import AmPmSwitcher from "./utils/classes/AmPmSwitcher.tsx";
 import SectionEraser from "./utils/classes/SectionEraser.tsx";
 import ValueUpdater from "./utils/classes/ValueUpdater.tsx";
-import { getSectionValue } from "DateTimeRange/utils/functions/sectionUtils.tsx";
-import useOnTimeUpdated from "./hooks/useOnTimeUpdated.tsx";
-import useOnDateUpdated from "./hooks/useOnDateUpdated.tsx";
+import { getSameHighlight, getSectionValue } from "DateTimeRange/utils/functions/sectionUtils.tsx";
+import useUpdateValueBasedOnTime from "./hooks/useUpdateValueBasedOnTime.tsx";
+import useUpdateValueBasedOnDate from "./hooks/useUpdateValueBasedOnDate.tsx";
 
 interface DateTimeInputProps {
     date: Date | null;
@@ -28,9 +28,7 @@ interface DateTimeInputProps {
 }
 
 function DateTimeInput({
-    isTimeInvalid,
     onIsTimeInvalidChange,
-    isDateInvalid,
     onIsDateInvalidChange,
     date,
     time,
@@ -145,9 +143,33 @@ function DateTimeInput({
         }
     }
 
-    useOnDateUpdated(date, value, isDateInvalid, valueUpdater, inputRef.current);
+    useUpdateValueBasedOnDate(date, value, updateInputValue);
+    useUpdateValueBasedOnTime(time, value, updateInputValue, useAMPM);
 
-    useOnTimeUpdated(time, value, isTimeInvalid, inputRef.current, useAMPM, valueUpdater);
+    function updateInputValue(newValue: string): void {
+        updateInputContents(newValue);
+        onValueChange(newValue);
+    }
+
+    function updateInputContents(
+        newValue: string,
+        sectionToHighlight?: { start: number; end: number },
+    ) {
+        if (!inputRef.current) {
+            return;
+        }
+
+        const newHighlightedSection = sectionToHighlight
+            ? sectionToHighlight
+            : getSameHighlight(inputRef.current);
+
+        if (!newHighlightedSection) {
+            return;
+        }
+
+        inputRef.current.value = newValue;
+        inputRef.current.setSelectionRange(newHighlightedSection.start, newHighlightedSection.end);
+    }
 
     function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
         e.preventDefault();

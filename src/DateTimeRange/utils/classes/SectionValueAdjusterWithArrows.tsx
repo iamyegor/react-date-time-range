@@ -22,7 +22,7 @@ export default class SectionValueAdjusterWithArrows {
 
         if (start === 17 && end === 19) {
             const isCurrentlyPM = this.value.slice(start, end) === "PM";
-            this.valueUpdater.updateValue(sections[5], isCurrentlyPM ? "AM" : "PM");
+            this.valueUpdater.update(sections[5], isCurrentlyPM ? "AM" : "PM");
 
             return;
         }
@@ -41,7 +41,7 @@ export default class SectionValueAdjusterWithArrows {
         }
 
         const pads: number = end - start;
-        this.valueUpdater.updateValue(currentSection!, currentValue.toString().padStart(pads, "0"));
+        this.valueUpdater.update(currentSection!, currentValue.toString().padStart(pads, "0"));
     }
 
     public canAdjust(currentSection: Section | null, pressedKey: string): boolean {

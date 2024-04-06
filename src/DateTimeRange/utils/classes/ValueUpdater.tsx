@@ -12,7 +12,7 @@ export default class ValueUpdater {
         this.onValueChange = onValueChange;
     }
 
-    public updateValue(
+    public update(
         updatedSection: { start: number; end: number },
         newSectionValue: string | number,
         highlightSection?: { start: number; end: number } | null,

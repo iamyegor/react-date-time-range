@@ -12,7 +12,7 @@ export default class AmPmSwitcher {
     public switch(section: Section | null, pressedKey: string) {
         if (this.canSwitch(section, pressedKey)) {
             const newAmPmValue: string = pressedKey == "a" ? "AM" : "PM";
-            this.valueUpdater.updateValue(section!, newAmPmValue);
+            this.valueUpdater.update(section!, newAmPmValue);
         }
     }
 

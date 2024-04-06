@@ -44,7 +44,7 @@ function DateTimeContainer({
     onFocus,
     isActive,
 }: DateTimeConatinerProps) {
-    const [inputValue, setInputValue] = useState<string>("");
+    const [inputValue, setInputValue] = useState<string>("MM/dd/yyyy hh:mm aa");
     const [isFocused, setIsFocused] = useState<boolean>(false);
     const [textWidth, setTextWidth] = useState<number>(0);
     const [shouldRemoveHiddenText, setShouldRemoveHiddenText] = useState<boolean>(false);
