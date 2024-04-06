@@ -1,4 +1,4 @@
-import { Section } from "types.tsx";
+import { SectionInfo } from "types.tsx";
 import { sections } from "globals.ts";
 import ValueUpdater from "./ValueUpdater.tsx";
 
@@ -10,7 +10,7 @@ export default class SectionValueAdjusterWithNumbers {
         this.valueUpdater = valueUpdater;
     }
 
-    public adjust(currentSection: Section | null, pressedKey: string): void {
+    public adjust(currentSection: SectionInfo | null, pressedKey: string): void {
         if (!this.canAdjust(currentSection, pressedKey)) {
             return;
         }
@@ -19,7 +19,7 @@ export default class SectionValueAdjusterWithNumbers {
 
         let currentSectionValue = this.value.slice(start, end);
         let newSectionValue: string;
-        let newHighlightedSection: Section;
+        let newHighlightedSection: SectionInfo;
         const numKey: number = parseInt(pressedKey);
 
         if (currentSection === sections[2]) {
@@ -44,7 +44,7 @@ export default class SectionValueAdjusterWithNumbers {
         this.valueUpdater.update(currentSection!, newSectionValue, newHighlightedSection);
     }
 
-    public canAdjust(currentSection: Section | null, pressedKey: string): boolean {
+    public canAdjust(currentSection: SectionInfo | null, pressedKey: string): boolean {
         if (!currentSection) {
             return false;
         }
@@ -53,10 +53,10 @@ export default class SectionValueAdjusterWithNumbers {
     }
 
     private calculateNewSectionValueForYear(currentSectionValue: string, numKey: number) {
-        if (currentSectionValue[0] !== "0") {
-            return "000" + numKey.toString();
-        } else {
+        if (currentSectionValue.startsWith("0")) {
             return (currentSectionValue + numKey).slice(-4);
+        } else {
+            return "000" + numKey.toString();
         }
     }
 
@@ -73,41 +73,45 @@ export default class SectionValueAdjusterWithNumbers {
         max: number,
         numKey: number,
         allowZero: boolean = false,
-    ) {
-        const maxFirstDigit = parseInt(max.toString()[0]);
-        const maxSecondDigit = parseInt(max.toString()[1]);
-        const secondDigit = parseInt(currentSectionValue[1]);
-
-        if (currentSectionValue[0] === "0") {
-            if (
-                secondDigit < maxFirstDigit ||
-                (secondDigit === maxFirstDigit && numKey <= maxSecondDigit)
-            ) {
-                return currentSectionValue[1] + numKey.toString();
-            }
+    ): string {
+        if (currentSectionValue.length != 2) {
+            throw new Error("Invalid section length");
         }
 
-        if (!allowZero) {
-            if (numKey === 0) {
+        const currentSecondDigit = parseInt(currentSectionValue[1]);
+
+        if (currentSectionValue.startsWith("0")) {
+            // For example the current value is '02' and the user inputs '5', this logic shifts the
+            // existing second digit ('2') to become the first digit, which results in 25
+            const intendedValue: number = parseInt(`${currentSecondDigit}${numKey}`);
+            if (intendedValue > max) {
+                return "0" + numKey.toString(); // e.g: 05
+            } else {
+                return intendedValue.toString();
+            }
+        } else {
+            if (!allowZero && numKey === 0) {
                 return currentSectionValue;
+            } else {
+                return "0" + numKey.toString();
             }
         }
-
-        return "0" + numKey.toString();
     }
 
     private calculateNewHighlightedSection(
         currentSectionIndex: number,
         currentSectionValue: string,
         max: number,
-    ) {
-        const maxFirstDigit = parseInt(max.toString()[0]);
-        const secondDigit = parseInt(currentSectionValue[1]);
+    ): SectionInfo {
+        const maxAllowedFirstDigit = parseInt(max.toString()[0]);
+        const currentFirstDigit = parseInt(currentSectionValue[0]);
+        const currentSecondDigit = parseInt(currentSectionValue[1]);
 
-        if (
-            (currentSectionValue[0] === "0" && secondDigit <= maxFirstDigit) ||
-            !parseInt(currentSectionValue)
-        ) {
+        if (!parseInt(currentSectionValue)) {
+            return sections[currentSectionIndex];
+        }
+
+        if (currentFirstDigit === 0 && currentSecondDigit <= maxAllowedFirstDigit) {
             return sections[currentSectionIndex];
         }
 

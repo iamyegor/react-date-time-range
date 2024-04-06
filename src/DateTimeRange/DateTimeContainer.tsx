@@ -14,6 +14,7 @@ import { Time } from "../types.tsx";
 import { isTimeLess } from "../utils.ts";
 import DateTimeInput from "./DateTimeInput.tsx";
 import "./styles/DateTimeContainer.css";
+import useUpdateDateTimeBasedOnValue from "./hooks/useUpdateDateTimeBasedOnValue.ts";
 
 interface DateTimeConatinerProps {
     text: string;
@@ -63,6 +64,15 @@ function DateTimeContainer({
             setShouldRemoveHiddenText(true);
         }
     }, []);
+
+    useUpdateDateTimeBasedOnValue(
+        inputValue,
+        useAMPM,
+        updateDate,
+        updateTime,
+        updateIsDateInvalid,
+        updateIsTimeInvalid,
+    );
 
     function handleFocus() {
         setIsFocused(true);
@@ -161,14 +171,8 @@ function DateTimeContainer({
                     <DateTimeInput
                         date={date}
                         time={time}
-                        onDateChange={updateDate}
-                        onTimeChange={updateTime}
                         value={inputValue}
-                        onValueChange={handleValueChange}
-                        isDateInvalid={isDateInvalid}
-                        onIsDateInvalidChange={updateIsDateInvalid}
-                        isTimeInvalid={isTimeInvalid}
-                        onIsTimeInvalidChange={updateIsTimeInvalid}
+                        updateValue={handleValueChange}
                     />
                 )}
                 <img src={calendarIcon} className=" absolute right-2 w-5 h-5" />

@@ -1,23 +1,9 @@
-import { Section } from "types.tsx";
+import { SectionGroup } from "../../enums/sections.ts";
+import { resolveSectionGroup } from "./sectionResolver.ts";
 
-export function getSectionValue(
-    wholeValue: string,
-    sectionPosition: {
-        start: number;
-        end: number;
-    },
-): string {
-    return wholeValue.slice(sectionPosition.start, sectionPosition.end);
-}
-
-export function extractPosition(
-    startPosition: Section | null,
-    endPosition: Section | null,
-): { start: number; end: number } {
-    const start = startPosition ? startPosition.start : 0;
-    const end = endPosition ? endPosition.end : 0;
-
-    return { start, end };
+export function extractSectionContentIn(valueToExtractFrom: string, section: SectionGroup): string {
+    const { start, end } = resolveSectionGroup(section);
+    return valueToExtractFrom.slice(start, end);
 }
 
 export function getSameHighlight(

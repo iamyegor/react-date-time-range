@@ -24,7 +24,7 @@ export enum DashedBorderDirection {
     Right = "right",
 }
 
-export interface Section {
+export interface SectionInfo {
     start: number;
     end: number;
     max: number;

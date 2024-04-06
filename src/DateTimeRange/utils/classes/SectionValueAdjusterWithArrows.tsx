@@ -1,20 +1,20 @@
-import { Section } from "types";
+import { SectionInfo } from "types";
 import { sections } from "globals";
-import ValueUpdater from "./ValueUpdater.tsx";
+import { decrementValueIn, incrementValueIn } from "../functions/sectionIncrementer.ts";
+import { Section } from "../../enums/sections.ts";
 
 export default class SectionValueAdjusterWithArrows {
     private readonly value: string;
-    private readonly useAMPM: boolean;
-    private readonly valueUpdater: ValueUpdater;
+    private readonly isAmPm: boolean;
+    private readonly updateInputValue: (newValue: string) => void;
 
-    constructor(value: string, valueUpdater: ValueUpdater, useAMPM: boolean) {
+    constructor(value: string, updateInputValue: (newValue: string) => void, isAmPm: boolean) {
         this.value = value;
-        this.valueUpdater = valueUpdater;
-        this.useAMPM = useAMPM;
+        this.updateInputValue = updateInputValue;
+        this.isAmPm = isAmPm;
     }
 
-    public adjust(currentSection: Section | null, pressedKey: string) {
-        const { start, end, min }: { start: number; end: number; min?: number } = currentSection!;
+    public adjust(currentSection: Section, pressedKey: string) {
 
         if (!this.canAdjust(currentSection, pressedKey)) {
             return;
@@ -22,41 +22,25 @@ export default class SectionValueAdjusterWithArrows {
 
         if (start === 17 && end === 19) {
             const isCurrentlyPM = this.value.slice(start, end) === "PM";
-            this.valueUpdater.update(sections[5], isCurrentlyPM ? "AM" : "PM");
+            // updateSectionIn(this.value, );
+            // this.updateInputValue(isCurrentlyPM ? "AM" : "PM");
 
             return;
         }
-
-        let currentValue: number = parseInt(this.value.slice(start, end)) || 0;
-        currentValue = pressedKey == "ArrowUp" ? currentValue + 1 : currentValue - 1;
-
-        const minThreshold: number = min ?? 1;
-        const maxThreshold: number = this.getMaxPossibleValueForSection(currentSection!);
-
-        if (currentValue < minThreshold) {
-            currentValue = maxThreshold;
-        }
-        if (currentValue > maxThreshold) {
-            currentValue = minThreshold;
-        }
+        
+        const newValue: number = "ArrowUp"
+            ? incrementValueIn(currentSection, this.value, this.isAmPm)
+            : decrementValueIn(currentSection, this.value, this.isAmPm);
 
         const pads: number = end - start;
         this.valueUpdater.update(currentSection!, currentValue.toString().padStart(pads, "0"));
     }
 
-    public canAdjust(currentSection: Section | null, pressedKey: string): boolean {
+    public canAdjust(currentSection: SectionInfo | null, pressedKey: string): boolean {
         if (!currentSection) {
             return false;
         }
 
         return pressedKey === "ArrowUp" || pressedKey === "ArrowDown";
-    }
-
-    private getMaxPossibleValueForSection(section: Section): number {
-        if (section === sections[3]) {
-            return this.useAMPM ? 12 : 23;
-        }
-
-        return section.max;
     }
 }

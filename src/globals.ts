@@ -1,6 +1,6 @@
-import { Section } from "./types";
+import { SectionInfo } from "./types";
 
-export const sections: Section[] = [
+export const sections: SectionInfo[] = [
     { start: 0, end: 2, max: 12, name: "MM" },
     { start: 3, end: 5, max: 31, name: "dd" },
     { start: 6, end: 10, max: 9999, name: "yyyy" },

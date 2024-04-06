@@ -1,175 +1,35 @@
-import { isValid } from "date-fns";
-import { KeyboardEvent, useEffect, useMemo, useRef } from "react";
+import { KeyboardEvent, useRef } from "react";
 import { useAppSelector } from "../app/hooks";
 import { selectUseAMPM } from "../features/dateTimeRangeSlice";
-import { getDateTimePlaceholder, sections } from "../globals";
-import { Section, Time } from "types.tsx";
-import SectionNavigation from "./utils/classes/SectionNavigation.tsx";
-import SectionValueAdjusterWithArrows from "./utils/classes/SectionValueAdjusterWithArrows.tsx";
-import SectionValueAdjusterWithNumbers from "./utils/classes/SectionValueAdjusterWithNumbers.tsx";
-import AmPmSwitcher from "./utils/classes/AmPmSwitcher.tsx";
-import SectionEraser from "./utils/classes/SectionEraser.tsx";
-import ValueUpdater from "./utils/classes/ValueUpdater.tsx";
-import { getSameHighlight, getSectionValue } from "DateTimeRange/utils/functions/sectionUtils.tsx";
+import { sections } from "../globals";
+import { SectionInfo, Time } from "types.tsx";
 import useUpdateValueBasedOnTime from "./hooks/useUpdateValueBasedOnTime.tsx";
 import useUpdateValueBasedOnDate from "./hooks/useUpdateValueBasedOnDate.tsx";
+import {
+    updateInputContents,
+    updateInputContentsAndHighlight,
+} from "./utils/functions/inputContentsUpdater.ts";
+import { Section } from "./enums/sections.ts";
+import { resolveSection, resolveSectionInfo } from "./utils/functions/sectionResolver.ts";
+import {
+    adjustSectionWithArrows,
+    canAdjustSectionWithArrows,
+} from "./utils/functions/sectionValueAdjuster.ts";
+import { canNavigateWithArrows, navigateWithArrows } from "./utils/functions/inputNavigator.ts";
 
 interface DateTimeInputProps {
     date: Date | null;
-    onDateChange: (date: Date | null) => void;
     time: Time | null;
-    onTimeChange: (time: Time | null) => void;
     value: string;
-    onValueChange: (value: string) => void;
-    isDateInvalid: boolean;
-    onIsDateInvalidChange: (isInvalid: boolean) => void;
-    isTimeInvalid: boolean;
-    onIsTimeInvalidChange: (isInvalid: boolean) => void;
+    updateValue: (value: string) => void;
 }
 
-function DateTimeInput({
-    onIsTimeInvalidChange,
-    onIsDateInvalidChange,
-    date,
-    time,
-    onDateChange,
-    onTimeChange,
-    value,
-    onValueChange,
-}: DateTimeInputProps) {
-    const useAMPM = useAppSelector(selectUseAMPM);
-
+export default function DateTimeInput({ date, time, value, updateValue }: DateTimeInputProps) {
+    const isAmPm = useAppSelector(selectUseAMPM);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    const valueUpdater = useMemo(
-        () => new ValueUpdater(inputRef, onValueChange),
-        [inputRef, onValueChange],
-    );
-
-    const sectionNavigation = useMemo(
-        () => new SectionNavigation(inputRef, sections, useAMPM),
-        [inputRef, sections, useAMPM],
-    );
-
-    const sectionAdjusterWithArrows = useMemo(
-        () => new SectionValueAdjusterWithArrows(value, valueUpdater, useAMPM),
-        [inputRef, value, onValueChange, useAMPM],
-    );
-
-    const amPmSwitcher = useMemo(() => new AmPmSwitcher(valueUpdater), [inputRef, onValueChange]);
-
-    const sectionAdjusterWithNumbers = useMemo(
-        () => new SectionValueAdjusterWithNumbers(value, valueUpdater),
-        [value, inputRef, onValueChange],
-    );
-
-    const sectionEraser = useMemo(() => new SectionEraser(valueUpdater), [inputRef, onValueChange]);
-
-    useEffect(() => {
-        const dateFromValue = queryDateFromValue();
-        const timeFromValue = queryTimeFromValue();
-
-        if (isValid(dateFromValue)) {
-            onDateChange(dateFromValue);
-            onIsDateInvalidChange(false);
-        } else {
-            onDateChange(null);
-            onIsDateInvalidChange(!isValuePlaceholder());
-        }
-
-        if (timeFromValue) {
-            onTimeChange(timeFromValue);
-            onIsTimeInvalidChange(false);
-        } else {
-            onTimeChange(null);
-            onIsTimeInvalidChange(!isValuePlaceholder());
-        }
-    }, [value]);
-
-    function isValuePlaceholder() {
-        const section = {
-            start: sections[0].start,
-            end: sections[5].end,
-        };
-
-        const allSectionsValue: string = getSectionValue(value, section);
-        return allSectionsValue === getDateTimePlaceholder(useAMPM);
-    }
-
-    function queryDateFromValue() {
-        const month = parseInt(getSectionValue(value, sections[0]));
-        const day = parseInt(getSectionValue(value, sections[1]));
-        const year = parseInt(getSectionValue(value, sections[2]));
-
-        if (year > 1899 && year < 2101) {
-            return new Date(year, month - 1, day);
-        }
-
-        return null;
-    }
-
-    function queryTimeFromValue() {
-        const hours = parseInt(getSectionValue(value, sections[3]));
-        const minutes = parseInt(getSectionValue(value, sections[4]));
-        const ampm = useAMPM ? getSectionValue(value, sections[5]) : "24";
-
-        if (isTimeValid(hours, minutes, ampm)) {
-            return { hours, minutes, ampm } as Time;
-        }
-
-        return null;
-    }
-
-    function isTimeValid(hours: number, minutes: number, ampm: string) {
-        if (ampm === "24") {
-            return !(
-                isNaN(hours) ||
-                isNaN(minutes) ||
-                hours > 23 ||
-                hours < 1 ||
-                minutes < 0 ||
-                minutes > 59
-            );
-        } else {
-            return !(
-                isNaN(hours) ||
-                isNaN(minutes) ||
-                hours < 1 ||
-                hours > 12 ||
-                minutes < 0 ||
-                minutes > 59 ||
-                (ampm !== "AM" && ampm !== "PM")
-            );
-        }
-    }
-
     useUpdateValueBasedOnDate(date, value, updateInputValue);
-    useUpdateValueBasedOnTime(time, value, updateInputValue, useAMPM);
-
-    function updateInputValue(newValue: string): void {
-        updateInputContents(newValue);
-        onValueChange(newValue);
-    }
-
-    function updateInputContents(
-        newValue: string,
-        sectionToHighlight?: { start: number; end: number },
-    ) {
-        if (!inputRef.current) {
-            return;
-        }
-
-        const newHighlightedSection = sectionToHighlight
-            ? sectionToHighlight
-            : getSameHighlight(inputRef.current);
-
-        if (!newHighlightedSection) {
-            return;
-        }
-
-        inputRef.current.value = newValue;
-        inputRef.current.setSelectionRange(newHighlightedSection.start, newHighlightedSection.end);
-    }
+    useUpdateValueBasedOnTime(time, value, updateInputValue, isAmPm);
 
     function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
         e.preventDefault();
@@ -177,28 +37,52 @@ function DateTimeInput({
         const currentSection: Section | null = getSelectedSection();
         const pressedKey: string = e.key;
 
-        if (sectionNavigation.canNavigate(currentSection, pressedKey)) {
-            sectionNavigation.navigate(currentSection, pressedKey);
+        if (!currentSection) {
+            return;
         }
-        if (sectionAdjusterWithArrows.canAdjust(currentSection, pressedKey)) {
-            sectionAdjusterWithArrows.adjust(currentSection, pressedKey);
+
+        if (canNavigateWithArrows(pressedKey)) {
+            navigateWithArrows(inputRef.current, pressedKey, currentSection, isAmPm);
+        } else if (canAdjustSectionWithArrows(pressedKey)) {
+            adjustSectionWithArrows(currentSection, pressedKey, value, isAmPm, updateInputValue);
+        } else if (canAdjustSectionWithNumbers(pressedKey)) {
+            adjustSectionWithNumbers()
         }
-        if (sectionAdjusterWithNumbers.canAdjust(currentSection, pressedKey)) {
-            sectionAdjusterWithNumbers.adjust(currentSection, pressedKey);
-        }
-        if (amPmSwitcher.canSwitch(currentSection, pressedKey)) {
-            amPmSwitcher.switch(currentSection, pressedKey);
-        }
-        if (sectionEraser.canErase(currentSection, pressedKey)) {
-            sectionEraser.erase(currentSection, pressedKey);
-        }
+        // if (sectionNavigation.canNavigate(currentSection, pressedKey)) {
+        //     sectionNavigation.navigate(currentSection, pressedKey);
+        // }
+        // if (sectionAdjusterWithArrows.canAdjust(currentSection, pressedKey)) {
+        //     sectionAdjusterWithArrows.adjust(currentSection, pressedKey);
+        // }
+        // if (sectionAdjusterWithNumbers.canAdjust(currentSection, pressedKey)) {
+        //     sectionAdjusterWithNumbers.adjust(currentSection, pressedKey);
+        // }
+        // if (amPmSwitcher.canSwitch(currentSection, pressedKey)) {
+        //     amPmSwitcher.switch(currentSection, pressedKey);
+        // }
+        // if (sectionEraser.canErase(currentSection, pressedKey)) {
+        //     sectionEraser.erase(currentSection, pressedKey);
+        // }
+    }
+
+    function updateInputValue(newValue: string): void {
+        updateInputContents(inputRef.current, newValue);
+        updateValue(newValue);
+    }
+
+    function updateInputValueAndHighlight(newValue: string, sectionToHighlight: Section) {
+        updateInputContentsAndHighlight(inputRef.current, newValue, sectionToHighlight);
+        updateValue(newValue);
     }
 
     function highlightSection(): void {
         const currentSection: Section | null = getSelectedSection();
-        if (currentSection) {
-            inputRef.current!.setSelectionRange(currentSection.start, currentSection.end);
+        if (!currentSection) {
+            return;
         }
+
+        const sectionInfo = resolveSectionInfo(currentSection);
+        inputRef.current!.setSelectionRange(sectionInfo.start, sectionInfo.end);
     }
 
     function getSelectedSection(): Section | null {
@@ -208,9 +92,15 @@ function DateTimeInput({
 
         const cursorPosition = inputRef.current.selectionStart || 0;
 
-        return sections.find(
+        const sectionInfo: SectionInfo | undefined = sections.find(
             (s) => cursorPosition >= s.start && cursorPosition <= s.end,
-        ) as Section | null;
+        );
+
+        if (sectionInfo) {
+            return resolveSection(sectionInfo);
+        }
+
+        return null;
     }
 
     return (
@@ -227,5 +117,3 @@ function DateTimeInput({
         />
     );
 }
-
-export default DateTimeInput;

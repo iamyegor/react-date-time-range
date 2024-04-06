@@ -1,14 +1,14 @@
-import { Section } from "../../types.tsx";
 import React from "react";
+import { SectionInfo } from "../../../types.tsx";
 
 export default class SectionNavigation {
     private readonly inputElement: React.MutableRefObject<HTMLInputElement | null>;
-    private readonly sections: Section[];
+    private readonly sections: SectionInfo[];
     private readonly useAMPM: boolean;
 
     constructor(
         inputElement: React.MutableRefObject<HTMLInputElement | null>,
-        sections: Section[],
+        sections: SectionInfo[],
         useAMPM: boolean,
     ) {
         this.inputElement = inputElement;
@@ -16,20 +16,21 @@ export default class SectionNavigation {
         this.useAMPM = useAMPM;
     }
 
-    public navigate(currentSection: Section | null, pressedKey: string): void {
+    public navigate(currentSection: SectionInfo | null, pressedKey: string): void {
         if (this.canNavigate(currentSection, pressedKey)) {
             const isNext = pressedKey === "ArrowRight";
             this.moveToDifferentSection(this.sections.indexOf(currentSection!), isNext);
         }
     }
 
-    public canNavigate(section: Section | null, pressedKey: string): boolean {
+    public canNavigate(section: SectionInfo | null, pressedKey: string): boolean {
         if (!section) return false;
         return pressedKey === "ArrowLeft" || pressedKey === "ArrowRight";
     }
 
     private moveToDifferentSection(currentSectionIndex: number, isNext: boolean): void {
         const nextSectionIndex = isNext ? currentSectionIndex + 1 : currentSectionIndex - 1;
+        
 
         const sectionsLength = this.useAMPM ? this.sections.length - 1 : this.sections.length - 2;
 
