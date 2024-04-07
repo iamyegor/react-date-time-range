@@ -2,8 +2,6 @@ import { KeyboardEvent, useRef } from "react";
 import { useAppSelector } from "../../redux/hooks.ts";
 import { selectUseAMPM } from "../../redux/dateTimeRangeSlice.ts";
 import { Time } from "types.tsx";
-import useUpdateValueBasedOnTime from "./hooks/useUpdateValueBasedOnTime.ts";
-import useUpdateValueBasedOnDate from "./hooks/useUpdateValueBasedOnDate.ts";
 import {
     updateInputContents,
     updateInputContentsAndHighlight,
@@ -22,6 +20,7 @@ import {
 import { canSwitchAmPm, switchAmPm } from "./features/switchAmPm.ts";
 import { canEraseSection, eraseSection } from "./features/eraseSection.ts";
 import { SectionInfo } from "./types/SectionInfo.ts";
+import useUpdateValueBasedOnDateTime from "./hooks/useUpdateValueBasedOnDateTime.ts";
 
 interface DateTimeInputProps {
     date: Date | null;
@@ -34,8 +33,7 @@ export default function DateTimeInput({ date, time, value, updateValue }: DateTi
     const isAmPm = useAppSelector(selectUseAMPM);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    useUpdateValueBasedOnDate(date, value, updateInputValue);
-    useUpdateValueBasedOnTime(time, value, updateInputValue, isAmPm);
+    useUpdateValueBasedOnDateTime(date, time, value, updateInputValue, isAmPm)
 
     function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
         e.preventDefault();
