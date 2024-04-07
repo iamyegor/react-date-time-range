@@ -1,6 +1,6 @@
 import { Section } from "../../enums/sections.ts";
 import { SectionInfo } from "../../../types.tsx";
-import { resolveSectionInfo } from "./sectionResolver.ts";
+import { getSectionContentIn, resolveSectionInfo } from "./sectionResolver.ts";
 
 export function incrementValueIn(section: Section, inputValue: string, isAmPm: boolean): number {
     if (section == Section.AmPm) {
@@ -9,9 +9,7 @@ export function incrementValueIn(section: Section, inputValue: string, isAmPm: b
 
     const sectionInfo: SectionInfo = resolveSectionInfo(section);
 
-    const currentValueString: string = inputValue.slice(sectionInfo.start, sectionInfo.end);
-    const currentValue: number = parseInt(currentValueString) || 0;
-
+    const currentValue: number = parseInt(getSectionContentIn(inputValue, section)) || 0;
     let incrementedValue: number = currentValue + 1;
 
     if (incrementedValue > getMaxThreshold(section, isAmPm)) {
@@ -28,9 +26,7 @@ export function decrementValueIn(section: Section, inputValue: string, isAmPm: b
 
     const sectionInfo: SectionInfo = resolveSectionInfo(section);
 
-    const currentValueString: string = inputValue.slice(sectionInfo.start, sectionInfo.end);
-    const currentValue: number = parseInt(currentValueString) || 0;
-
+    const currentValue: number = parseInt(getSectionContentIn(inputValue, section)) || 0;
     let decrementedValue: number = currentValue - 1;
 
     if (decrementedValue < (sectionInfo.min ?? 1)) {

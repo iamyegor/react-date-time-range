@@ -1,21 +1,27 @@
 import { KeyboardEvent, useRef } from "react";
-import { useAppSelector } from "../app/hooks";
-import { selectUseAMPM } from "../features/dateTimeRangeSlice";
-import { sections } from "../globals";
+import { useAppSelector } from "../../app/hooks.ts";
+import { selectUseAMPM } from "../../features/dateTimeRangeSlice.ts";
+import { sections } from "../../globals.ts";
 import { SectionInfo, Time } from "types.tsx";
-import useUpdateValueBasedOnTime from "./hooks/useUpdateValueBasedOnTime.tsx";
-import useUpdateValueBasedOnDate from "./hooks/useUpdateValueBasedOnDate.tsx";
+import useUpdateValueBasedOnTime from "../hooks/useUpdateValueBasedOnTime.tsx";
+import useUpdateValueBasedOnDate from "../hooks/useUpdateValueBasedOnDate.tsx";
 import {
     updateInputContents,
     updateInputContentsAndHighlight,
-} from "./utils/functions/inputContentsUpdater.ts";
-import { Section } from "./enums/sections.ts";
-import { resolveSection, resolveSectionInfo } from "./utils/functions/sectionResolver.ts";
+} from "../utils/functions/inputContentsUpdater.ts";
+import { Section } from "../enums/sections.ts";
+import { resolveSection, resolveSectionInfo } from "../utils/functions/sectionResolver.ts";
+import { canNavigateWithArrows, navigateInputWithArrows } from "./features/navigateInput.ts";
 import {
     adjustSectionWithArrows,
     canAdjustSectionWithArrows,
-} from "./utils/functions/sectionValueAdjuster.ts";
-import { canNavigateWithArrows, navigateWithArrows } from "./utils/functions/inputNavigator.ts";
+} from "./features/adjustSectionWithArrows.ts";
+import {
+    adjustSectionWithNumbers,
+    canAdjustSectionWithNumbers,
+} from "./features/adjustSectionWithNumbers.ts";
+import { canSwitchAmPm, switchAmPm } from "./features/switchAmPm.ts";
+import { canEraseSection, eraseSection } from "./features/eraseSection.ts";
 
 interface DateTimeInputProps {
     date: Date | null;
@@ -42,27 +48,22 @@ export default function DateTimeInput({ date, time, value, updateValue }: DateTi
         }
 
         if (canNavigateWithArrows(pressedKey)) {
-            navigateWithArrows(inputRef.current, pressedKey, currentSection, isAmPm);
+            navigateInputWithArrows(inputRef.current, pressedKey, currentSection, isAmPm);
         } else if (canAdjustSectionWithArrows(pressedKey)) {
-            adjustSectionWithArrows(currentSection, pressedKey, value, isAmPm, updateInputValue);
-        } else if (canAdjustSectionWithNumbers(pressedKey)) {
-            adjustSectionWithNumbers()
+            adjustSectionWithArrows(pressedKey, currentSection, value, isAmPm, updateInputValue);
+        } else if (canAdjustSectionWithNumbers(pressedKey, currentSection)) {
+            adjustSectionWithNumbers(
+                pressedKey,
+                currentSection,
+                value,
+                updateInputValueAndHighlight,
+                isAmPm,
+            );
+        } else if (canSwitchAmPm(pressedKey, currentSection)) {
+            switchAmPm(pressedKey, currentSection, value, updateInputValue);
+        } else if (canEraseSection(pressedKey)) {
+            eraseSection(pressedKey, currentSection, value, updateInputValue);
         }
-        // if (sectionNavigation.canNavigate(currentSection, pressedKey)) {
-        //     sectionNavigation.navigate(currentSection, pressedKey);
-        // }
-        // if (sectionAdjusterWithArrows.canAdjust(currentSection, pressedKey)) {
-        //     sectionAdjusterWithArrows.adjust(currentSection, pressedKey);
-        // }
-        // if (sectionAdjusterWithNumbers.canAdjust(currentSection, pressedKey)) {
-        //     sectionAdjusterWithNumbers.adjust(currentSection, pressedKey);
-        // }
-        // if (amPmSwitcher.canSwitch(currentSection, pressedKey)) {
-        //     amPmSwitcher.switch(currentSection, pressedKey);
-        // }
-        // if (sectionEraser.canErase(currentSection, pressedKey)) {
-        //     sectionEraser.erase(currentSection, pressedKey);
-        // }
     }
 
     function updateInputValue(newValue: string): void {
@@ -81,7 +82,7 @@ export default function DateTimeInput({ date, time, value, updateValue }: DateTi
             return;
         }
 
-        const sectionInfo = resolveSectionInfo(currentSection);
+        const sectionInfo: SectionInfo = resolveSectionInfo(currentSection);
         inputRef.current!.setSelectionRange(sectionInfo.start, sectionInfo.end);
     }
 

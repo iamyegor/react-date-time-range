@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { isValid } from "date-fns";
 import { getDateTimePlaceholder } from "../../globals.ts";
-import { extractSectionContentIn } from "../utils/functions/sectionUtils.tsx";
 import { Time } from "../../types.tsx";
 import { parseStringToTime } from "../utils/functions/timeParser.ts";
 import { parseStringToDate } from "../utils/functions/dateParser.ts";
 import { SectionGroup } from "../enums/sections.ts";
+import { getSectionContentIn } from "../utils/functions/sectionResolver.ts";
 
 export default function useUpdateDateTimeBasedOnValue(
     value: string,
@@ -41,15 +41,15 @@ export default function useUpdateDateTimeBasedOnValue(
     }
 
     function extractDateFrom(valueToExtractFrom: string): Date | null {
-        const dateString: string = extractSectionContentIn(valueToExtractFrom, SectionGroup.Date);
+        const dateString: string = getSectionContentIn(valueToExtractFrom, SectionGroup.Date);
 
         return parseStringToDate(dateString);
     }
 
     function extractTimeFrom(valueToExtractFrom: string): Time | null {
-        const timeString: string = extractSectionContentIn(
+        const timeString: string = getSectionContentIn(
             valueToExtractFrom,
-            isAmPm ? SectionGroup.Time24 : SectionGroup.TimeAmPm,
+            isAmPm ? SectionGroup.TimeAmPm : SectionGroup.Time24,
         );
 
         return parseStringToTime(timeString);

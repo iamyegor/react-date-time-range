@@ -1,12 +1,11 @@
 import { Section } from "../../enums/sections.ts";
-import { decrementValueIn, incrementValueIn } from "./sectionIncrementer.ts";
-import { resolveSectionInfo } from "./sectionResolver.ts";
-import { updateSectionIn } from "./sectionUpdater.ts";
-import { toggleAmPm } from "./amPmToggler.ts";
+import { decrementValueIn, incrementValueIn } from "../../utils/functions/sectionIncrementer.ts";
+import { getSectionContentIn, resolveSectionInfo } from "../../utils/functions/sectionResolver.ts";
+import { updateSectionIn } from "../../utils/functions/sectionUpdater.ts";
 
 export function adjustSectionWithArrows(
-    section: Section,
     pressedKey: string,
+    section: Section,
     value: string,
     isAmPm: boolean,
     updateInputValue: (newValue: string) => void,
@@ -14,11 +13,11 @@ export function adjustSectionWithArrows(
     if (!canAdjustSectionWithArrows(pressedKey)) {
         return;
     }
-    
+
     let newSectionValue: string | number;
 
     if (section == Section.AmPm) {
-        newSectionValue = toggleAmPm(value);
+        newSectionValue = toggleAmPmIn(value);
     } else {
         if (pressedKey == "ArrowUp") {
             newSectionValue = incrementValueIn(section, value, isAmPm);
@@ -32,7 +31,17 @@ export function adjustSectionWithArrows(
     updateInputValue(newValue);
 }
 
-export function canAdjustSectionWithArrows(pressedKey:string): boolean {
+export function toggleAmPmIn(inputValue: string): string {
+    const amPm: string = getSectionContentIn(inputValue, Section.AmPm);
+
+    if (amPm == "AM") {
+        return "PM";
+    } else {
+        return "AM";
+    }
+}
+
+export function canAdjustSectionWithArrows(pressedKey: string): boolean {
     return pressedKey == "ArrowUp" || pressedKey == "ArrowDown";
 }
 

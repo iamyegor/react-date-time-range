@@ -103,15 +103,14 @@ export default class SectionValueAdjusterWithNumbers {
         currentSectionValue: string,
         max: number,
     ): SectionInfo {
-        const maxAllowedFirstDigit = parseInt(max.toString()[0]);
-        const currentFirstDigit = parseInt(currentSectionValue[0]);
-        const currentSecondDigit = parseInt(currentSectionValue[1]);
+        const maxAllowedFirstDigit: number = parseInt(max.toString().charAt(0));
+        const currentSecondDigit: number = parseInt(currentSectionValue.charAt(1));
 
         if (!parseInt(currentSectionValue)) {
             return sections[currentSectionIndex];
         }
 
-        if (currentFirstDigit === 0 && currentSecondDigit <= maxAllowedFirstDigit) {
+        if (currentSectionValue.startsWith("0") && currentSecondDigit <= maxAllowedFirstDigit) {
             return sections[currentSectionIndex];
         }
 

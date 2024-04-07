@@ -1,4 +1,3 @@
-import { getSameHighlight } from "./sectionUtils.tsx";
 import { SectionInfo } from "../../../types.tsx";
 import { Section } from "../../enums/sections.ts";
 import { resolveSectionInfo } from "./sectionResolver.ts";
@@ -14,12 +13,13 @@ export function updateInputContents(input: HTMLInputElement | null, newValue: st
         return;
     }
 
-    input.value = newValue;
+    const sectionToHighlight = {
+        start: input.selectionStart || 0,
+        end: input.selectionEnd || 0,
+    };
 
-    const sectionToHighlight: { start: number; end: number } | null = getSameHighlight(input);
-    if (sectionToHighlight) {
-        input.setSelectionRange(sectionToHighlight.start, sectionToHighlight.end);
-    }
+    input.value = newValue;
+    input.setSelectionRange(sectionToHighlight.start, sectionToHighlight.end);
 }
 
 export function updateInputContentsAndHighlight(

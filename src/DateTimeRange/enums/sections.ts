@@ -12,3 +12,4 @@ export enum Section {
     Minute,
     AmPm
 }
+

@@ -1,5 +1,5 @@
-import { Section } from "../../types.tsx";
 import ValueUpdater from "./ValueUpdater.tsx";
+import { Section } from "../../enums/sections.ts";
 
 export default class SectionEraser {
     private readonly valueUpdater: ValueUpdater;

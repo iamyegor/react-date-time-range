@@ -44,12 +44,9 @@ export function getNextSectionInfo(section: Section, isAmPm: boolean): SectionIn
     const nextSectionIndex = sections.indexOf(sectionInfo) + 1;
     const numberOfSections = isAmPm ? sections.length : sections.length - 1;
 
-    if (nextSectionIndex > numberOfSections) {
-        return null;
-    }
-
-    return sections[nextSectionIndex];
+    return nextSectionIndex > numberOfSections ? null : sections[nextSectionIndex];
 }
+
 export function getPreviousSectionInfo(section: Section): SectionInfo | null {
     const sectionInfo: SectionInfo = resolveSectionInfo(section);
 
@@ -58,15 +55,30 @@ export function getPreviousSectionInfo(section: Section): SectionInfo | null {
     if (previousSectionIndex < 0) {
         return null;
     }
-    
+
     return sections[previousSectionIndex];
+}
+
+export function getSectionContentIn(
+    inputValue: string,
+    sectionOrSectionGroup: Section | SectionGroup,
+): string {
+    let sectionInfo: { start: number; end: number };
+
+    if (isSectionGroup(sectionOrSectionGroup)) {
+        sectionInfo = resolveSectionStartEnd(sectionOrSectionGroup as SectionGroup);
+    } else {
+        sectionInfo = resolveSectionInfo(sectionOrSectionGroup as Section);
+    }
+
+    return inputValue.slice(sectionInfo.start, sectionInfo.end);
 }
 
 function sameSection(section1: SectionInfo, section2: SectionInfo) {
     return section1.start === section2.start && section1.end === section2.end;
 }
 
-export function resolveSectionGroup(sectionGroup: SectionGroup): { start: number; end: number } {
+export function resolveSectionStartEnd(sectionGroup: SectionGroup): { start: number; end: number } {
     if (sectionGroup == SectionGroup.Date) {
         return { start: sections[0].start, end: sections[2].end };
     } else if (sectionGroup == SectionGroup.Time24) {
@@ -76,4 +88,8 @@ export function resolveSectionGroup(sectionGroup: SectionGroup): { start: number
     }
 
     throw new Error("Should never get here!");
+}
+
+export function isSectionGroup(sectionOrSectionGroup: Section | SectionGroup) {
+    return Object.values(SectionGroup).includes(sectionOrSectionGroup as SectionGroup);
 }
