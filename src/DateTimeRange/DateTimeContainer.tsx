@@ -16,7 +16,7 @@ import DateTimeInput from "./DateTimeInput/DateTimeInput.tsx";
 import "./styles/DateTimeContainer.css";
 import useUpdateDateTimeBasedOnValue from "./DateTimeInput/hooks/useUpdateDateTimeBasedOnValue.ts";
 
-interface DateTimeConatinerProps {
+interface DateTimeContainerProps {
     text: string;
     date: Date | null;
     updateDate: (date: Date | null) => void;
@@ -44,7 +44,7 @@ function DateTimeContainer({
     updateTime,
     onFocus,
     isActive,
-}: DateTimeConatinerProps) {
+}: DateTimeContainerProps) {
     const [inputValue, setInputValue] = useState<string>("MM/dd/yyyy hh:mm aa");
     const [isFocused, setIsFocused] = useState<boolean>(false);
     const [textWidth, setTextWidth] = useState<number>(0);
