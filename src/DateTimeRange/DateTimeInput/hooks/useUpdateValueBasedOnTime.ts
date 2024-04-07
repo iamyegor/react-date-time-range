@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { Time } from "../../types.tsx";
-import { SectionGroup, updateSectionIn } from "../utils/functions/updateSectionIn.ts";
-import { parseTimeToString } from "../utils/functions/timeParser.ts";
+import { Time } from "../../../types.tsx";
+import { parseTimeToString } from "../utils/timeParser.ts";
+import { SectionGroup } from "../enums/sections.ts";
+import { updateSectionIn } from "../utils/sectionUpdater.ts";
 
 export default function useUpdateValueBasedOnTime(
     time: Time | null,

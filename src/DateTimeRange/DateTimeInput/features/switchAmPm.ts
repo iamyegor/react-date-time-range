@@ -1,5 +1,5 @@
-import { Section } from "../../enums/sections.ts";
-import { updateSectionIn } from "../../utils/functions/sectionUpdater.ts";
+import { Section } from "../enums/sections.ts";
+import { updateSectionIn } from "../utils/sectionUpdater.ts";
 
 export function switchAmPm(
     pressedKey: string,

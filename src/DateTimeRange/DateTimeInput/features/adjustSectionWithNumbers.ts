@@ -1,11 +1,11 @@
-import { Section } from "../../enums/sections.ts";
-import { updateSectionIn } from "../../utils/functions/sectionUpdater.ts";
+import { Section } from "../enums/sections.ts";
+import { updateSectionIn } from "../utils/sectionUpdater.ts";
 import {
     getNextSectionInfo,
     getSectionContentIn,
     resolveSection,
     resolveSectionInfo,
-} from "../../utils/functions/sectionResolver.ts";
+} from "../utils/sectionResolver.ts";
 import { SectionInfo } from "../../../types.tsx";
 
 export function canAdjustSectionWithNumbers(pressedKey: string, currentSection: Section): boolean {

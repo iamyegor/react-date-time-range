@@ -1,7 +1,7 @@
-import { Section } from "../../enums/sections.ts";
-import { decrementValueIn, incrementValueIn } from "../../utils/functions/sectionIncrementer.ts";
-import { getSectionContentIn, resolveSectionInfo } from "../../utils/functions/sectionResolver.ts";
-import { updateSectionIn } from "../../utils/functions/sectionUpdater.ts";
+import { Section } from "../enums/sections.ts";
+import { decrementValueIn, incrementValueIn } from "../utils/sectionIncrementer.ts";
+import { getSectionContentIn, resolveSectionInfo } from "../utils/sectionResolver.ts";
+import { updateSectionIn } from "../utils/sectionUpdater.ts";
 
 export function adjustSectionWithArrows(
     pressedKey: string,

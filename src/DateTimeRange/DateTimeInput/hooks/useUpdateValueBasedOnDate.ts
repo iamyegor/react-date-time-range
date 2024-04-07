@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { updateSectionIn, SectionGroup } from "../utils/functions/updateSectionIn.ts";
-import { parseDateToString } from "../utils/functions/dateParser.ts";
+import { parseDateToString } from "../utils/dateParser.ts";
+import { updateSectionIn } from "../utils/sectionUpdater.ts";
+import { SectionGroup } from "../enums/sections.ts";
 
 export default function useUpdateValueBasedOnDate(
     date: Date | null,

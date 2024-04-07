@@ -3,14 +3,14 @@ import { useAppSelector } from "../../app/hooks.ts";
 import { selectUseAMPM } from "../../features/dateTimeRangeSlice.ts";
 import { sections } from "../../globals.ts";
 import { SectionInfo, Time } from "types.tsx";
-import useUpdateValueBasedOnTime from "../hooks/useUpdateValueBasedOnTime.tsx";
-import useUpdateValueBasedOnDate from "../hooks/useUpdateValueBasedOnDate.tsx";
+import useUpdateValueBasedOnTime from "./hooks/useUpdateValueBasedOnTime.ts";
+import useUpdateValueBasedOnDate from "./hooks/useUpdateValueBasedOnDate.ts";
 import {
     updateInputContents,
     updateInputContentsAndHighlight,
-} from "../utils/functions/inputContentsUpdater.ts";
-import { Section } from "../enums/sections.ts";
-import { resolveSection, resolveSectionInfo } from "../utils/functions/sectionResolver.ts";
+} from "./utils/inputContentsUpdater.ts";
+import { Section } from "./enums/sections.ts";
+import { resolveSection, resolveSectionInfo } from "./utils/sectionResolver.ts";
 import { canNavigateWithArrows, navigateInputWithArrows } from "./features/navigateInput.ts";
 import {
     adjustSectionWithArrows,

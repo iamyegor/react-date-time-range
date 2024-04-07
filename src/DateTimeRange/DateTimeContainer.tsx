@@ -14,7 +14,7 @@ import { Time } from "../types.tsx";
 import { isTimeLess } from "../utils.ts";
 import DateTimeInput from "./DateTimeInput/DateTimeInput.tsx";
 import "./styles/DateTimeContainer.css";
-import useUpdateDateTimeBasedOnValue from "./hooks/useUpdateDateTimeBasedOnValue.ts";
+import useUpdateDateTimeBasedOnValue from "./DateTimeInput/hooks/useUpdateDateTimeBasedOnValue.ts";
 
 interface DateTimeConatinerProps {
     text: string;
