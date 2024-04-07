@@ -6,7 +6,8 @@ import {
     resolveSection,
     resolveSectionInfo,
 } from "../utils/sectionResolver.ts";
-import { SectionInfo } from "../../../types.tsx";
+
+import { SectionInfo } from "../types/SectionInfo.ts";
 
 export function canAdjustSectionWithNumbers(pressedKey: string, currentSection: Section): boolean {
     return !isNaN(parseInt(pressedKey, 10)) && currentSection !== Section.AmPm;

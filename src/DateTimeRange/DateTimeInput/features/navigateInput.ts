@@ -1,6 +1,6 @@
 import { Section } from "../enums/Section.ts";
-import { SectionInfo } from "../../../types.tsx";
 import { getNextSectionInfo, getPreviousSectionInfo } from "../utils/sectionResolver.ts";
+import { SectionInfo } from "../types/SectionInfo.ts";
 
 export function navigateInputWithArrows(
     input: HTMLInputElement | null,

@@ -1,6 +1,8 @@
-import { sections } from "../../../globals.ts";
-import { Section, SectionGroup } from "../enums/Section.ts";
-import { SectionInfo } from "../../../types.tsx";
+import { Section } from "../enums/Section.ts";
+
+import { SectionInfo } from "../types/SectionInfo.ts";
+import { sections } from "../constants/sections.ts";
+import { SectionGroup } from "../enums/SectionGroup.ts";
 
 export function resolveSectionInfo(section: Section): SectionInfo {
     if (section == Section.Month) {

@@ -2,7 +2,6 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { addMonths, format, subMonths } from "date-fns";
 import { ReactNode } from "react";
-import { DATE_PLACEHOLDER, getDateTimePlaceholder } from "../../globals";
 import convertTo2DigitString from "../../utils";
 import {
     clickAMPMOption,
@@ -17,16 +16,15 @@ import {
     expectDatesHighlighted,
     expectFirstInputToBeInvalid,
     expectFirstInputToHaveValue,
-    expectHourToBeDisabled,
-    expectHourToBeEnabled,
     expectHoursToBeDisabledInRange,
     expectHoursToBeDisabledUpTo,
     expectHoursToBeEnabledUpTo,
+    expectHourToBeDisabled,
+    expectHourToBeEnabled,
     expectMinutesToBeDisabledInRange,
     expectMinutesToBeDisabledUpTo,
     expectMinutesToBeEnabled,
     expectOnlyCellIsSelected,
-    expectSecondInputToBeInvalid,
     expectSecondInputToHaveValue,
     getCell,
     getEmptyCellsFor,
@@ -36,6 +34,7 @@ import {
     renderWithMaxDate,
     renderWithMinDate,
 } from "../../test/helpers.tsx";
+import { DATE_TIME_AMPM } from "../DateTimeInput/constants/placeholders.ts";
 
 Element.prototype.scrollTo = () => {};
 vi.mock("react-transition-group", () => {
@@ -46,6 +45,10 @@ vi.mock("react-transition-group", () => {
         TransitionGroup: ({ children }: { children: ReactNode }) => children,
     };
 });
+
+function getDateTimePlaceholder(isAmPm: boolean) {
+    return isAmPm ? DATE_TIME_AMPM : DATE_TIME_AMPM;
+}
 
 describe("DateTimeRange", () => {
     beforeEach(() => {
@@ -272,7 +275,7 @@ describe("DateTimeRange", () => {
         await clickFirstInput();
         await clickCell("20");
 
-        expectSecondInputToHaveValue(DATE_PLACEHOLDER + " 07:00 AM");
+        expectSecondInputToHaveValue("MM/dd/yyyy 07:00 AM");
     });
 
     it(`removes the second date highlight when user selects the first date 
@@ -301,7 +304,7 @@ describe("DateTimeRange", () => {
         await clickSecondInput();
         await clickCell("10");
 
-        expectSecondInputToHaveValue(DATE_PLACEHOLDER + " 07:00 AM");
+        expectSecondInputToHaveValue("MM/dd/yyyy 07:00 AM");
     });
 
     it(`removes the second date highlight when user selects the second date that 

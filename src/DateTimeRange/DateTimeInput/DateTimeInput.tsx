@@ -1,7 +1,7 @@
 import { KeyboardEvent, useRef } from "react";
 import { useAppSelector } from "../../app/hooks.ts";
 import { selectUseAMPM } from "../../features/dateTimeRangeSlice.ts";
-import { SectionInfo, Time } from "types.tsx";
+import { Time } from "types.tsx";
 import useUpdateValueBasedOnTime from "./hooks/useUpdateValueBasedOnTime.ts";
 import useUpdateValueBasedOnDate from "./hooks/useUpdateValueBasedOnDate.ts";
 import {
@@ -21,6 +21,7 @@ import {
 } from "./features/adjustSectionWithNumbers.ts";
 import { canSwitchAmPm, switchAmPm } from "./features/switchAmPm.ts";
 import { canEraseSection, eraseSection } from "./features/eraseSection.ts";
+import { SectionInfo } from "./types/SectionInfo.ts";
 
 interface DateTimeInputProps {
     date: Date | null;

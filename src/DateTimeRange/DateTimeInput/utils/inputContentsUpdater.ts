@@ -1,6 +1,6 @@
-import { SectionInfo } from "../../../types.tsx";
 import { Section } from "../enums/Section.ts";
 import { resolveSectionInfo } from "./sectionResolver.ts";
+import { SectionInfo } from "../types/SectionInfo.ts";
 
 // Updates the content of the specified input field with a new value and
 // maintains the user's cursor position. Without this function, just modifying

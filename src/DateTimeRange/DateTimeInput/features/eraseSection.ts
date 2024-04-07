@@ -1,7 +1,7 @@
 import { Section } from "../enums/Section.ts";
 import { updateSectionIn } from "../utils/sectionUpdater.ts";
-import { SectionInfo } from "../../../types.tsx";
 import { resolveSectionInfo } from "../utils/sectionResolver.ts";
+import { SectionInfo } from "../types/SectionInfo.ts";
 
 export function canEraseSection(pressedKey: string) {
     return pressedKey === "Backspace";

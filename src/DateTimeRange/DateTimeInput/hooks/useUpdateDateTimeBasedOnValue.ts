@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { isValid } from "date-fns";
-import { getDateTimePlaceholder } from "../../../globals.ts";
 import { Time } from "../../../types.tsx";
 import { parseStringToTime } from "../utils/timeParser.ts";
 import { parseStringToDate } from "../utils/dateParser.ts";
-import { SectionGroup } from "../enums/Section.ts";
 import { getSectionContentIn } from "../utils/sectionResolver.ts";
+import { DATE_TIME_24, DATE_TIME_AMPM } from "../constants/placeholders.ts";
+import { SectionGroup } from "../enums/SectionGroup.ts";
 
 export default function useUpdateDateTimeBasedOnValue(
     value: string,
@@ -37,7 +37,7 @@ export default function useUpdateDateTimeBasedOnValue(
     }, [value]);
 
     function isValuePlaceholder() {
-        return value === getDateTimePlaceholder(isAmPm);
+        return value === DATE_TIME_AMPM || value === DATE_TIME_24;
     }
 
     function extractDateFrom(valueToExtractFrom: string): Date | null {

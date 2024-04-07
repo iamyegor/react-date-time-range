@@ -1,6 +1,6 @@
 import { Section } from "../enums/Section.ts";
-import { SectionInfo } from "../../../types.tsx";
 import { getSectionContentIn, resolveSectionInfo } from "./sectionResolver.ts";
+import { SectionInfo } from "../types/SectionInfo.ts";
 
 export function incrementValueIn(section: Section, inputValue: string, isAmPm: boolean): number {
     if (section == Section.AmPm) {

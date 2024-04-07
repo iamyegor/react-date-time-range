@@ -1,4 +1,5 @@
-import { Section, SectionGroup } from "../enums/Section.ts";
+import { Section } from "../enums/Section.ts";
+import { SectionGroup } from "../enums/SectionGroup.ts";
 import { resolveSectionInfo, resolveStartEndOf } from "./sectionResolver.ts";
 
 export function updateSectionIn(

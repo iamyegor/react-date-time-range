@@ -8,13 +8,13 @@ import {
     selectMinTimeIn24Hours,
     selectUseAMPM,
 } from "../features/dateTimeRangeSlice.ts";
-import { getDateTimePlaceholder } from "../globals.ts";
 import { Time } from "../types.tsx";
 import { isTimeLess } from "../utils.ts";
 import DateTimeInput from "./DateTimeInput/DateTimeInput.tsx";
 import "./styles/DateTimeContainer.css";
 import useUpdateDateTimeBasedOnValue from "./DateTimeInput/hooks/useUpdateDateTimeBasedOnValue.ts";
 import classNames from "classnames";
+import { DATE_TIME_24, DATE_TIME_AMPM } from "./DateTimeInput/constants/placeholders.ts";
 
 interface DateTimeContainerProps {
     text: string;
@@ -89,7 +89,7 @@ function DateTimeContainer({
             date ||
             time ||
             isActive ||
-            (inputValue && inputValue !== getDateTimePlaceholder(useAMPM))
+            (inputValue && inputValue !== (useAMPM ? DATE_TIME_AMPM : DATE_TIME_24))
         ) {
             return true;
         }
