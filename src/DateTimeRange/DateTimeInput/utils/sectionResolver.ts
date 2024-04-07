@@ -74,7 +74,7 @@ export function getSectionContentIn(
     let sectionInfo: { start: number; end: number };
 
     if (isSectionGroup(sectionOrSectionGroup)) {
-        sectionInfo = resolveSectionStartEnd(sectionOrSectionGroup as SectionGroup);
+        sectionInfo = resolveStartEndOf(sectionOrSectionGroup as SectionGroup);
     } else {
         sectionInfo = resolveSectionInfo(sectionOrSectionGroup as Section);
     }
@@ -86,7 +86,7 @@ function sameSection(section1: SectionInfo, section2: SectionInfo) {
     return section1.start === section2.start && section1.end === section2.end;
 }
 
-export function resolveSectionStartEnd(sectionGroup: SectionGroup): { start: number; end: number } {
+export function resolveStartEndOf(sectionGroup: SectionGroup): { start: number; end: number } {
     if (sectionGroup == SectionGroup.Date) {
         return { start: sections[0].start, end: sections[2].end };
     } else if (sectionGroup == SectionGroup.Time24) {
