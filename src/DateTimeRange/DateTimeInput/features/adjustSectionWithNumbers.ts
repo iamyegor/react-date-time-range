@@ -1,4 +1,4 @@
-import { Section } from "../enums/sections.ts";
+import { Section } from "../enums/Section.ts";
 import { updateSectionIn } from "../utils/sectionUpdater.ts";
 import {
     getNextSectionInfo,

@@ -1,9 +1,3 @@
-export enum SectionGroup {
-    Date = 101,
-    Time24 = 102,
-    TimeAmPm = 103,
-}
-
 export enum Section {
     Month = 1,
     Day = 2,

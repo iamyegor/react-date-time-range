@@ -1,5 +1,5 @@
 import { SectionInfo } from "../../../types.tsx";
-import { Section } from "../enums/sections.ts";
+import { Section } from "../enums/Section.ts";
 import { resolveSectionInfo } from "./sectionResolver.ts";
 
 // Updates the content of the specified input field with a new value and

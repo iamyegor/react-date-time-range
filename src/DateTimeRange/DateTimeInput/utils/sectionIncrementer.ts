@@ -1,4 +1,4 @@
-import { Section } from "../enums/sections.ts";
+import { Section } from "../enums/Section.ts";
 import { SectionInfo } from "../../../types.tsx";
 import { getSectionContentIn, resolveSectionInfo } from "./sectionResolver.ts";
 

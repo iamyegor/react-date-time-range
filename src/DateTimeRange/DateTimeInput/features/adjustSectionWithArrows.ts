@@ -1,4 +1,4 @@
-import { Section } from "../enums/sections.ts";
+import { Section } from "../enums/Section.ts";
 import { decrementValueIn, incrementValueIn } from "../utils/sectionIncrementer.ts";
 import { getSectionContentIn, resolveSectionInfo } from "../utils/sectionResolver.ts";
 import { updateSectionIn } from "../utils/sectionUpdater.ts";

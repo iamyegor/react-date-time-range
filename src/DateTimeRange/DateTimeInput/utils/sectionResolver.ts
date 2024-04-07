@@ -1,5 +1,5 @@
 import { sections } from "../../../globals.ts";
-import { Section, SectionGroup } from "../enums/sections.ts";
+import { Section, SectionGroup } from "../enums/Section.ts";
 import { SectionInfo } from "../../../types.tsx";
 
 export function resolveSectionInfo(section: Section): SectionInfo {

@@ -4,7 +4,7 @@ import { getDateTimePlaceholder } from "../../../globals.ts";
 import { Time } from "../../../types.tsx";
 import { parseStringToTime } from "../utils/timeParser.ts";
 import { parseStringToDate } from "../utils/dateParser.ts";
-import { SectionGroup } from "../enums/sections.ts";
+import { SectionGroup } from "../enums/Section.ts";
 import { getSectionContentIn } from "../utils/sectionResolver.ts";
 
 export default function useUpdateDateTimeBasedOnValue(

@@ -8,7 +8,7 @@ import {
     updateInputContents,
     updateInputContentsAndHighlight,
 } from "./utils/inputContentsUpdater.ts";
-import { Section } from "./enums/sections.ts";
+import { Section } from "./enums/Section.ts";
 import { resolveSectionBy, resolveSectionInfo } from "./utils/sectionResolver.ts";
 import { canNavigateWithArrows, navigateInputWithArrows } from "./features/navigateInput.ts";
 import {
