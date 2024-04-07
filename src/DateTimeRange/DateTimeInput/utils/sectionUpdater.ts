@@ -2,7 +2,7 @@ import { Section } from "../enums/Section.ts";
 import { SectionGroup } from "../enums/SectionGroup.ts";
 import { resolveSectionInfo, resolveStartEndOf } from "./sectionResolver.ts";
 
-export function updateSectionIn(
+export function replaceSectionValue(
     inputValue: string,
     section: Section,
     newSectionValue: string | number,
@@ -11,7 +11,7 @@ export function updateSectionIn(
     return inputValue.slice(0, start) + newSectionValue + inputValue.slice(end);
 }
 
-export function updateSectionGroupIn(
+export function replaceSectionGroupValue(
     inputValue: string,
     sectionGroup: SectionGroup,
     newSectionValue: string | number,

@@ -1,5 +1,5 @@
 import { Section } from "../enums/Section.ts";
-import { updateSectionIn } from "../utils/sectionUpdater.ts";
+import { replaceSectionValue } from "../utils/sectionUpdater.ts";
 import {
     getNextSectionInfo,
     getSectionContentIn,
@@ -36,7 +36,7 @@ export function adjustSectionWithNumbers(
             ? updateYearSectionHighlight(updatedContentOfSection)
             : update2DigitSectionHighlight(updatedContentOfSection, currentSection, isAmPm);
 
-    const newInputValue: string = updateSectionIn(value, currentSection, updatedContentOfSection)!;
+    const newInputValue: string = replaceSectionValue(value, currentSection, updatedContentOfSection)!;
     updateInputValueAndHighlight(newInputValue, sectionToHighlight);
 }
 

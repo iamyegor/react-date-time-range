@@ -1,5 +1,5 @@
 import { Section } from "../enums/Section.ts";
-import { updateSectionIn } from "../utils/sectionUpdater.ts";
+import { replaceSectionValue } from "../utils/sectionUpdater.ts";
 
 export function switchAmPm(
     pressedKey: string,
@@ -12,7 +12,7 @@ export function switchAmPm(
     }
 
     const newAmPmValue: string = pressedKey == "a" ? "AM" : "PM";
-    const newInputValue: string = updateSectionIn(value, currentSection, newAmPmValue);
+    const newInputValue: string = replaceSectionValue(value, currentSection, newAmPmValue);
     updateInputValue(newInputValue);
 }
 

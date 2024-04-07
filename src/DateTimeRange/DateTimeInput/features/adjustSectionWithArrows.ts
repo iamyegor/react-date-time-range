@@ -1,7 +1,7 @@
 import { Section } from "../enums/Section.ts";
 import { decrementValueIn, incrementValueIn } from "../utils/sectionIncrementer.ts";
 import { getSectionContentIn, resolveSectionInfo } from "../utils/sectionResolver.ts";
-import { updateSectionIn } from "../utils/sectionUpdater.ts";
+import { replaceSectionValue } from "../utils/sectionUpdater.ts";
 
 export function adjustSectionWithArrows(
     pressedKey: string,
@@ -27,7 +27,7 @@ export function adjustSectionWithArrows(
     }
 
     const newSectionWithPads: string = addPadsBasedOnSection(newSectionValue, section);
-    const newValue: string = updateSectionIn(value, section, newSectionWithPads)!;
+    const newValue: string = replaceSectionValue(value, section, newSectionWithPads)!;
     updateInputValue(newValue);
 }
 

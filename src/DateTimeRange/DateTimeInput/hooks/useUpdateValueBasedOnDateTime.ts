@@ -1,5 +1,5 @@
 import { Time } from "../../../types.tsx";
-import { updateSectionGroupIn } from "../utils/sectionUpdater.ts";
+import { replaceSectionGroupValue } from "../utils/sectionUpdater.ts";
 import { SectionGroup } from "../enums/SectionGroup.ts";
 import { parseDateToString } from "../utils/dateParser.ts";
 import { useEffect } from "react";
@@ -16,14 +16,14 @@ export default function useUpdateValueBasedOnDateTime(
         let newInputValue: string = inputValue;
 
         if (date) {
-            newInputValue = updateSectionGroupIn(
+            newInputValue = replaceSectionGroupValue(
                 newInputValue,
                 SectionGroup.Date,
                 parseDateToString(date),
             );
         }
         if (time) {
-            newInputValue = updateSectionGroupIn(
+            newInputValue = replaceSectionGroupValue(
                 newInputValue,
                 isAmPm ? SectionGroup.TimeAmPm : SectionGroup.Time24,
                 parseTimeToString(time, isAmPm),

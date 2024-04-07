@@ -1,5 +1,5 @@
 import { Section } from "../enums/Section.ts";
-import { updateSectionIn } from "../utils/sectionUpdater.ts";
+import { replaceSectionValue } from "../utils/sectionUpdater.ts";
 import { resolveSectionInfo } from "../utils/sectionResolver.ts";
 import { SectionInfo } from "../types/SectionInfo.ts";
 
@@ -17,6 +17,6 @@ export function eraseSection(
     }
 
     const { name }: { name: string } = resolveSectionInfo(section);
-    const newInputValue: string = updateSectionIn(value, section, name);
+    const newInputValue: string = replaceSectionValue(value, section, name);
     updateInputValue(newInputValue);
 }
