@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Time } from "../../../types.tsx";
 import { parseTimeToString } from "../utils/timeParser.ts";
 import { SectionGroup } from "../enums/sections.ts";
-import { updateSectionIn } from "../utils/sectionUpdater.ts";
+import { updateSectionGroupIn } from "../utils/sectionUpdater.ts";
 
 export default function useUpdateValueBasedOnTime(
     time: Time | null,
@@ -15,7 +15,7 @@ export default function useUpdateValueBasedOnTime(
             return;
         }
 
-        const newValue: string | null = updateSectionIn(
+        const newValue: string | null = updateSectionGroupIn(
             currentInputValue,
             isAmPm ? SectionGroup.TimeAmPm : SectionGroup.Time24,
             parseTimeToString(time, isAmPm),

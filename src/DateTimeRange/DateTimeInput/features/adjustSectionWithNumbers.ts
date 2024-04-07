@@ -9,7 +9,7 @@ import {
 import { SectionInfo } from "../../../types.tsx";
 
 export function canAdjustSectionWithNumbers(pressedKey: string, currentSection: Section): boolean {
-    return !isNaN(parseInt(pressedKey, 10)) || currentSection === Section.AmPm;
+    return !isNaN(parseInt(pressedKey, 10)) && currentSection !== Section.AmPm;
 }
 
 export function adjustSectionWithNumbers(
@@ -19,6 +19,10 @@ export function adjustSectionWithNumbers(
     updateInputValueAndHighlight: (newValue: string, sectionToHighlight: Section) => void,
     isAmPm: boolean,
 ): void {
+    if (!canAdjustSectionWithNumbers(pressedKey, currentSection)) {
+        return;
+    }
+
     const numKey: number = parseInt(pressedKey);
 
     const updatedContentOfSection: string =

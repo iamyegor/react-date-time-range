@@ -66,7 +66,7 @@ function formatToTimeObj(hours: number, minutes: number, ampm: string): Time | n
         }
         time = { hours, minutes, ampm: format as "AM" | "PM" | "24" };
     } else {
-        throw new Error("Invalid time suffix");
+        throw new Error(`Invalid time suffix: ${ampm}`);
     }
 
     if (isTimeValid(time)) {

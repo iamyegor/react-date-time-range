@@ -1,15 +1,20 @@
 import { Section, SectionGroup } from "../enums/sections.ts";
-import { isSectionGroup, resolveSectionStartEnd, resolveSectionInfo } from "./sectionResolver.ts";
+import { resolveSectionInfo, resolveSectionStartEnd } from "./sectionResolver.ts";
 
 export function updateSectionIn(
     inputValue: string,
-    sectionToUpdate: Section | SectionGroup,
+    section: Section,
     newSectionValue: string | number,
 ): string {
-    const section: { start: number; end: number } = isSectionGroup(sectionToUpdate)
-        ? resolveSectionStartEnd(sectionToUpdate as SectionGroup)
-        : resolveSectionInfo(sectionToUpdate as Section);
-
-    return inputValue.slice(0, section.start) + newSectionValue + inputValue.slice(section.end);
+    const { start, end }: { start: number; end: number } = resolveSectionInfo(section);
+    return inputValue.slice(0, start) + newSectionValue + inputValue.slice(end);
 }
 
+export function updateSectionGroupIn(
+    inputValue: string,
+    sectionGroup: SectionGroup,
+    newSectionValue: string | number,
+) {
+    const { start, end }: { start: number; end: number } = resolveSectionStartEnd(sectionGroup);
+    return inputValue.slice(0, start) + newSectionValue + inputValue.slice(end);
+}
