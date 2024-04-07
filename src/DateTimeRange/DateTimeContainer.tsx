@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../app/hooks.ts";
+import { useAppSelector } from "../redux/hooks.ts";
 import calendarIcon from "../assets/icons/calendar.svg";
 import {
     selectFirstDateTimeIsGreater,
@@ -7,11 +7,11 @@ import {
     selectMinDate,
     selectMinTimeIn24Hours,
     selectUseAMPM,
-} from "../features/dateTimeRangeSlice.ts";
+} from "../redux/dateTimeRangeSlice.ts";
 import { Time } from "../types.tsx";
 import { isTimeLess } from "../utils.ts";
 import DateTimeInput from "./DateTimeInput/DateTimeInput.tsx";
-import "./styles/DateTimeContainer.css";
+import "./styles/dateTimeContainer.css";
 import useUpdateDateTimeBasedOnValue from "./DateTimeInput/hooks/useUpdateDateTimeBasedOnValue.ts";
 import classNames from "classnames";
 import { DATE_TIME_24, DATE_TIME_AMPM } from "./DateTimeInput/constants/placeholders.ts";

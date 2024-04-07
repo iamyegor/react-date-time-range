@@ -9,9 +9,9 @@ import {
     startOfWeek,
 } from "date-fns";
 import { Provider } from "react-redux";
-import dateTimeRangeSlice from "../features/dateTimeRangeSlice";
+import dateTimeRangeSlice from "../redux/dateTimeRangeSlice";
 import convertTo2DigitString from "../utils";
-import DateTimeRange from "../DateTimeRange/DateTimeRange";
+import DateTimeRange from "../DateTimeRange/DateTimeRange/DateTimeRange.tsx";
 
 export function expectHourToBeDisabled(hour: number) {
     const hourOptions = screen.getAllByTestId("hour-option");

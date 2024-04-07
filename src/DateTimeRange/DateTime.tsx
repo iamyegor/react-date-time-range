@@ -1,6 +1,6 @@
-import Calendar from "../Calendar/Calendar";
-import TimePicker from "../TimePicker/TimePicker";
-import OKButton from "./OKButton";
+import Calendar from "./Calendar.tsx";
+import TimePicker from "./TimePicker/TimePicker.tsx";
+import OkButton from "./OkButton.tsx";
 
 export default function DateTime() {
     return (
@@ -15,7 +15,7 @@ export default function DateTime() {
                 <TimePicker />
             </div>
             <hr />
-            <OKButton>OK</OKButton>
+            <OkButton>OK</OkButton>
         </div>
     );
 }

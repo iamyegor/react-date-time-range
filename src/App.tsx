@@ -1,4 +1,4 @@
-import DateTimeRange from "./DateTimeRange/DateTimeRange";
+import DateTimeRange from "./DateTimeRange/DateTimeRange/DateTimeRange.tsx";
 import "./index.css";
 
 export default function App() {

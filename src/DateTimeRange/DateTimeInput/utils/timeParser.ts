@@ -13,11 +13,15 @@ export function parseStringToTime(timeString: string): Time | null {
     const { hoursStr, minutesStr, ampm } = extractTimeParts(timeString);
     const parsedTime: { hours: number; minutes: number } | null = parseTime(hoursStr, minutesStr);
 
-    if (!parsedTime) {
+    if (!parsedTime || !isAmPmValid(ampm)) {
         return null;
     }
 
     return formatToTimeObj(parsedTime.hours, parsedTime.minutes, ampm);
+}
+
+function isAmPmValid(ampm: string): boolean {
+    return ampm == "AM" || ampm == "PM" || ampm == "";
 }
 
 function extractTimeParts(timeString: string): {
