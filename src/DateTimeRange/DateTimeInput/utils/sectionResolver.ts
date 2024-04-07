@@ -38,6 +38,14 @@ export function resolveSection(section: SectionInfo): Section {
     throw new Error("Should never get here!");
 }
 
+export function resolveSectionBy(position: number): Section | null {
+    const sectionInfo: SectionInfo | undefined = sections.find(
+        (s) => position >= s.start && position <= s.end,
+    );
+
+    return sectionInfo ? resolveSection(sectionInfo) : null;
+}
+
 export function getNextSectionInfo(section: Section, isAmPm: boolean): SectionInfo | null {
     const sectionInfo: SectionInfo = resolveSectionInfo(section);
 

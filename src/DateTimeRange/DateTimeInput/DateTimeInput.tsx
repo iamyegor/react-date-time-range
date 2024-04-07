@@ -1,7 +1,6 @@
 import { KeyboardEvent, useRef } from "react";
 import { useAppSelector } from "../../app/hooks.ts";
 import { selectUseAMPM } from "../../features/dateTimeRangeSlice.ts";
-import { sections } from "../../globals.ts";
 import { SectionInfo, Time } from "types.tsx";
 import useUpdateValueBasedOnTime from "./hooks/useUpdateValueBasedOnTime.ts";
 import useUpdateValueBasedOnDate from "./hooks/useUpdateValueBasedOnDate.ts";
@@ -10,7 +9,7 @@ import {
     updateInputContentsAndHighlight,
 } from "./utils/inputContentsUpdater.ts";
 import { Section } from "./enums/sections.ts";
-import { resolveSection, resolveSectionInfo } from "./utils/sectionResolver.ts";
+import { resolveSectionBy, resolveSectionInfo } from "./utils/sectionResolver.ts";
 import { canNavigateWithArrows, navigateInputWithArrows } from "./features/navigateInput.ts";
 import {
     adjustSectionWithArrows,
@@ -71,18 +70,18 @@ export default function DateTimeInput({ date, time, value, updateValue }: DateTi
         updateValue(newValue);
     }
 
-    function updateInputValueAndHighlight(newValue: string, sectionToHighlight: Section) {
+    function updateInputValueAndHighlight(newValue: string, sectionToHighlight: Section): void {
         updateInputContentsAndHighlight(inputRef.current, newValue, sectionToHighlight);
         updateValue(newValue);
     }
 
     function highlightSection(): void {
-        const currentSection: Section | null = getSelectedSection();
-        if (!currentSection) {
+        const selectedSection: Section | null = getSelectedSection();
+        if (!selectedSection) {
             return;
         }
 
-        const sectionInfo: SectionInfo = resolveSectionInfo(currentSection);
+        const sectionInfo: SectionInfo = resolveSectionInfo(selectedSection);
         inputRef.current!.setSelectionRange(sectionInfo.start, sectionInfo.end);
     }
 
@@ -91,17 +90,8 @@ export default function DateTimeInput({ date, time, value, updateValue }: DateTi
             return null;
         }
 
-        const cursorPosition = inputRef.current.selectionStart || 0;
-
-        const sectionInfo: SectionInfo | undefined = sections.find(
-            (s) => cursorPosition >= s.start && cursorPosition <= s.end,
-        );
-
-        if (sectionInfo) {
-            return resolveSection(sectionInfo);
-        }
-
-        return null;
+        const cursorPosition: number = inputRef.current.selectionStart || 0;
+        return resolveSectionBy(cursorPosition);
     }
 
     return (
