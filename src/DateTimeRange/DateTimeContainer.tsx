@@ -24,7 +24,7 @@ interface DateTimeContainerProps {
     updateTime: (time: Time | null) => void;
     onFocus: () => void;
     isActive: boolean;
-    testid?: string;
+    testId?: string;
     isDateInvalid: boolean;
     updateIsDateInvalid: (date: boolean) => void;
     isTimeInvalid: boolean;
@@ -36,7 +36,7 @@ function DateTimeContainer({
     updateIsTimeInvalid,
     isDateInvalid,
     updateIsDateInvalid,
-    testid = "date-time-container",
+    testId = "date-time-container",
     text,
     date,
     updateDate,
@@ -159,7 +159,7 @@ function DateTimeContainer({
             className="relative group w-[15rem] h-10 cursor-text"
             onFocus={handleFocus}
             onBlur={handleBlur}
-            data-testid={testid}
+            data-testid={testId}
         >
             <div
                 className={getInputClasses()}

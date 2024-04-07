@@ -48,7 +48,7 @@ export default function FirstDateTimeContainer({ text }: { text: string }) {
             updateIsDateInvalid={updateIsDateInvalid}
             isTimeInvalid={isFirstTimeInvalid}
             updateIsTimeInvalid={updateIsTimeInvalid}
-            testid="first-date-time-container"
+            testId="first-date-time-container"
         />
     );
 }

@@ -48,7 +48,7 @@ export default function SecondDateTimeContainer({ text }: { text: string }) {
             updateIsDateInvalid={updateIsDateInvalid}
             isTimeInvalid={isSecondTimeInvalid}
             updateIsTimeInvalid={updateIsTimeInvalid}
-            testid="second-date-time-container"
+            testId="second-date-time-container"
         />
     );
 }
